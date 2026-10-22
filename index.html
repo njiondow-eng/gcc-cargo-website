@@ -481,10 +481,125 @@ function doAdminLogin() {
   }
 }
 
-// Apply language on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  setLang(LANG);
-});
+// ─── CONDITIONAL FORM LOGIC ─────────────────────────────────────────────────
+  function handleModeDepot(val) {
+    var lalamove   = document.getElementById('sectionLalamove');
+    var presentiel = document.getElementById('sectionPresentiel');
+    var modeEnvoi  = document.getElementById('fieldModeEnvoi');
+    if (!lalamove) return;
+    if (val === 'lalamove') {
+      lalamove.style.display   = '';
+      presentiel.style.display = 'none';
+      modeEnvoi.style.display  = '';
+      handleModePaiement(document.getElementById('modePaiement') ? document.getElementById('modePaiement').value : 'transfer');
+    } else if (val === 'presentiel') {
+      lalamove.style.display   = 'none';
+      presentiel.style.display = '';
+      modeEnvoi.style.display  = '';
+    } else {
+      lalamove.style.display   = 'none';
+      presentiel.style.display = 'none';
+    }
+  }
+
+  var PAIEMENT_INFO = {
+    transfer: '🏦 <strong>Bank Transfer</strong><br>Banque : BPI · BDO · Metrobank<br>Titulaire : GCC CARGO HANDLING INC<br>Envoyez la capture d'écran de votre virement.',
+    gcash:    '📱 <strong>GCash / Maya</strong><br>Numéro : <strong>+63 968 313 5356</strong><br>Nom : WILLIAM NJIONDO<br>Envoyez la capture d'écran de la transaction.',
+    momo:     '💚 <strong>MoMo Money</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d'écran du dépôt.',
+    om:       '🧡 <strong>Orange Money (OM)</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d'écran du dépôt.',
+  };
+
+  function handleModePaiement(val) {
+    var infoEl = document.getElementById('infoPaiement');
+    if (!infoEl) return;
+    infoEl.innerHTML = PAIEMENT_INFO[val] || '';
+  }
+
+  // ─── FORM SUBMIT: collect & store ────────────────────────────────────────
+  var _submissions = [];
+  try {
+    var _stored = JSON.parse(localStorage.getItem('gcc_submissions') || '[]');
+    if (Array.isArray(_stored)) _submissions = _stored;
+  } catch(ex){}
+
+  function handleShipSubmit(e) {
+    e.preventDefault();
+    var now = new Date();
+    var ref = 'GCC-' + now.getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
+    var depotSel = document.getElementById('modeDepot');
+    var paymentSel = document.getElementById('modePaiement');
+    var destSel = document.querySelectorAll('#envoyer select')[0];
+    var entry = {
+      ref:         ref,
+      date:        now.toLocaleDateString('fr-FR'),
+      expediteur:  (document.querySelector('input[placeholder="Ex : William Tabi"]') || {value:''}).value,
+      tel_exp:     (document.querySelector('input[placeholder="+63 968 313 5356"]') || {value:''}).value,
+      email_exp:   (document.querySelector('input[type="email"]') || {value:''}).value,
+      recepteur:   (document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
+      tel_rec:     (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
+      destination: destSel ? destSel.value : '',
+      modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
+      modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
+      modePaiement:paymentSel ? paymentSel.options[paymentSel.selectedIndex].text : '',
+      adresse:     (document.getElementById('adresseLalamove') || {value:''}).value,
+      dateColl:    (document.getElementById('dateLalamove') || {value:''}).value,
+      creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
+      statut:      'En attente',
+    };
+    _submissions.unshift(entry);
+    try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+    showToast('✅ Demande envoyée !', 'Votre référence : ' + ref + ' — Notre équipe vous contacte sous 24h.');
+    e.target.reset();
+    handleModeDepot('');
+    refreshAdminTable();
+  }
+
+  function refreshAdminTable() {
+    var tbody = document.getElementById('admin-submissions-tbody');
+    if (!tbody) return;
+    var kpiDem = document.getElementById('kpi-demandes');
+    var kpiAtt = document.getElementById('kpi-attente');
+    if (kpiDem) kpiDem.textContent = _submissions.length;
+    if (kpiAtt) kpiAtt.textContent = _submissions.filter(function(s){return s.statut==='En attente';}).length;
+    if (_submissions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>';
+      return;
+    }
+    var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
+    tbody.innerHTML = _submissions.map(function(s, i) {
+      var cls = statClasses[s.statut] || 'b-pending';
+      return '<tr>' +
+        '<td><strong style="font-family:monospace;">' + s.ref + '</strong><br><small style="color:#999;">' + s.date + '</small></td>' +
+        '<td>' + (s.expediteur||'—') + '<br><small style="color:#888;">' + (s.tel_exp||'') + '</small><br><small style="color:#aaa;">' + (s.email_exp||'') + '</small></td>' +
+        '<td>' + (s.recepteur||'—') + '<br><small style="color:#888;">' + (s.tel_rec||'') + '</small></td>' +
+        '<td>' + (s.destination||'—') + '</td>' +
+        '<td style="font-size:.8rem;">' + (s.modeDepot||'—') + '</td>' +
+        '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
+        '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('présentiel') ? '🏢 En bureau' : '—')) + '</td>' +
+        '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>' +
+        '<td style="white-space:nowrap;">' +
+        '<button class="notif-btn" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;" onclick="cycleStatut(' + i + ')">🔄 Statut</button>' +
+        '<button class="notif-btn" style="font-size:.72rem;background:var(--blue);display:block;width:100%;" onclick="sendEmailNotif('' + s.ref + '','' + (s.expediteur||'').replace(/'/g,'\\\'\') + '','' + (s.email_exp||'').replace(/'/g,'\\\'\') + '','' + s.statut + '','')">📧 Email</button>' +
+        '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function cycleStatut(i) {
+    var order = ['En attente','En transit','Arrivé','Livré'];
+    var cur = _submissions[i].statut;
+    _submissions[i].statut = order[(order.indexOf(cur)+1) % order.length];
+    try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+    refreshAdminTable();
+    showToast('📦 Statut mis à jour', _submissions[i].ref + ' → ' + _submissions[i].statut);
+  }
+
+  // Apply language + init on DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    setLang(LANG);
+    handleModePaiement('transfer');
+    refreshAdminTable();
+  });
 </script>
 </head>
 <body>
@@ -650,11 +765,94 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
       <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input type="tel" placeholder="+237 6XX XXX XXX" required></div>
-      <div class="fg"><label data-fr="Mode d'envoi" data-en="Shipping mode">Mode d'envoi</label>
-        <select>
+      <!-- MODE DE DEPOT (conditionnel) -->
+      <div class="fg full">
+        <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
+        <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
+          <option value="">— Choisir le mode de dépôt —</option>
+          <option value="presentiel">🏢 En présentiel (bureaux GCC Parañaque)</option>
+          <option value="lalamove">🛵 Livraison Lalamove (collecte à domicile)</option>
+        </select>
+      </div>
+
+      <!-- Mode d'expédition (Air/Sea) -->
+      <div class="fg" id="fieldModeEnvoi">
+        <label data-fr="Mode d'expédition" data-en="Shipping mode">Mode d'expédition</label>
+        <select id="selectModeEnvoi">
           <option>✈ Air Shipping</option>
           <option>🚢 Sea Shipping</option>
         </select>
+      </div>
+
+      <!-- ═══ SECTION LALAMOVE (masquée par défaut) ═══ -->
+      <div class="fg full" id="sectionLalamove" style="display:none;">
+        <div style="background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid var(--orange);border-radius:12px;padding:20px 22px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;">🛵 INFORMATIONS LALAMOVE</div>
+          <div class="form-grid" style="gap:14px;">
+            <div class="fg full">
+              <label>Adresse de collecte (Philippines)</label>
+              <input type="text" id="adresseLalamove" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
+            </div>
+            <div class="fg">
+              <label>Date souhaitée de collecte</label>
+              <input type="date" id="dateLalamove" style="font-size:.9rem;">
+            </div>
+            <div class="fg">
+              <label>Créneau horaire préféré</label>
+              <select id="creneauLalamove" style="font-size:.9rem;">
+                <option>Matin (8h – 12h)</option>
+                <option>Après-midi (12h – 17h)</option>
+                <option>Soir (17h – 20h)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PAIEMENT -->
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(232,119,34,.25);">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;">💳 MODE DE PAIEMENT</div>
+            <div class="form-grid" style="gap:14px;">
+              <div class="fg full">
+                <label>Méthode de paiement</label>
+                <select id="modePaiement" onchange="handleModePaiement(this.value)" style="font-size:.9rem;">
+                  <option value="transfer">🏦 Bank Transfer (BPI, BDO, Metrobank…)</option>
+                  <option value="gcash">📱 GCash / Maya</option>
+                  <option value="momo">💚 MoMo Money</option>
+                  <option value="om">🧡 Orange Money (OM)</option>
+                </select>
+              </div>
+              <!-- Infos bancaires dynamiques -->
+              <div class="fg full" id="infoPaiement" style="background:#f0f6ff;border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--navy);line-height:1.7;"></div>
+              <!-- Upload capture de paiement -->
+              <div class="fg full" id="sectionCapturePaiement">
+                <label>📸 Capture d'écran du paiement / dépôt</label>
+                <div class="upload-zone" onclick="document.getElementById('captureFile').click()" style="padding:16px;">
+                  <div class="uz-icon" style="font-size:1.6rem;">📸</div>
+                  <p>Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
+                  <div class="uz-name" id="capture-name"></div>
+                  <input id="captureFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'capture-name')">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ INFO PRESENTIEL ═══ -->
+      <div class="fg full" id="sectionPresentiel" style="display:none;">
+        <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--blue);border-radius:12px;padding:20px 22px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--blue);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;">
+            Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
+          </p>
+          <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
+            📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
+            🕗 Horaires : Lun–Sam, 9h00 – 18h00<br>
+            📞 +63 968 313 5356 / +63 915 385 7604
+          </div>
+          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;">
+            💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer
+          </p>
+        </div>
       </div>
       <div class="fg"><label data-fr="Type de contenu" data-en="Content type">Type de contenu</label>
         <select>
@@ -710,6 +908,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <h4>1. OBJET</h4>
             <p>Le présent protocole d'accord régit les droits et obligations entre <strong>GCC CARGO HANDLING INC</strong> (ci-après « GCC CARGO ») et le client expéditeur pour tout envoi de colis ou marchandise via les services de fret aérien ou maritime proposés par la société.</p>
+
+            <h4>4. COMMANDES VIA PLATEFORMES E-COMMERCE (Lazada, Shopee, etc.)</h4>
+            <p>Le client qui passe commande via Lazada, Shopee ou toute autre plateforme e-commerce est <strong>seul et entièrement responsable</strong> du contenu, de l'état, de la conformité et de la légalité du colis commandé. GCC CARGO HANDLING INC décline toute responsabilité quant au contenu de ces livraisons, à leur état à réception et à leur conformité réglementaire. Le client reconnaît qu'il s'expose à des poursuites judiciaires en cas de contenu illicite ou non conforme à la réglementation douanière des pays de destination.</p>
 
             <h4 data-fr="2. OBLIGATIONS DU CLIENT" data-en="2. CLIENT OBLIGATIONS">2. OBLIGATIONS DU CLIENT</h4>
             <p>Le client s'engage à : (a) fournir une déclaration exacte et complète du contenu et de la valeur des marchandises ; (b) présenter une pièce d'identité valide lors de l'enregistrement ; (c) s'assurer que les articles sont conformes aux législations du pays d'origine (Philippines) et du pays de destination ; (d) emballer correctement les colis pour éviter tout dommage pendant le transport.</p>
@@ -903,14 +1104,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Tabs -->
     <div class="admin-tabs">
-      <button class="adm-tab active" onclick="switchTab('colis',this)">📦 Colis</button>
-      <button class="adm-tab" onclick="switchTab('clients',this)">👥 Clients</button>
-      <button class="adm-tab" onclick="switchTab('parrainage',this)">💰 Parrainage</button>
-      <button class="adm-tab" onclick="switchTab('departs',this)">✈ Départs</button>
+      <button class="adm-tab active" onclick="showTab('demandes',this)">📬 Demandes clients</button>
+      <button class="adm-tab" onclick="showTab('colis',this)">📦 Colis en cours</button>
+      <button class="adm-tab" onclick="showTab('clients',this)">👥 Clients</button>
+      <button class="adm-tab" onclick="showTab('parrainage',this)">💰 Parrainage</button>
+      <button class="adm-tab" onclick="showTab('departs',this)">✈ Départs</button>
+    </div>
+
+    <!-- ═══ DEMANDES CLIENTS TAB ═══ -->
+    <div id="tab-demandes" class="adm-content" style="display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:0;">Demandes reçues via le formulaire</div>
+        <button class="notif-btn" style="background:var(--navy);" onclick="if(confirm('Effacer toutes les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();}">🗑 Vider</button>
+      </div>
+      <!-- KPIs demandes -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px;">
+        <div class="kpi" style="border-top-color:var(--blue);">
+          <div class="kpi-val" id="kpi-demandes">0</div>
+          <div class="kpi-lbl">Total demandes</div>
+        </div>
+        <div class="kpi" style="border-top-color:#e65100;">
+          <div class="kpi-val" id="kpi-attente">0</div>
+          <div class="kpi-lbl">En attente</div>
+        </div>
+      </div>
+      <div class="admin-table-wrap" style="overflow-x:auto;">
+        <table style="min-width:900px;">
+          <thead>
+            <tr>
+              <th>Réf / Date</th>
+              <th>Expéditeur</th>
+              <th>Récepteur</th>
+              <th>Destination</th>
+              <th>Mode dépôt</th>
+              <th>Paiement</th>
+              <th>Adresse / Créneau</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-submissions-tbody">
+            <tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- COLIS TAB -->
-    <div id="tab-colis">
+    <div id="tab-colis" class="adm-content" style="display:none;">
       <div style="margin-bottom:16px;">
         <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:12px;">Mettre à jour un colis</div>
         <div class="admin-update-form">
@@ -944,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- CLIENTS TAB -->
-    <div id="tab-clients" style="display:none;">
+    <div id="tab-clients" class="adm-content" style="display:none;">
       <div class="admin-table-wrap">
         <table>
           <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Colis envoyés</th><th>Code parrain</th><th>Inscription</th></tr></thead>
@@ -959,7 +1200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- PARRAINAGE TAB -->
-    <div id="tab-parrainage" style="display:none;">
+    <div id="tab-parrainage" class="adm-content" style="display:none;">
       <div class="admin-table-wrap">
         <table>
           <thead><tr><th>Parrain</th><th>Code</th><th>Filleuls</th><th>CA généré</th><th>Taux</th><th>Commission</th><th>Statut</th></tr></thead>
@@ -973,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- DEPARTS TAB -->
-    <div id="tab-departs" style="display:none;">
+    <div id="tab-departs" class="adm-content" style="display:none;">
       <div class="admin-update-form" style="margin-bottom:20px;">
         <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Publier une annonce de départ</div>
         <div class="au-row" style="grid-template-columns:1fr 1fr 1fr auto;">
@@ -1075,6 +1316,25 @@ function showTab(name,btn){
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
+function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
+  // Build a mailto link — opens the user's email client pre-filled
+  var subject = encodeURIComponent('[GCC CARGO] Mise à jour de votre colis — ' + ref);
+  var body = encodeURIComponent(
+    'Bonjour ' + (expediteurNom || 'Client') + ',\n\n' +
+    'Votre colis GCC CARGO ' + ref + ' a été mis à jour :\n' +
+    '▶ Nouveau statut : ' + statut + '\n' +
+    (note ? '📝 Note : ' + note + '\n' : '') +
+    '\nPour suivre votre colis en temps réel, rendez-vous sur notre site.\n\n' +
+    'Cordialement,\nL'équipe GCC CARGO HANDLING INC\n' +
+    'Tél : +63 968 313 5356 | +63 915 385 7604\n' +
+    'Trimar Building, Multinational Ave, Parañaque, Metro Manila'
+  );
+  var to = emailExp || '';
+  var mailtoLink = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  window.open(mailtoLink, '_blank');
+  showToast('📧 Email préparé', 'Votre application email s'ouvre avec le message pré-rempli pour ' + (expediteurNom || ref) + '.');
+}
+
 function doUpdate(){
   const t=document.getElementById('upTrack').value;
   if(!t){showToast('⚠️','Entrez un numéro de tracking.');return;}
