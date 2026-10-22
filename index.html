@@ -363,6 +363,129 @@ tr:last-child td{border:none;}
 .lang-btn.active{background:var(--orange);border-color:var(--orange);}
 .lang-btn:hover{background:var(--orange);border-color:var(--orange);}
 </style>
+<script>
+// ══════════════════════════════════════════════════
+// GCC CARGO — Core functions (loaded early)
+// ══════════════════════════════════════════════════
+
+// ─── Language system ───
+var LANG = (function() {
+  try { return localStorage.getItem('gcc_lang') || 'fr'; } catch(e) { return 'fr'; }
+})();
+
+function setLang(l) {
+  LANG = l;
+  try { localStorage.setItem('gcc_lang', l); } catch(e) {}
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-fr]').forEach(function(el) {
+    var val = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+    if (!val) return;
+    var tag = el.tagName.toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA') {
+      el.placeholder = val;
+    } else if (tag === 'OPTION') {
+      el.textContent = val;
+    } else {
+      el.innerHTML = val;
+    }
+  });
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.textContent.trim() === l.toUpperCase());
+  });
+}
+
+// ─── Secret admin shortcut: type "gcc" ───
+var _gccBuffer = '';
+document.addEventListener('keydown', function(e) {
+  var tag = (e.target ? e.target.tagName : '').toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.key && e.key.length === 1) {
+    _gccBuffer += e.key.toLowerCase();
+    if (_gccBuffer.length > 10) _gccBuffer = _gccBuffer.slice(-10);
+    if (_gccBuffer.includes('gcc')) {
+      _gccBuffer = '';
+      openAdminLogin();
+    }
+  }
+});
+
+// ─── Admin auth ───
+var _ADMIN_USER = 'gcc.admin';
+var _ADMIN_PASS = 'GCC@Cargo2026!';
+var _loginAttempts = 0;
+var _lockUntil = 0;
+try {
+  _loginAttempts = parseInt(sessionStorage.getItem('gcc_attempts') || '0') || 0;
+  _lockUntil = parseInt(sessionStorage.getItem('gcc_lock') || '0') || 0;
+} catch(e) {}
+
+function openAdminLogin() {
+  var now = Date.now();
+  if (now < _lockUntil) {
+    var mins = Math.ceil((_lockUntil - now) / 60000);
+    if (typeof showToast === 'function') showToast('🔒 Bloqué', 'Réessayez dans ' + mins + ' min.');
+    return;
+  }
+  var m = document.getElementById('adminModal');
+  if (m) {
+    m.classList.add('open');
+    setTimeout(function() {
+      var u = document.getElementById('adminUser');
+      if (u) u.focus();
+    }, 120);
+  }
+}
+
+function closeAdminLogin() {
+  var m = document.getElementById('adminModal');
+  if (m) m.classList.remove('open');
+  var err = document.getElementById('login-err');
+  if (err) err.style.display = 'none';
+}
+
+function doAdminLogin() {
+  var now = Date.now();
+  if (now < _lockUntil) return;
+  var uEl = document.getElementById('adminUser');
+  var pEl = document.getElementById('adminPass');
+  if (!uEl || !pEl) return;
+  var u = uEl.value.trim();
+  var p = pEl.value;
+  if (u === _ADMIN_USER && p === _ADMIN_PASS) {
+    _loginAttempts = 0;
+    try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
+    closeAdminLogin();
+    var panel = document.getElementById('adminPanel');
+    if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+    if (typeof showToast === 'function') showToast('✅ Connecté', 'Bienvenue Admin GCC CARGO.');
+  } else {
+    _loginAttempts++;
+    try { sessionStorage.setItem('gcc_attempts', String(_loginAttempts)); } catch(e) {}
+    if (_loginAttempts >= 5) {
+      _lockUntil = Date.now() + 15 * 60 * 1000;
+      try { sessionStorage.setItem('gcc_lock', String(_lockUntil)); } catch(e) {}
+      _loginAttempts = 0;
+      try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
+      if (typeof showToast === 'function') showToast('🔒 Bloqué', 'Trop de tentatives. 15 min de blocage.');
+    } else {
+      var rem = 5 - _loginAttempts;
+      if (typeof showToast === 'function') showToast('❌ Refusé', 'Identifiants incorrects. ' + rem + ' tentative(s).');
+    }
+    var err = document.getElementById('login-err');
+    if (err) {
+      err.textContent = _loginAttempts >= 5
+        ? 'Compte bloqué 15 min.'
+        : 'Identifiants incorrects. ' + (5 - _loginAttempts) + ' tentative(s) restante(s).';
+      err.style.display = 'block';
+    }
+  }
+}
+
+// Apply language on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  setLang(LANG);
+});
+</script>
 </head>
 <body>
 
@@ -945,118 +1068,9 @@ function showToast(title,msg){
   setTimeout(()=>t.classList.remove('show'),4000);
 }
 
-// ═══ LANGUAGE SYSTEM ═══
-let LANG = localStorage.getItem('gcc_lang') || 'fr';
 
-function setLang(l) {
-  LANG = l;
-  localStorage.setItem('gcc_lang', l);
-  document.documentElement.lang = l;
-  document.querySelectorAll('[data-fr]').forEach(function(el) {
-    var val = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
-    if (!val) return;
-    var tag = el.tagName.toUpperCase();
-    if (tag === 'INPUT' || tag === 'TEXTAREA') {
-      el.placeholder = val;
-    } else if (tag === 'OPTION') {
-      el.textContent = val;
-    } else {
-      el.innerHTML = val;
-    }
-  });
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.textContent.trim() === l.toUpperCase());
-  });
-}
-
-// Apply on load
-document.addEventListener('DOMContentLoaded', function() {
-  setLang(LANG);
-});
-
-// ═══ SECRET ADMIN — type "gcc" anywhere ═══
-var secretBuffer = '';
-document.addEventListener('keydown', function(e) {
-  var tag = (e.target.tagName || '').toUpperCase();
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-  if (e.key && e.key.length === 1) {
-    secretBuffer += e.key.toLowerCase();
-  }
-  if (secretBuffer.length > 10) secretBuffer = secretBuffer.slice(-10);
-  if (secretBuffer.includes('gcc')) {
-    secretBuffer = '';
-    openAdminLogin();
-  }
-});
-
-// ═══ ADMIN AUTH ═══
-var ADMIN_USER = 'gcc.admin';
-var ADMIN_PASS = 'GCC@Cargo2026!';
-var loginAttempts = parseInt(sessionStorage.getItem('gcc_attempts') || '0');
-var lockUntil = parseInt(sessionStorage.getItem('gcc_lock') || '0');
-
-function openAdminLogin() {
-  var now = Date.now();
-  if (now < lockUntil) {
-    var mins = Math.ceil((lockUntil - now) / 60000);
-    showToast('🔒 Bloqué', 'Réessayez dans ' + mins + ' minute(s).');
-    return;
-  }
-  document.getElementById('adminModal').classList.add('open');
-  setTimeout(function(){ var u=document.getElementById('adminUser'); if(u) u.focus(); }, 100);
-}
-
-function closeAdminLogin(){
-  document.getElementById('adminModal').classList.remove('open');
-  var errEl = document.getElementById('login-err');
-  if (errEl) errEl.style.display = 'none';
-}
-
-function doAdminLogin(){
-  var now = Date.now();
-  if (now < lockUntil) return;
-  var u = document.getElementById('adminUser').value.trim();
-  var p = document.getElementById('adminPass').value;
-  if (u === ADMIN_USER && p === ADMIN_PASS) {
-    loginAttempts = 0;
-    sessionStorage.setItem('gcc_attempts', '0');
-    closeAdminLogin();
-    document.getElementById('adminPanel').style.display='block';
-    document.body.style.overflow='hidden';
-    showToast('✅ Connecté', 'Bienvenue dans l'espace Admin GCC CARGO.');
-  } else {
-    loginAttempts++;
-    sessionStorage.setItem('gcc_attempts', loginAttempts);
-    var remaining = 5 - loginAttempts;
-    if (loginAttempts >= 5) {
-      var until = Date.now() + 15 * 60 * 1000;
-      lockUntil = until;
-      sessionStorage.setItem('gcc_lock', until);
-      loginAttempts = 0;
-      sessionStorage.setItem('gcc_attempts', '0');
-      showToast('🔒 Bloqué', 'Trop de tentatives. Compte bloqué 15 minutes.');
-    } else {
-      showToast('❌ Accès refusé', 'Identifiants incorrects. ' + remaining + ' tentative(s) restante(s).');
-    }
-    var errEl = document.getElementById('login-err');
-    if (errEl) {
-      errEl.textContent = loginAttempts >= 5
-        ? 'Compte bloqué 15 min.'
-        : 'Identifiants incorrects. ' + (5-loginAttempts) + ' tentative(s).';
-      errEl.style.display = 'block';
-    }
-  }
-}
-function doLogout(){
-  document.getElementById('adminPanel').style.display='none';
-  document.body.style.overflow='';
-  showToast('👋 Déconnecté','Session administrateur fermée.');
-}
-function switchTab(name,btn){
-  ['colis','clients','parrainage','departs'].forEach(t=>{
-    const el=document.getElementById('tab-'+t);
-    if(el)el.style.display='none';
-  });
+function showTab(name,btn){
+  document.querySelectorAll('.adm-content').forEach(t=>t.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
