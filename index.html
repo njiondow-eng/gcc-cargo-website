@@ -2,275 +2,303 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>GCC CARGO HANDLING INC — Safe Cargo, Global Delivery</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCC CARGO HANDLING INC — Livraison Philippines-Afrique</title>
+<meta name="description" content="GCC CARGO HANDLING INC — Expédition de colis des Philippines vers l'Afrique. Air & Sea Shipping.">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --navy:#0B1F3A;--sky:#1A72B8;--orange:#E87722;
-  --ice:#D6EDFB;--gold:#F5A623;--white:#FFFFFF;
-  --slate:#3D5166;--light:#F2F7FC;--green:#2E7D32;
-  color-scheme:light;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
+:root {
+  --orange:#E8660A;
+  --orange-dark:#c45208;
+  --blue:#0A3D7A;
+  --blue-light:#1a5cb8;
+  --white:#ffffff;
+  --gray-light:#f5f6fa;
+  --gray:#6b7280;
+  --shadow:0 4px 24px rgba(0,0,0,0.10);
+  --radius:12px;
 }
-*,*::before,*::after{box-sizing:inherit;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--navy);}
-img{max-width:100%;display:block;}
-a{text-decoration:none;}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;background:#fff;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--navy);border-bottom:3px solid var(--orange);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:70px;}
-.nav-logo{display:flex;align-items:center;gap:10px;}
-.nav-logo img{height:52px;width:52px;object-fit:contain;border-radius:50%;}
-.nav-logo-text .gcc{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.25rem;color:var(--orange);letter-spacing:.04em;}
-.nav-logo-text .sub{font-size:.7rem;font-weight:600;color:var(--ice);letter-spacing:.06em;}
-.nav-links{display:flex;gap:22px;list-style:none;}
-.nav-links a{color:var(--ice);font-weight:600;font-size:.85rem;letter-spacing:.03em;transition:color .2s;border-bottom:2px solid transparent;padding:4px 0;}
-.nav-links a:hover{color:var(--orange);border-bottom-color:var(--orange);}
-.nav-actions{display:flex;gap:10px;align-items:center;}
-.btn-admin{background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--ice);font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
-.btn-admin:hover{background:rgba(255,255,255,.1);}
-.btn-nav-cta{background:var(--orange);color:var(--white);font-weight:700;padding:10px 20px;border-radius:4px;font-size:.88rem;white-space:nowrap;transition:opacity .2s;}
-.btn-nav-cta:hover{opacity:.88;}
-.hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.6rem;cursor:pointer;}
+nav{
+  position:fixed;top:0;left:0;width:100%;z-index:1000;
+  background:rgba(10,61,122,0.97);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.2);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo img{width:44px;height:44px;border-radius:8px;}
+.nav-brand{color:#fff;font-size:1rem;font-weight:700;line-height:1.2;}
+.nav-brand span{color:var(--orange);display:block;font-size:.75rem;font-weight:400;}
+.nav-links{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.nav-links a{
+  color:rgba(255,255,255,0.88);text-decoration:none;font-size:.85rem;
+  padding:6px 12px;border-radius:6px;transition:.2s;
+}
+.nav-links a:hover{background:rgba(255,255,255,0.12);color:#fff;}
+.lang-switcher{display:flex;align-items:center;gap:4px;margin-left:8px;}
+.lang-btn{
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);
+  color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.8rem;
+  font-weight:600;transition:.2s;
+}
+.lang-btn.active{background:var(--orange);border-color:var(--orange);}
+.lang-btn:hover{background:var(--orange-dark);}
+.btn-admin{display:none !important;}
+.btn-admin.revealed{
+  display:flex !important;align-items:center;gap:6px;
+  background:rgba(255,100,0,0.2);border:1px solid var(--orange);
+  color:var(--orange);padding:5px 12px;border-radius:6px;cursor:pointer;
+  font-size:.8rem;font-weight:600;transition:.2s;
+}
+.btn-admin.revealed:hover{background:var(--orange);color:#fff;}
 
 /* HERO */
-.hero{margin-top:70px;background:linear-gradient(140deg,var(--navy) 0%,#163356 55%,#1A72B8 100%);padding:72px 8vw 80px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden;min-height:88vh;}
-.hero-badge{background:var(--orange);color:var(--white);font-weight:700;font-size:.75rem;letter-spacing:.1em;padding:5px 12px;border-radius:3px;display:inline-block;margin-bottom:18px;}
-.hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(2.6rem,5vw,4.2rem);color:var(--white);line-height:1.02;text-transform:uppercase;margin-bottom:20px;}
-.hero h1 .accent{color:var(--orange);}
-.hero-desc{color:var(--ice);font-size:1rem;line-height:1.75;max-width:460px;margin-bottom:32px;}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
-.btn-primary{background:var(--orange);color:var(--white);font-weight:700;padding:14px 28px;border-radius:5px;font-size:.95rem;transition:opacity .2s;display:inline-block;}
-.btn-primary:hover{opacity:.88;}
-.btn-outline{border:2px solid rgba(255,255,255,.5);color:var(--white);font-weight:700;padding:14px 28px;border-radius:5px;font-size:.95rem;transition:background .2s;display:inline-block;}
-.btn-outline:hover{background:rgba(255,255,255,.1);}
-.route-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;}
-.rpill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);padding:6px 14px;border-radius:50px;font-size:.8rem;font-weight:600;}
-.hero-right{display:flex;flex-direction:column;gap:16px;align-items:center;}
-.hero-logo-big img{width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,.4));}
+.hero{
+  min-height:100vh;background:linear-gradient(135deg,#0A3D7A 0%,#1a5cb8 50%,#0d4a8a 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:100px 24px 60px;text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle at 30% 30%,rgba(232,102,10,0.15) 0%,transparent 60%);
+}
+.hero-content{position:relative;z-index:1;max-width:800px;}
+.hero-logo{width:180px;height:180px;border-radius:20px;margin-bottom:28px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.3);border:3px solid rgba(255,255,255,0.2);}
+.hero h1{color:#fff;font-size:2.6rem;font-weight:800;line-height:1.2;margin-bottom:16px;
+  text-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.hero h1 span{color:var(--orange);}
+.hero p{color:rgba(255,255,255,0.85);font-size:1.15rem;margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{
+  background:var(--orange);color:#fff;padding:14px 32px;border-radius:10px;
+  font-size:1rem;font-weight:700;border:none;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;transition:.2s;
+  box-shadow:0 4px 16px rgba(232,102,10,0.4);
+}
+.btn-primary:hover{background:var(--orange-dark);transform:translateY(-2px);}
+.btn-secondary{
+  background:rgba(255,255,255,0.12);color:#fff;padding:14px 32px;border-radius:10px;
+  font-size:1rem;font-weight:600;border:2px solid rgba(255,255,255,0.4);cursor:pointer;
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:.2s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.2);}
 
-/* DEPARTURE BOARD */
-.departure-board{width:100%;max-width:380px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:14px;overflow:hidden;}
-.db-header{background:var(--orange);padding:14px 20px;display:flex;align-items:center;gap:10px;}
-.db-header-icon{font-size:1.4rem;}
-.db-header .dh1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--white);letter-spacing:.04em;}
-.db-header .dh2{font-size:.78rem;color:rgba(255,255,255,.85);}
-.db-body{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:100px;}
-.depart-item{background:rgba(255,255,255,.08);border-radius:8px;padding:12px;border-left:3px solid var(--gold);}
-.depart-item .di-route{font-weight:700;font-size:.88rem;color:var(--white);}
-.depart-item .di-date{font-size:.78rem;color:var(--gold);margin-top:3px;}
-.depart-item .di-status{font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px;}
-.db-empty{text-align:center;color:rgba(255,255,255,.35);font-size:.85rem;padding:20px;}
-.db-meta{padding:0 16px 14px;display:flex;justify-content:space-between;align-items:center;}
-.db-meta span{font-size:.75rem;color:rgba(255,255,255,.4);}
-.db-notify-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;}
-
-/* STATS */
-.stats-bar{background:var(--orange);display:grid;grid-template-columns:repeat(4,1fr);}
-.stat{padding:18px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.25);}
-.stat:last-child{border:none;}
-.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:var(--white);}
-.stat-lbl{font-size:.75rem;font-weight:700;color:rgba(255,255,255,.8);margin-top:2px;}
+/* DEPARTURES BANNER */
+.departures-section{
+  background:var(--orange);padding:20px 24px;text-align:center;
+}
+.departures-section h3{color:#fff;font-size:1rem;margin-bottom:10px;}
+.dep-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.dep-card{
+  background:rgba(255,255,255,0.2);border-radius:8px;padding:10px 20px;
+  color:#fff;font-size:.9rem;border:1px solid rgba(255,255,255,0.3);
+}
+.dep-card strong{display:block;font-size:1rem;}
 
 /* SECTIONS */
-.section-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:8px;}
-.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(1.8rem,3.5vw,2.8rem);color:var(--navy);margin-bottom:12px;line-height:1.1;}
-.section-sub{color:var(--slate);font-size:.97rem;line-height:1.7;max-width:560px;margin-bottom:44px;}
-
-/* DESTINATIONS */
-.destinations{padding:80px 8vw;background:var(--light);}
-.dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
-.dest-card{background:var(--white);border-radius:10px;padding:18px;border-bottom:3px solid var(--sky);box-shadow:0 2px 12px rgba(11,31,58,.06);transition:transform .2s;text-align:center;}
-.dest-card:hover{transform:translateY(-4px);}
-.dest-flag{font-size:2rem;margin-bottom:10px;}
-.dest-card h3{font-weight:700;font-size:.9rem;color:var(--navy);}
-.dest-card p{font-size:.78rem;color:var(--slate);margin-top:3px;}
+section{padding:80px 24px;}
+.section-header{text-align:center;margin-bottom:50px;}
+.section-header h2{font-size:2rem;font-weight:800;color:var(--blue);margin-bottom:12px;}
+.section-header p{color:var(--gray);font-size:1.05rem;max-width:600px;margin:0 auto;}
+.container{max-width:1100px;margin:0 auto;}
 
 /* SERVICES */
-.services{padding:80px 8vw;}
-.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-top:44px;}
-.svc-card{border-radius:10px;padding:26px 20px;background:var(--light);transition:background .2s;}
-.svc-card:hover{background:var(--ice);}
-.svc-icon{font-size:2rem;margin-bottom:12px;}
-.svc-card h3{font-weight:700;font-size:.95rem;color:var(--navy);margin-bottom:5px;}
-.svc-card p{font-size:.87rem;color:var(--slate);line-height:1.6;}
+.services-bg{background:var(--gray-light);}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;}
+.service-card{
+  background:#fff;border-radius:var(--radius);padding:32px 24px;text-align:center;
+  box-shadow:var(--shadow);transition:.3s;border-top:4px solid transparent;
+}
+.service-card:hover{transform:translateY(-6px);border-top-color:var(--orange);}
+.service-icon{font-size:2.8rem;margin-bottom:16px;}
+.service-card h3{font-size:1.15rem;font-weight:700;color:var(--blue);margin-bottom:10px;}
+.service-card p{color:var(--gray);font-size:.92rem;line-height:1.6;}
 
-/* SEND FORM */
-.send-section{padding:80px 8vw;background:var(--navy);}
-.send-section .section-eyebrow{color:var(--gold);}
-.send-section .section-title{color:var(--white);}
-.send-section .section-sub{color:var(--ice);}
-.form-wrap{max-width:740px;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.fg{display:flex;flex-direction:column;gap:5px;}
-.fg.full{grid-column:1/-1;}
-.fg label{font-size:.82rem;font-weight:600;color:var(--ice);}
-.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--white);padding:11px 14px;border-radius:6px;font-size:.92rem;font-family:'Barlow',sans-serif;transition:border-color .2s;}
-.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--orange);}
-.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.35);}
-.fg select option{background:#163356;}
-.upload-zone{border:2px dashed rgba(255,255,255,.25);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;}
-.upload-zone:hover{border-color:var(--orange);}
-.upload-zone .uz-icon{font-size:1.8rem;margin-bottom:6px;}
-.upload-zone p{color:rgba(255,255,255,.5);font-size:.82rem;line-height:1.5;}
-.uz-name{font-size:.75rem;color:var(--gold);margin-top:5px;display:none;}
-.protocol-consent{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:20px;}
-.proto-scroll{max-height:200px;overflow-y:auto;font-size:.8rem;color:rgba(214,237,251,.8);line-height:1.7;margin-bottom:14px;padding-right:6px;}
-.proto-scroll::-webkit-scrollbar{width:3px;}
-.proto-scroll::-webkit-scrollbar-thumb{background:var(--orange);border-radius:3px;}
-.proto-scroll h4{color:var(--gold);margin:12px 0 4px;font-size:.85rem;}
-.proto-warn{background:rgba(245,166,35,.1);border-left:3px solid var(--gold);padding:8px 12px;border-radius:3px;margin:8px 0;font-size:.8rem;}
-.consent-row{display:flex;gap:10px;align-items:flex-start;}
-.consent-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--orange);flex-shrink:0;margin-top:2px;cursor:pointer;}
-.consent-row label{font-size:.85rem;color:var(--ice);line-height:1.5;cursor:pointer;}
-.btn-submit{width:100%;background:var(--orange);color:var(--white);font-weight:700;font-size:1rem;padding:15px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;transition:opacity .2s;margin-top:14px;}
-.btn-submit:hover{opacity:.88;}
-.btn-submit:disabled{opacity:.35;cursor:not-allowed;}
-.form-status{margin-top:10px;padding:12px 16px;border-radius:6px;font-size:.88rem;font-weight:600;display:none;}
-.form-status.success{background:rgba(46,125,50,.2);border:1px solid rgba(46,125,50,.4);color:#81C784;}
-.form-status.error{background:rgba(198,40,40,.2);border:1px solid rgba(198,40,40,.4);color:#EF9A9A;}
+/* DESTINATIONS */
+.dest-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;
+}
+.dest-card{
+  background:#fff;border-radius:var(--radius);padding:24px 16px;text-align:center;
+  box-shadow:var(--shadow);border:2px solid transparent;transition:.3s;cursor:default;
+}
+.dest-card:hover{border-color:var(--orange);transform:translateY(-4px);}
+.dest-flag{font-size:2.8rem;margin-bottom:10px;}
+.dest-card h3{font-size:.95rem;font-weight:700;color:var(--blue);margin-bottom:4px;}
+.dest-card p{font-size:.82rem;color:var(--gray);}
 
 /* TRACKING */
-.tracking{padding:64px 8vw;background:var(--ice);}
-.track-inner{max-width:660px;margin:0 auto;text-align:center;}
-.track-form{display:flex;gap:10px;margin-top:28px;}
-.track-input{flex:1;padding:14px 18px;border:2px solid var(--sky);border-radius:6px;font-size:.95rem;font-family:'Barlow',sans-serif;background:var(--white);color:var(--navy);}
-.btn-track{background:var(--sky);color:var(--white);font-weight:700;padding:14px 24px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.95rem;white-space:nowrap;}
-.track-result{display:none;background:var(--white);border-radius:10px;padding:22px;margin-top:18px;text-align:left;border-left:4px solid var(--orange);}
-.track-step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
-.ts-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;}
-.ts-done{background:var(--sky);color:var(--white);}
-.ts-active{background:var(--orange);color:var(--white);}
-.ts-pending{background:#e8edf2;color:var(--slate);}
-.ts-text h4{font-weight:700;font-size:.9rem;color:var(--navy);}
-.ts-text p{font-size:.78rem;color:var(--slate);margin-top:1px;}
+.tracking-bg{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-light) 100%);}
+.tracking-box{
+  max-width:600px;margin:0 auto;background:rgba(255,255,255,0.1);
+  border-radius:16px;padding:40px;border:1px solid rgba(255,255,255,0.2);
+}
+.tracking-box h2{color:#fff;text-align:center;font-size:1.8rem;margin-bottom:8px;}
+.tracking-box p{color:rgba(255,255,255,0.8);text-align:center;margin-bottom:28px;}
+.track-input-row{display:flex;gap:10px;}
+.track-input-row input{
+  flex:1;padding:14px 18px;border-radius:10px;border:none;font-size:1rem;
+  background:rgba(255,255,255,0.95);color:#1a1a2e;
+}
+.track-input-row button{
+  background:var(--orange);color:#fff;border:none;padding:14px 24px;
+  border-radius:10px;cursor:pointer;font-weight:700;font-size:1rem;transition:.2s;
+}
+.track-input-row button:hover{background:var(--orange-dark);}
+#tracking-result{margin-top:24px;}
+.tracking-card{
+  background:rgba(255,255,255,0.95);border-radius:12px;padding:24px;color:#1a1a2e;
+}
+.track-status{
+  display:inline-block;padding:6px 16px;border-radius:20px;font-size:.85rem;
+  font-weight:700;margin-bottom:16px;
+}
+.stat-enregistre{background:#dbeafe;color:#1e40af;}
+.stat-transit{background:#fef3c7;color:#92400e;}
+.stat-arrive{background:#d1fae5;color:#065f46;}
+.stat-livre{background:#dcfce7;color:#14532d;}
+.track-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.track-item label{font-size:.75rem;color:#6b7280;display:block;margin-bottom:2px;}
+.track-item p{font-weight:600;font-size:.95rem;}
 
-/* REFERRAL */
-.referral{padding:80px 8vw;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
-.ref-visual{background:linear-gradient(135deg,var(--navy) 0%,#1A72B8 100%);border-radius:16px;padding:44px 32px;text-align:center;color:var(--white);}
-.ref-pct{font-family:'Barlow Condensed',sans-serif;font-size:5.5rem;font-weight:900;color:var(--orange);line-height:1;}
-.ref-visual p{font-size:1rem;opacity:.85;margin-top:6px;}
-.ref-example{background:rgba(255,255,255,.1);border-radius:8px;padding:14px;margin-top:20px;font-size:.83rem;line-height:1.7;}
-.ref-steps{display:flex;flex-direction:column;gap:16px;margin-top:28px;}
-.ref-step{display:flex;gap:12px;align-items:flex-start;}
-.rs-num{background:var(--orange);color:var(--white);font-weight:900;font-size:.82rem;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.rs-body h4{font-weight:700;color:var(--navy);margin-bottom:2px;font-size:.92rem;}
-.rs-body p{font-size:.85rem;color:var(--slate);line-height:1.5;}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:1/-1;}
+.form-group label{font-size:.88rem;font-weight:600;color:#374151;}
+.form-group input,.form-group select,.form-group textarea{
+  padding:12px 16px;border:1.5px solid #d1d5db;border-radius:8px;font-size:.95rem;
+  transition:.2s;background:#fff;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,102,10,0.1);
+}
+.form-group textarea{resize:vertical;min-height:90px;}
+.checkbox-group{display:flex;align-items:flex-start;gap:10px;}
+.checkbox-group input{width:18px;height:18px;margin-top:2px;cursor:pointer;accent-color:var(--orange);}
+.checkbox-group label{font-size:.88rem;color:#374151;cursor:pointer;line-height:1.5;}
+.submit-btn{
+  background:var(--orange);color:#fff;border:none;padding:15px 36px;
+  border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;
+  width:100%;transition:.2s;margin-top:8px;
+}
+.submit-btn:hover{background:var(--orange-dark);transform:translateY(-1px);}
 
 /* CONTACT */
-.contact{padding:80px 8vw;display:grid;grid-template-columns:1fr 1fr;gap:56px;}
-.ci-item{display:flex;gap:12px;margin-bottom:16px;}
-.ci-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px;}
-.ci-body h4{font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:1px;}
-.ci-body p,.ci-body a{font-size:.86rem;color:var(--slate);line-height:1.6;}
-.ci-body a:hover{color:var(--orange);}
-.social-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
-.s-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:6px;font-weight:700;font-size:.83rem;color:var(--white);transition:opacity .2s;}
-.s-btn:hover{opacity:.85;}
-.s-tiktok{background:#010101;}
-.s-insta{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
-.s-wa{background:#25D366;}
-.contact-form{background:var(--light);border-radius:12px;padding:30px;}
-.contact-form h3{font-weight:700;font-size:1.05rem;color:var(--navy);margin-bottom:18px;}
-.cf-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.cf-field label{font-size:.8rem;font-weight:600;color:var(--slate);}
-.cf-field input,.cf-field textarea{background:var(--white);border:1px solid #d0dbe6;color:var(--navy);padding:10px 13px;border-radius:6px;font-size:.88rem;font-family:'Barlow',sans-serif;}
-.btn-send{background:var(--navy);color:var(--white);font-weight:700;padding:12px;width:100%;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.92rem;transition:background .2s;}
-.btn-send:hover{background:var(--sky);}
+.contact-bg{background:var(--gray-light);}
+.contact-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:start;}
+.contact-info h3{font-size:1.3rem;font-weight:700;color:var(--blue);margin-bottom:20px;}
+.contact-item{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start;}
+.contact-icon{
+  width:44px;height:44px;background:var(--orange);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;
+}
+.contact-item h4{font-weight:700;color:#1a1a2e;margin-bottom:2px;font-size:.92rem;}
+.contact-item p{color:var(--gray);font-size:.88rem;line-height:1.5;}
 
 /* FOOTER */
-footer{background:var(--navy);color:var(--ice);padding:48px 8vw 24px;border-top:3px solid var(--orange);}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;}
-.footer-brand img{height:64px;width:64px;object-fit:contain;border-radius:50%;margin-bottom:12px;}
-.footer-brand p{font-size:.83rem;color:rgba(214,237,251,.6);line-height:1.65;max-width:230px;}
-.footer-col h4{font-weight:700;font-size:.8rem;color:var(--orange);letter-spacing:.08em;margin-bottom:12px;text-transform:uppercase;}
-.footer-col ul{list-style:none;}
-.footer-col li{margin-bottom:7px;}
-.footer-col a{color:rgba(214,237,251,.6);font-size:.83rem;transition:color .2s;}
-.footer-col a:hover{color:var(--white);}
-.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
-.footer-bottom p{font-size:.78rem;color:rgba(214,237,251,.4);}
+footer{
+  background:#0a1628;color:rgba(255,255,255,0.75);padding:48px 24px 24px;
+}
+.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;margin-bottom:32px;}
+.footer-col h4{color:#fff;font-weight:700;margin-bottom:16px;font-size:.95rem;}
+.footer-col p,.footer-col a{color:rgba(255,255,255,0.65);font-size:.85rem;line-height:1.8;text-decoration:none;display:block;}
+.footer-col a:hover{color:var(--orange);}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  font-size:.82rem;
+}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.footer-logo img{width:48px;height:48px;border-radius:8px;}
 
-/* ADMIN MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center;}
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);
+}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--white);border-radius:14px;padding:36px;width:90%;max-width:420px;position:relative;}
-.modal h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;color:var(--navy);margin-bottom:4px;}
-.modal .close-btn{position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--slate);}
-.m-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.m-field label{font-size:.8rem;font-weight:600;color:var(--slate);}
-.m-field input{background:var(--light);border:1px solid #d0dbe6;color:var(--navy);padding:11px 14px;border-radius:6px;font-size:.92rem;font-family:'Barlow',sans-serif;}
-.btn-login{width:100%;background:var(--navy);color:var(--white);font-weight:700;padding:13px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.95rem;margin-top:4px;}
-.btn-login:hover{background:var(--sky);}
+.modal-box{
+  background:#fff;border-radius:16px;padding:40px;max-width:420px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;
+}
+.modal-box h2{color:var(--blue);font-size:1.4rem;margin-bottom:6px;}
+.modal-box p{color:var(--gray);font-size:.9rem;margin-bottom:24px;}
+.modal-field{margin-bottom:16px;}
+.modal-field label{display:block;font-size:.85rem;font-weight:600;color:#374151;margin-bottom:6px;}
+.modal-field input{
+  width:100%;padding:12px 16px;border:1.5px solid #d1d5db;border-radius:8px;font-size:1rem;
+}
+.modal-field input:focus{outline:none;border-color:var(--orange);}
+.modal-btn{
+  width:100%;background:var(--orange);color:#fff;border:none;padding:13px;
+  border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s;
+}
+.modal-btn:hover{background:var(--orange-dark);}
+.modal-close{
+  position:absolute;top:16px;right:16px;background:none;border:none;
+  font-size:1.4rem;cursor:pointer;color:#6b7280;line-height:1;
+}
+.modal-error{
+  background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;
+  font-size:.85rem;margin-bottom:12px;display:none;
+}
 
 /* ADMIN PANEL */
-.admin-panel{display:none;position:fixed;inset:0;background:var(--light);z-index:400;overflow-y:auto;}
-.admin-topbar{background:var(--navy);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:10;}
-.admin-topbar .at-brand{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--white);}
-.admin-topbar .at-brand span{color:var(--orange);}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--ice);font-size:.8rem;font-weight:600;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;}
-.admin-body{padding:28px;}
-.admin-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.4rem;color:var(--navy);margin-bottom:18px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px;}
-.kpi{background:var(--white);border-radius:10px;padding:18px 20px;border-top:4px solid var(--orange);box-shadow:0 2px 10px rgba(11,31,58,.06);}
-.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;color:var(--navy);}
-.kpi-lbl{font-size:.78rem;color:var(--slate);font-weight:600;margin-top:1px;}
-.admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--white);border-radius:8px;padding:4px;width:fit-content;box-shadow:0 2px 8px rgba(11,31,58,.07);}
-.adm-tab{background:none;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.85rem;color:var(--slate);transition:background .2s,color .2s;}
-.adm-tab.active{background:var(--orange);color:var(--white);}
-.admin-table-wrap{background:var(--white);border-radius:10px;padding:18px;overflow-x:auto;box-shadow:0 2px 10px rgba(11,31,58,.05);}
-table{width:100%;border-collapse:collapse;font-size:.84rem;}
-th{text-align:left;padding:9px 12px;font-weight:700;color:var(--slate);border-bottom:2px solid var(--light);font-size:.77rem;text-transform:uppercase;letter-spacing:.05em;}
-td{padding:11px 12px;border-bottom:1px solid var(--light);color:var(--navy);}
-tr:last-child td{border:none;}
-.badge{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.72rem;font-weight:700;}
-.b-transit{background:#e3f2fd;color:var(--sky);}
-.b-arrived{background:#e8f5e9;color:var(--green);}
-.b-pending{background:#fff8e1;color:#e65100;}
-.b-delivered{background:#f3e5f5;color:#7b1fa2;}
-.notif-btn{background:var(--orange);color:var(--white);border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:.77rem;font-weight:700;font-family:'Barlow',sans-serif;}
-.admin-update-form{background:var(--white);border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(11,31,58,.05);margin-bottom:16px;}
-.au-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;}
-.au-field{display:flex;flex-direction:column;gap:4px;}
-.au-field label{font-size:.78rem;font-weight:600;color:var(--slate);}
-.au-field input,.au-field select{background:var(--light);border:1px solid #d0dbe6;color:var(--navy);padding:9px 12px;border-radius:6px;font-size:.85rem;font-family:'Barlow',sans-serif;}
-.btn-update{background:var(--navy);color:var(--white);font-weight:700;padding:9px 18px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.85rem;}
-.depart-form{background:var(--white);border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(11,31,58,.05);margin-bottom:16px;}
-
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:var(--white);padding:14px 20px;border-radius:10px;border-left:4px solid var(--orange);box-shadow:0 8px 28px rgba(11,31,58,.3);z-index:600;max-width:300px;transform:translateY(120%);transition:transform .35s ease;font-size:.88rem;line-height:1.5;}
-.toast.show{transform:translateY(0);}
-.toast strong{display:block;margin-bottom:3px;color:var(--orange);}
-
-/* LOADING */
-.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;margin-left:8px;vertical-align:middle;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* MOBILE */
-@media(max-width:860px){
-  .nav-links{display:none;}
-  .btn-admin{display:none;}
-  .hamburger{display:block;}
-  .hero{grid-template-columns:1fr;min-height:unset;padding:40px 5vw 60px;}
-  .hero-right{display:none;}
-  .stats-bar{grid-template-columns:repeat(2,1fr);}
-  .referral{grid-template-columns:1fr;}
-  .contact{grid-template-columns:1fr;}
-  .footer-grid{grid-template-columns:1fr 1fr;}
-  .form-grid{grid-template-columns:1fr;}
-  .track-form{flex-direction:column;}
-  .au-row{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+.admin-panel{
+  display:none;position:fixed;inset:0;background:#f0f4f8;z-index:8000;overflow-y:auto;padding:20px;
 }
-@media(max-width:480px){
-  .footer-grid{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:1fr;}
+.admin-panel.open{display:block;}
+.admin-header{
+  background:var(--blue);color:#fff;padding:16px 24px;border-radius:12px;
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;
+}
+.admin-header h2{font-size:1.2rem;}
+.admin-close-btn{
+  background:rgba(255,255,255,0.15);border:none;color:#fff;padding:8px 16px;
+  border-radius:8px;cursor:pointer;font-weight:600;
+}
+.admin-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.admin-tab{
+  padding:10px 20px;border-radius:8px;border:2px solid #d1d5db;background:#fff;
+  cursor:pointer;font-weight:600;font-size:.9rem;transition:.2s;
+}
+.admin-tab.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+.admin-content{background:#fff;border-radius:12px;padding:24px;box-shadow:var(--shadow);}
+.admin-content h3{font-size:1.1rem;font-weight:700;color:var(--blue);margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:#f8fafc;padding:10px 12px;text-align:left;border-bottom:2px solid #e5e7eb;font-weight:600;color:#374151;}
+td{padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#1a1a2e;}
+tr:hover td{background:#fafafa;}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:600;
+}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-yellow{background:#fef3c7;color:#92400e;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-orange{background:#ffedd5;color:#9a3412;}
+
+/* ALERTS */
+.alert{
+  padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:.92rem;display:none;
+}
+.alert.show{display:block;}
+.alert-success{background:#d1fae5;color:#065f46;border-left:4px solid #10b981;}
+.alert-error{background:#fee2e2;color:#991b1b;border-left:4px solid #ef4444;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero h1{font-size:1.8rem;}
+  .form-grid{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .track-grid{grid-template-columns:1fr;}
+  .nav-links a{font-size:.78rem;padding:5px 8px;}
+  .track-input-row{flex-direction:column;}
 }
 </style>
 </head>
@@ -278,727 +306,792 @@ tr:last-child td{border:none;}
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">
-    <img src="data:image/webp;base64,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" alt="GCC Cargo">
-    <div class="nav-logo-text">
-      <div class="gcc">GCC CARGO</div>
-      <div class="sub">HANDLING INC</div>
+  <a href="#" class="nav-logo">
+    <img src="data:image/webp;base64,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" alt="GCC CARGO">
+    <div class="nav-brand">
+      GCC CARGO
+      <span>Handling Inc.</span>
     </div>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#destinations">Destinations</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#envoyer">Envoyer</a></li>
-    <li><a href="#tracking">Tracking</a></li>
-    <li><a href="#parrainage">Parrainage</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <div class="nav-actions">
-    <button class="btn-admin" onclick="openAdminLogin()">🔐 Admin</button>
-    <a href="#envoyer" class="btn-nav-cta">Envoyer un colis</a>
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </a>
+  <div class="nav-links">
+    <a href="#services" data-fr="Services" data-en="Services">Services</a>
+    <a href="#destinations" data-fr="Destinations" data-en="Destinations">Destinations</a>
+    <a href="#tracking" data-fr="Suivi" data-en="Track">Suivi</a>
+    <a href="#expedier" data-fr="Expédier" data-en="Ship">Expédier</a>
+    <a href="#contact" data-fr="Contact" data-en="Contact">Contact</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="btn-admin" id="adminBtn" onclick="openAdminLogin()">⚙️ Admin</button>
   </div>
 </nav>
 
-<!-- Mobile menu -->
-<div id="mob-menu" style="display:none;position:fixed;top:70px;left:0;right:0;background:var(--navy);z-index:190;border-bottom:2px solid var(--orange);padding:12px 5vw;">
-  <ul style="list-style:none;">
-    <li><a href="#destinations" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Destinations</a></li>
-    <li><a href="#services" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Services</a></li>
-    <li><a href="#envoyer" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Envoyer un colis</a></li>
-    <li><a href="#tracking" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Tracking</a></li>
-    <li><a href="#parrainage" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Parrainage</a></li>
-    <li><a href="#contact" onclick="closeMenu()" style="display:block;padding:12px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Contact</a></li>
-    <li style="padding:12px 0;"><button onclick="openAdminLogin();closeMenu();" style="background:none;border:none;color:var(--gold);font-weight:700;font-family:'Barlow',sans-serif;font-size:1rem;cursor:pointer;">🔐 Espace Admin</button></li>
-  </ul>
-</div>
-
 <!-- HERO -->
-<section class="hero">
-  <div>
-    <span class="hero-badge">✈ CARGO INTERNATIONAL</span>
-    <h1>Safe Cargo<br><span class="accent">Strong Connections</span><br>Global Delivery</h1>
-    <p class="hero-desc">Votre partenaire de confiance pour l'envoi de colis entre les Philippines et l'Afrique. Transport aérien, maritime, sourcing et partenariat.</p>
+<section class="hero" id="home">
+  <div class="hero-content">
+    <img src="data:image/webp;base64,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" alt="GCC CARGO HANDLING INC" class="hero-logo">
+    <h1 data-fr="GCC CARGO <span>HANDLING INC</span>" data-en="GCC CARGO <span>HANDLING INC</span>">GCC CARGO <span>HANDLING INC</span></h1>
+    <p data-fr="Votre partenaire de confiance pour l'expédition de colis des Philippines vers l'Afrique. Air & Sea Shipping — Rapide, Sécurisé, Fiable."
+       data-en="Your trusted partner for shipping packages from the Philippines to Africa. Air & Sea Shipping — Fast, Secure, Reliable.">
+      Votre partenaire de confiance pour l'expédition de colis des Philippines vers l'Afrique. Air &amp; Sea Shipping — Rapide, Sécurisé, Fiable.
+    </p>
     <div class="hero-btns">
-      <a href="#envoyer" class="btn-primary">Envoyer un colis →</a>
-      <a href="#tracking" class="btn-outline">Suivre mon colis</a>
-    </div>
-    <div class="route-pills">
-      <span class="rpill">🇵🇭 Manila</span><span class="rpill">🇨🇲 Cameroun</span><span class="rpill">🇨🇬 Congo</span><span class="rpill">🇬🇦 Gabon</span><span class="rpill">🇨🇮 Côte d'Ivoire</span><span class="rpill">🇨🇫 RCA</span><span class="rpill">🇹🇬 Togo</span><span class="rpill">🇧🇫 Burkina</span><span class="rpill">🇬🇭 Ghana</span>
-    </div>
-  </div>
-  <div class="hero-right">
-    <div class="hero-logo-big"><img src="data:image/webp;base64,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" alt="GCC Cargo Logo"></div>
-    <div class="departure-board">
-      <div class="db-header">
-        <div class="db-header-icon">✈</div>
-        <div><div class="dh1">PROCHAINS DÉPARTS</div><div class="dh2">Annonces & Arrivées</div></div>
-      </div>
-      <div class="db-body" id="departures-list">
-        <div class="db-empty">Chargement...</div>
-      </div>
-      <div class="db-meta">
-        <span id="depart-count">—</span>
-        <button class="db-notify-btn" onclick="showToast('📩 Notification','Vous serez alerté dès le prochain départ !')">Me notifier</button>
-      </div>
+      <a href="#expedier" class="btn-primary" data-fr="📦 Envoyer un Colis" data-en="📦 Send a Package">📦 Envoyer un Colis</a>
+      <a href="#tracking" class="btn-secondary" data-fr="🔍 Suivre mon Colis" data-en="🔍 Track my Package">🔍 Suivre mon Colis</a>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stat"><div class="stat-num">8</div><div class="stat-lbl">Pays desservis</div></div>
-  <div class="stat"><div class="stat-num">Air+Sea</div><div class="stat-lbl">Transport</div></div>
-  <div class="stat"><div class="stat-num" id="stat-colis">—</div><div class="stat-lbl">Colis traités</div></div>
-  <div class="stat"><div class="stat-num">D2D</div><div class="stat-lbl">Door to Door</div></div>
+<!-- DEPARTURES BANNER -->
+<div class="departures-section">
+  <h3 data-fr="🗓️ Prochains Départs" data-en="🗓️ Upcoming Departures">🗓️ Prochains Départs</h3>
+  <div class="dep-grid" id="dep-grid">
+    <div class="dep-card"><strong data-fr="Chargement..." data-en="Loading...">Chargement...</strong></div>
+  </div>
 </div>
-
-<!-- DESTINATIONS -->
-<section class="destinations" id="destinations">
-  <div class="section-eyebrow">ZONES DE LIVRAISON</div>
-  <h2 class="section-title">Où nous livrons</h2>
-  <p class="section-sub">GCC CARGO HANDLING INC dessert 8 pays d'Afrique centrale et de l'Ouest depuis les Philippines via Manila.</p>
-  <div class="dest-grid">
-    <div class="dest-card"><div class="dest-flag">🇨🇲</div><h3>Cameroun</h3><p>Yaoundé & Douala</p></div>
-    <div class="dest-card"><div class="dest-flag">🇨🇬</div><h3>Congo Brazzaville</h3><p>Brazzaville</p></div>
-    <div class="dest-card"><div class="dest-flag">🇨🇩</div><h3>Congo Kinshasa</h3><p>Kinshasa (RDC)</p></div>
-    <div class="dest-card"><div class="dest-flag">🇬🇦</div><h3>Gabon</h3><p>Libreville</p></div>
-    <div class="dest-card"><div class="dest-flag">🇨🇮</div><h3>Côte d'Ivoire</h3><p>Abidjan</p></div>
-    <div class="dest-card"><div class="dest-flag">🇨🇫</div><h3>RCA</h3><p>Bangui</p></div>
-    <div class="dest-card"><div class="dest-flag">🇹🇬</div><h3>Togo</h3><p>Lomé</p></div>
-    <div class="dest-card"><div class="dest-flag">🇧🇫</div><h3>Burkina Faso</h3><p>Ouagadougou</p></div>
-    <div class="dest-card"><div class="dest-flag">🇬🇭</div><h3>Ghana</h3><p>Accra</p></div>
-  </div>
-</section>
 
 <!-- SERVICES -->
-<section class="services" id="services">
-  <div class="section-eyebrow">NOS SERVICES</div>
-  <h2 class="section-title">Ce que nous proposons</h2>
-  <p class="section-sub">Du fret aérien au sourcing de produits, GCC CARGO couvre l'ensemble de la chaîne logistique entre les Philippines et l'Afrique.</p>
-  <div class="services-grid">
-    <div class="svc-card"><div class="svc-icon">✈️</div><h3>Air Shipping</h3><p>Transport aérien rapide entre Manila et vos destinations africaines. Idéal pour les envois urgents.</p></div>
-    <div class="svc-card"><div class="svc-icon">🚢</div><h3>Sea Shipping</h3><p>Fret maritime économique pour les envois en grande quantité. Solution idéale pour les commerçants.</p></div>
-    <div class="svc-card"><div class="svc-icon">🔍</div><h3>Sourcing</h3><p>Nous localisons et achetons pour vous les produits aux Philippines ou en Asie.</p></div>
-    <div class="svc-card"><div class="svc-icon">🤝</div><h3>Partenariat</h3><p>Programme pour agents et revendeurs souhaitant intégrer notre réseau en Afrique.</p></div>
-    <div class="svc-card"><div class="svc-icon">📦</div><h3>Balikbayan Boxes</h3><p>Boîtes cadeaux pour la famille — vêtements, chaussures, produits alimentaires.</p></div>
-    <div class="svc-card"><div class="svc-icon">🚪</div><h3>Door to Door</h3><p>Collecte à domicile aux Philippines et livraison directe chez le destinataire en Afrique.</p></div>
-    <div class="svc-card"><div class="svc-icon">🛃</div><h3>Dédouanement</h3><p>Accompagnement dans les démarches douanières pour assurer la conformité de vos envois.</p></div>
-    <div class="svc-card"><div class="svc-icon">📊</div><h3>Tracking en ligne</h3><p>Suivez l'acheminement de votre colis en temps réel avec notifications SMS/email.</p></div>
+<section class="services-bg" id="services">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-fr="Nos Services" data-en="Our Services">Nos Services</h2>
+      <p data-fr="Des solutions d'expédition complètes pour tous vos besoins logistiques entre l'Asie et l'Afrique."
+         data-en="Complete shipping solutions for all your logistics needs between Asia and Africa.">
+        Des solutions d'expédition complètes pour tous vos besoins logistiques entre l'Asie et l'Afrique.
+      </p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">✈️</div>
+        <h3 data-fr="Air Shipping" data-en="Air Shipping">Air Shipping</h3>
+        <p data-fr="Livraison rapide par avion. Idéal pour les colis urgents et les petits volumes. Transit de 5 à 10 jours."
+           data-en="Fast air delivery. Ideal for urgent parcels and small volumes. 5 to 10 days transit.">
+           Livraison rapide par avion. Idéal pour les colis urgents et les petits volumes. Transit de 5 à 10 jours.
+        </p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🚢</div>
+        <h3 data-fr="Sea Shipping" data-en="Sea Shipping">Sea Shipping</h3>
+        <p data-fr="Transport maritime économique pour les grands volumes et conteneurs. Solution idéale pour les marchands."
+           data-en="Economical maritime transport for large volumes and containers. Ideal for merchants.">
+           Transport maritime économique pour les grands volumes et conteneurs. Solution idéale pour les marchands.
+        </p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔍</div>
+        <h3 data-fr="Sourcing" data-en="Sourcing">Sourcing</h3>
+        <p data-fr="Nous localisons et acquérons vos produits aux meilleures conditions depuis l'Asie."
+           data-en="We locate and acquire your products at the best conditions from Asia.">
+           Nous localisons et acquérons vos produits aux meilleures conditions depuis l'Asie.
+        </p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🤝</div>
+        <h3 data-fr="Partenariat" data-en="Partnership">Partenariat</h3>
+        <p data-fr="Programme de parrainage avec commissions attractives. Devenez agent GCC CARGO et générez des revenus."
+           data-en="Referral program with attractive commissions. Become a GCC CARGO agent and earn income.">
+           Programme de parrainage avec commissions attractives. Devenez agent GCC CARGO et générez des revenus.
+        </p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- SEND FORM -->
-<section class="send-section" id="envoyer">
-  <div class="section-eyebrow">EXPÉDITION</div>
-  <h2 class="section-title" style="color:var(--white);">Envoyer un colis</h2>
-  <p class="section-sub">Remplissez le formulaire, chargez votre pièce d'identité et les photos. Notre équipe vous rappelle sous 24h.</p>
-  <form class="form-wrap" id="shipForm" onsubmit="handleShipSubmit(event)">
-    <div class="form-grid">
-      <div class="fg"><label>Prénom & Nom (expéditeur) *</label><input type="text" id="f_nom" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label>Téléphone / WhatsApp *</label><input type="tel" id="f_tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label>Email expéditeur</label><input type="email" id="f_email" placeholder="votre@email.com"></div>
-      <div class="fg"><label>Destination *</label>
-        <select id="f_dest">
-          <option>🇨🇲 Yaoundé — Cameroun</option><option>🇨🇲 Douala — Cameroun</option>
-          <option>🇨🇬 Brazzaville — Congo</option><option>🇨🇩 Kinshasa — RDC</option>
-          <option>🇬🇦 Libreville — Gabon</option><option>🇨🇮 Abidjan — Côte d'Ivoire</option>
-          <option>🇨🇫 Bangui — RCA</option><option>🇹🇬 Lomé — Togo</option>
-          <option>🇧🇫 Ouagadougou — Burkina Faso</option><option>🇬🇭 Accra — Ghana</option>
-        </select>
-      </div>
-      <div class="fg"><label>Nom du récepteur *</label><input type="text" id="f_recep_nom" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label>Téléphone récepteur *</label><input type="tel" id="f_recep_tel" placeholder="+237 6XX XXX XXX" required></div>
-      <div class="fg"><label>Mode d'envoi</label>
-        <select id="f_mode"><option>✈ Air Shipping</option><option>🚢 Sea Shipping</option></select>
-      </div>
-      <div class="fg"><label>Type de contenu</label>
-        <select id="f_type">
-          <option>Marchandises générales</option><option>Électronique</option><option>Médicaments</option>
-          <option>Natural Hair</option><option>Produits alimentaires</option><option>Vêtements / Chaussures</option>
-          <option>Pièces détachées</option><option>Cosmétiques</option><option>Autre</option>
-        </select>
-      </div>
-      <div class="fg"><label>Poids estimé (KG)</label><input type="number" id="f_poids" placeholder="Ex : 10" min="1"></div>
-      <div class="fg"><label>Valeur déclarée (₱)</label><input type="number" id="f_valeur" placeholder="Ex : 5000" min="0"></div>
-      <div class="fg full"><label>Description du contenu</label><textarea id="f_desc" rows="3" placeholder="Décrivez précisément le contenu..."></textarea></div>
-      <div class="fg full"><label>Code de parrainage (optionnel)</label><input type="text" id="f_referral" placeholder="Ex : GCC-REF-0042"></div>
-
-      <div class="fg full">
-        <label>🪪 Pièce d'identité valide</label>
-        <div class="upload-zone" onclick="document.getElementById('idFile').click()">
-          <div class="uz-icon">🪪</div>
-          <p>Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
-          <div class="uz-name" id="id-name"></div>
-          <input id="idFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'id-name')">
-        </div>
-      </div>
-      <div class="fg full">
-        <label>📷 Photos du colis (1 à 5 photos)</label>
-        <div class="upload-zone" onclick="document.getElementById('colisFiles').click()">
-          <div class="uz-icon">📦</div>
-          <p>Photos claires de votre colis<br><small>JPG, PNG — max 10 MB — 5 fichiers max</small></p>
-          <div class="uz-name" id="colis-names"></div>
-          <input id="colisFiles" type="file" accept=".jpg,.jpeg,.png" multiple style="display:none" onchange="showFileNames(this,'colis-names')">
-        </div>
-      </div>
-
-      <div class="fg full">
-        <label>📄 Protocole d'accord — Lisez entièrement avant de cocher</label>
-        <div class="protocol-consent">
-          <div class="proto-scroll">
-            <div style="text-align:center;margin-bottom:12px;">
-              <img src="data:image/webp;base64,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" style="width:44px;height:44px;border-radius:50%;margin:0 auto 6px;" alt="GCC">
-              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;color:var(--gold);">GCC CARGO HANDLING INC</div>
-              <div style="font-size:.72rem;opacity:.6;">PROTOCOLE D'ACCORD — CONDITIONS GÉNÉRALES D'EXPÉDITION</div>
-            </div>
-            <h4>1. OBJET</h4>
-            <p>Le présent protocole régit les droits et obligations entre GCC CARGO HANDLING INC et le client expéditeur pour tout envoi via les services de fret aérien ou maritime proposés.</p>
-            <h4>2. OBLIGATIONS DU CLIENT</h4>
-            <p>Le client s'engage à fournir une déclaration exacte du contenu, présenter une pièce d'identité valide, s'assurer de la conformité des articles et emballer correctement ses colis.</p>
-            <h4>3. RESPONSABILITÉ DE GCC CARGO</h4>
-            <p>En cas de perte totale imputable à GCC CARGO, une indemnisation maximale de 80% de la valeur déclarée sera versée. GCC CARGO décline toute responsabilité en cas de force majeure.</p>
-            <h4>4. SAISIE DOUANIÈRE</h4>
-            <p>GCC CARGO n'est pas responsable de la confiscation douanière résultant d'une non-conformité. Les frais de dédouanement restent à la charge du client.</p>
-            <div class="proto-warn">⚠️ <strong>ARTICLES INTERDITS :</strong> drogues, armes, explosifs, contrefaçons, matières radioactives, animaux vivants, pornographie. Tout envoi illicite sera signalé aux autorités et entraînera des poursuites pénales.</div>
-            <h4>5. PAIEMENT</h4>
-            <p>Le paiement intégral est exigé avant l'enlèvement. Aucun remboursement après prise en charge, sauf faute prouvée de GCC CARGO.</p>
-            <h4>6. LITIGES</h4>
-            <p>Tout litige sera soumis aux tribunaux compétents de Metro Manila, Philippines, après tentative de résolution amiable sous 15 jours.</p>
-          </div>
-          <div class="consent-row">
-            <input type="checkbox" id="consentCheck" onchange="toggleSubmit()">
-            <label for="consentCheck">J'ai lu et j'accepte entièrement le Protocole d'Accord de GCC CARGO HANDLING INC. Je certifie que mon colis ne contient aucun article illicite.</label>
-          </div>
-        </div>
-      </div>
+<!-- DESTINATIONS -->
+<section id="destinations">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-fr="Nos Destinations" data-en="Our Destinations">Nos Destinations</h2>
+      <p data-fr="Nous livrons dans 11 pays africains — et d'autres destinations sur demande."
+         data-en="We deliver to 11 African countries — and other destinations on request.">
+         Nous livrons dans 11 pays africains — et d'autres destinations sur demande.
+      </p>
     </div>
-    <button type="submit" class="btn-submit" id="submitBtn" disabled>Soumettre ma demande d'expédition →</button>
-    <div class="form-status" id="formStatus"></div>
-  </form>
+    <div class="dest-grid">
+      <div class="dest-card"><div class="dest-flag">🇨🇲</div><h3 data-fr="Cameroun" data-en="Cameroon">Cameroun</h3><p>Yaoundé / Douala</p></div>
+      <div class="dest-card"><div class="dest-flag">🇨🇩</div><h3 data-fr="Congo RDC" data-en="Congo DRC">Congo RDC</h3><p>Kinshasa</p></div>
+      <div class="dest-card"><div class="dest-flag">🇨🇬</div><h3 data-fr="Congo Brazza" data-en="Congo Brazza">Congo Brazza</h3><p>Brazzaville</p></div>
+      <div class="dest-card"><div class="dest-flag">🇬🇦</div><h3>Gabon</h3><p>Libreville</p></div>
+      <div class="dest-card"><div class="dest-flag">🇨🇮</div><h3 data-fr="Côte d'Ivoire" data-en="Ivory Coast">Côte d'Ivoire</h3><p>Abidjan</p></div>
+      <div class="dest-card"><div class="dest-flag">🇨🇫</div><h3 data-fr="RCA" data-en="CAR">RCA</h3><p>Bangui</p></div>
+      <div class="dest-card"><div class="dest-flag">🇹🇬</div><h3>Togo</h3><p>Lomé</p></div>
+      <div class="dest-card"><div class="dest-flag">🇧🇫</div><h3 data-fr="Burkina Faso" data-en="Burkina Faso">Burkina Faso</h3><p>Ouagadougou</p></div>
+      <div class="dest-card"><div class="dest-flag">🇬🇭</div><h3>Ghana</h3><p>Accra</p></div>
+      <div class="dest-card"><div class="dest-flag">🇬🇶</div><h3 data-fr="Guinée Équatoriale" data-en="Equatorial Guinea">Guinée Équatoriale</h3><p>Malabo</p></div>
+      <div class="dest-card"><div class="dest-flag">🇧🇯</div><h3>Bénin</h3><p>Cotonou</p></div>
+    </div>
+  </div>
 </section>
 
 <!-- TRACKING -->
-<section class="tracking" id="tracking">
-  <div class="track-inner">
-    <div class="section-eyebrow" style="text-align:center;">SUIVI DE COLIS</div>
-    <h2 class="section-title" style="text-align:center;">Où est mon colis ?</h2>
-    <p style="color:var(--slate);text-align:center;">Entrez le numéro de tracking reçu par email ou SMS.</p>
-    <div class="track-form">
-      <input class="track-input" type="text" id="trackInput" placeholder="Ex : GCC-2026-00123">
-      <button class="btn-track" onclick="doTrack()">Suivre →</button>
-    </div>
-    <div class="track-result" id="trackResult">
-      <div style="font-weight:700;color:var(--navy);margin-bottom:14px;font-size:.95rem;">📦 Colis <span id="trackNum"></span></div>
-      <div id="trackSteps"></div>
+<section class="tracking-bg" id="tracking">
+  <div class="container">
+    <div class="tracking-box">
+      <h2 data-fr="🔍 Suivi de Colis" data-en="🔍 Package Tracking">🔍 Suivi de Colis</h2>
+      <p data-fr="Entrez votre numéro de suivi pour connaître l'état de votre colis."
+         data-en="Enter your tracking number to check your package status.">
+         Entrez votre numéro de suivi pour connaître l'état de votre colis.
+      </p>
+      <div class="track-input-row">
+        <input type="text" id="track-input" placeholder="GCC-2026-00001"
+               data-fr="Numéro de suivi (ex: GCC-2026-00001)"
+               data-en="Tracking number (ex: GCC-2026-00001)">
+        <button onclick="trackPackage()" data-fr="Chercher" data-en="Search">Chercher</button>
+      </div>
+      <div id="tracking-result"></div>
     </div>
   </div>
 </section>
 
-<!-- PARRAINAGE -->
-<section class="referral" id="parrainage">
-  <div class="ref-visual">
-    <div style="font-size:2.5rem;margin-bottom:10px;">💰</div>
-    <div class="ref-pct">3–10%</div>
-    <p>de commission sur chaque client référé</p>
-    <div class="ref-example">Exemple : 5 clients × 50 kg × 1 200 ₱<br><strong>Commission : jusqu'à 30 000 ₱ 🎉</strong></div>
-    <a href="#envoyer" class="btn-primary" style="margin-top:20px;display:inline-block;">Obtenir mon code →</a>
-  </div>
-  <div>
-    <div class="section-eyebrow">PROGRAMME DE PARRAINAGE</div>
-    <h2 class="section-title">Gagnez en partageant</h2>
-    <p class="section-sub">Partagez votre lien unique sur TikTok, Instagram ou WhatsApp. Chaque client référé vous rapporte une commission automatique.</p>
-    <div class="ref-steps">
-      <div class="ref-step"><div class="rs-num">1</div><div class="rs-body"><h4>Inscrivez-vous</h4><p>Un code de parrainage unique vous est attribué automatiquement.</p></div></div>
-      <div class="ref-step"><div class="rs-num">2</div><div class="rs-body"><h4>Partagez sur vos réseaux</h4><p>TikTok, Instagram, WhatsApp — chaque partage est une opportunité.</p></div></div>
-      <div class="ref-step"><div class="rs-num">3</div><div class="rs-body"><h4>Un ami envoie un colis</h4><p>Il utilise votre code — la commission est calculée automatiquement.</p></div></div>
-      <div class="ref-step"><div class="rs-num">4</div><div class="rs-body"><h4>Recevez votre paiement</h4><p>3% à 10% versés mensuellement via GCash ou virement bancaire.</p></div></div>
+<!-- SHIP FORM -->
+<section id="expedier">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-fr="📦 Expédier un Colis" data-en="📦 Ship a Package">📦 Expédier un Colis</h2>
+      <p data-fr="Remplissez ce formulaire pour enregistrer votre expédition. Notre équipe vous contactera sous 24h."
+         data-en="Fill this form to register your shipment. Our team will contact you within 24 hours.">
+         Remplissez ce formulaire pour enregistrer votre expédition. Notre équipe vous contactera sous 24h.
+      </p>
     </div>
+    <div id="form-alert" class="alert"></div>
+    <form id="shipping-form" onsubmit="submitShipping(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-fr="Nom expéditeur *" data-en="Sender name *">Nom expéditeur *</label>
+          <input type="text" id="exp-nom" required
+                 data-fr="Votre nom complet" data-en="Your full name" placeholder="Votre nom complet">
+        </div>
+        <div class="form-group">
+          <label data-fr="Téléphone expéditeur *" data-en="Sender phone *">Téléphone expéditeur *</label>
+          <input type="tel" id="exp-tel" required
+                 data-fr="+63 9XX XXX XXXX" data-en="+63 9XX XXX XXXX" placeholder="+63 9XX XXX XXXX">
+        </div>
+        <div class="form-group full">
+          <label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label>
+          <input type="email" id="exp-email"
+                 data-fr="votre@email.com" data-en="your@email.com" placeholder="votre@email.com">
+        </div>
+        <div class="form-group">
+          <label data-fr="Nom destinataire *" data-en="Recipient name *">Nom destinataire *</label>
+          <input type="text" id="rec-nom" required
+                 data-fr="Nom complet du destinataire" data-en="Recipient full name" placeholder="Nom complet du destinataire">
+        </div>
+        <div class="form-group">
+          <label data-fr="Téléphone destinataire *" data-en="Recipient phone *">Téléphone destinataire *</label>
+          <input type="tel" id="rec-tel" required
+                 data-fr="+237 6XX XXX XXX" data-en="+237 6XX XXX XXX" placeholder="+237 6XX XXX XXX">
+        </div>
+        <div class="form-group">
+          <label data-fr="Destination *" data-en="Destination *">Destination *</label>
+          <select id="destination" required>
+            <option value="" data-fr="— Choisir le pays —" data-en="— Select country —">— Choisir le pays —</option>
+            <option>🇨🇲 Yaoundé / Douala — Cameroun</option>
+            <option>🇨🇩 Kinshasa — Congo RDC</option>
+            <option>🇨🇬 Brazzaville — Congo Brazza</option>
+            <option>🇬🇦 Libreville — Gabon</option>
+            <option>🇨🇮 Abidjan — Côte d'Ivoire</option>
+            <option>🇨🇫 Bangui — RCA</option>
+            <option>🇹🇬 Lomé — Togo</option>
+            <option>🇧🇫 Ouagadougou — Burkina Faso</option>
+            <option>🇬🇭 Accra — Ghana</option>
+            <option>🇬🇶 Malabo — Guinée Équatoriale</option>
+            <option>🇧🇯 Cotonou — Bénin</option>
+            <option data-fr="🌍 Autre destination (nous contacter)" data-en="🌍 Other destination (contact us)">🌍 Autre destination</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-fr="Mode d'envoi *" data-en="Shipping mode *">Mode d'envoi *</label>
+          <select id="mode-envoi" required>
+            <option data-fr="✈ Air Shipping (5-10 jours)" data-en="✈ Air Shipping (5-10 days)">✈ Air Shipping (5-10 jours)</option>
+            <option data-fr="🚢 Sea Shipping (30-45 jours)" data-en="🚢 Sea Shipping (30-45 days)">🚢 Sea Shipping (30-45 jours)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-fr="Type de contenu *" data-en="Content type *">Type de contenu *</label>
+          <select id="type-contenu" required>
+            <option data-fr="Marchandises générales" data-en="General goods">Marchandises générales</option>
+            <option data-fr="Électronique" data-en="Electronics">Électronique</option>
+            <option data-fr="Vêtements / Textile" data-en="Clothing / Textile">Vêtements / Textile</option>
+            <option data-fr="Alimentation / Cosmétiques" data-en="Food / Cosmetics">Alimentation / Cosmétiques</option>
+            <option data-fr="Documents / Courrier" data-en="Documents / Mail">Documents / Courrier</option>
+            <option data-fr="Autre" data-en="Other">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-fr="Poids estimé (kg) *" data-en="Estimated weight (kg) *">Poids estimé (kg) *</label>
+          <input type="number" id="poids" min="0.1" step="0.1" required
+                 data-fr="Ex: 5.5" data-en="Ex: 5.5" placeholder="Ex: 5.5">
+        </div>
+        <div class="form-group">
+          <label data-fr="Valeur déclarée (PHP) *" data-en="Declared value (PHP) *">Valeur déclarée (PHP) *</label>
+          <input type="number" id="valeur" min="1" required
+                 data-fr="Ex: 5000" data-en="Ex: 5000" placeholder="Ex: 5000">
+        </div>
+        <div class="form-group">
+          <label data-fr="Code parrainage (optionnel)" data-en="Referral code (optional)">Code parrainage (optionnel)</label>
+          <input type="text" id="parrainage"
+                 data-fr="Code de votre parrain" data-en="Your referrer's code" placeholder="Code de votre parrain">
+        </div>
+        <div class="form-group full">
+          <label data-fr="Description du colis" data-en="Package description">Description du colis</label>
+          <textarea id="description"
+                    data-fr="Décrivez le contenu de votre colis..."
+                    data-en="Describe the contents of your package..."
+                    placeholder="Décrivez le contenu de votre colis..."></textarea>
+        </div>
+        <div class="form-group full">
+          <div class="checkbox-group">
+            <input type="checkbox" id="accord-check" required>
+            <label for="accord-check"
+                   data-fr="J'ai lu et j'accepte le Protocole d'Accord GCC CARGO, notamment les conditions d'expédition, la politique de remboursement et les responsabilités des parties."
+                   data-en="I have read and accept the GCC CARGO Protocol Agreement, including shipping conditions, refund policy and responsibilities of the parties.">
+              J'ai lu et j'accepte le Protocole d'Accord GCC CARGO, notamment les conditions d'expédition, la politique de remboursement et les responsabilités des parties.
+            </label>
+          </div>
+        </div>
+        <div class="form-group full">
+          <button type="submit" class="submit-btn"
+                  data-fr="📦 Enregistrer mon Expédition" data-en="📦 Register my Shipment">
+            📦 Enregistrer mon Expédition
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
 </section>
 
 <!-- CONTACT -->
-<section class="contact" id="contact">
-  <div>
-    <div class="section-eyebrow">NOUS TROUVER</div>
-    <h2 class="section-title">Contact & Bureaux</h2>
-    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4>Bureau Principal — Philippines</h4><p>F2V3+377 Trimar Building, Multinational Ave<br>Parañaque, 1709 Metro Manila, Philippines</p></div></div>
-    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4>Agence — Cameroun (GOCACO.SARL)</h4><p>Après commissariat 2ème, Maria Goretti<br>Yaoundé, Cameroun</p></div></div>
-    <div class="ci-item"><div class="ci-icon">📞</div><div class="ci-body"><h4>Téléphones</h4><p>🇵🇭 +63 968 313 5356 | +63 915 385 7604<br>🇨🇲 +237 6 53 62 22 70</p></div></div>
-    <div class="ci-item"><div class="ci-icon">✉️</div><div class="ci-body"><h4>Email</h4><a href="mailto:gomerjavan45@gmail.com">gomerjavan45@gmail.com</a></div></div>
-    <div class="social-row">
-      <a class="s-btn s-tiktok" href="#">♪ TikTok</a>
-      <a class="s-btn s-insta" href="#">📷 Instagram</a>
-      <a class="s-btn s-wa" href="https://wa.me/639683135356" target="_blank">💬 WhatsApp</a>
+<section class="contact-bg" id="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-fr="Contactez-nous" data-en="Contact Us">Contactez-nous</h2>
+      <p data-fr="Notre équipe est disponible pour répondre à toutes vos questions."
+         data-en="Our team is available to answer all your questions.">
+         Notre équipe est disponible pour répondre à toutes vos questions.
+      </p>
     </div>
-  </div>
-  <div class="contact-form">
-    <h3>Envoyer un message</h3>
-    <div class="cf-field"><label>Votre nom</label><input type="text" id="c_nom" placeholder="William Tabi"></div>
-    <div class="cf-field"><label>Email ou WhatsApp</label><input type="text" id="c_contact" placeholder="votre@email.com"></div>
-    <div class="cf-field"><label>Sujet</label><input type="text" id="c_sujet" placeholder="Renseignement tarif, partenariat..."></div>
-    <div class="cf-field"><label>Message</label><textarea id="c_msg" rows="4" placeholder="Votre message..."></textarea></div>
-    <button class="btn-send" onclick="sendContactMsg()">Envoyer le message →</button>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3 data-fr="Nos Coordonnées" data-en="Our Contact Details">Nos Coordonnées</h3>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <h4 data-fr="Siège — Philippines" data-en="HQ — Philippines">Siège — Philippines</h4>
+            <p>F2V3+377 Trimar Building<br>Multinational Ave, Parañaque<br>1709 Metro Manila</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🏢</div>
+          <div>
+            <h4 data-fr="Succursale — Cameroun" data-en="Branch — Cameroon">Succursale — Cameroun</h4>
+            <p>GOCACO.SARL<br>After commissariat 2ème Maria Goretti<br>Yaoundé, Cameroun</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4 data-fr="Téléphone" data-en="Phone">Téléphone</h4>
+            <p>+63 968 313 5356<br>+63 915 385 7604<br>+237 6 53 62 22 70</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <h4 data-fr="Email" data-en="Email">Email</h4>
+            <p>gomerjavan45@gmail.com</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div id="contact-alert" class="alert"></div>
+        <form onsubmit="submitContact(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label data-fr="Nom *" data-en="Name *">Nom *</label>
+              <input type="text" id="c-nom" required
+                     data-fr="Votre nom" data-en="Your name" placeholder="Votre nom">
+            </div>
+            <div class="form-group">
+              <label data-fr="Téléphone / Email *" data-en="Phone / Email *">Téléphone / Email *</label>
+              <input type="text" id="c-contact" required
+                     data-fr="Comment vous joindre?" data-en="How to reach you?" placeholder="Comment vous joindre?">
+            </div>
+            <div class="form-group full">
+              <label data-fr="Sujet *" data-en="Subject *">Sujet *</label>
+              <input type="text" id="c-sujet" required
+                     data-fr="Objet de votre message" data-en="Subject of your message" placeholder="Objet de votre message">
+            </div>
+            <div class="form-group full">
+              <label data-fr="Message *" data-en="Message *">Message *</label>
+              <textarea id="c-message" rows="5" required
+                        data-fr="Votre message..." data-en="Your message..." placeholder="Votre message..."></textarea>
+            </div>
+            <div class="form-group full">
+              <button type="submit" class="submit-btn"
+                      data-fr="📨 Envoyer le Message" data-en="📨 Send Message">
+                📨 Envoyer le Message
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <img src="data:image/webp;base64,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" alt="GCC Cargo">
-      <p>Safe Cargo · Strong Connections · Global Delivery.<br>Manila 🇵🇭 → Afrique 🌍 | Air & Sea | Sourcing | Partenariat</p>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-logo">
+          <img src="data:image/webp;base64,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" alt="GCC CARGO">
+          <div>
+            <strong style="color:#fff;display:block;">GCC CARGO HANDLING INC</strong>
+            <span style="font-size:.78rem;">Philippines → Afrique</span>
+          </div>
+        </div>
+        <p data-fr="Votre partenaire logistique de confiance depuis les Philippines vers toute l'Afrique."
+           data-en="Your trusted logistics partner from the Philippines to all of Africa.">
+           Votre partenaire logistique de confiance depuis les Philippines vers toute l'Afrique.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4 data-fr="Services" data-en="Services">Services</h4>
+        <a href="#services">✈ Air Shipping</a>
+        <a href="#services">🚢 Sea Shipping</a>
+        <a href="#services" data-fr="🔍 Sourcing" data-en="🔍 Sourcing">🔍 Sourcing</a>
+        <a href="#services" data-fr="🤝 Partenariat" data-en="🤝 Partnership">🤝 Partenariat</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-fr="Destinations" data-en="Destinations">Destinations</h4>
+        <a href="#destinations">🇨🇲 Cameroun</a>
+        <a href="#destinations">🇨🇩 Congo RDC</a>
+        <a href="#destinations">🇬🇦 Gabon</a>
+        <a href="#destinations">🇨🇮 Côte d'Ivoire</a>
+        <a href="#destinations">🇬🇶 Guinée Équatoriale</a>
+        <a href="#destinations">🇧🇯 Bénin</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-fr="Contact" data-en="Contact">Contact</h4>
+        <p>📍 Parañaque, Metro Manila</p>
+        <p>📞 +63 968 313 5356</p>
+        <p>📞 +237 6 53 62 22 70</p>
+        <p>✉️ gomerjavan45@gmail.com</p>
+      </div>
     </div>
-    <div class="footer-col"><h4>Services</h4><ul><li><a href="#services">Air Shipping</a></li><li><a href="#services">Sea Shipping</a></li><li><a href="#services">Sourcing</a></li><li><a href="#services">Partenariat</a></li><li><a href="#services">Door to Door</a></li></ul></div>
-    <div class="footer-col"><h4>Navigation</h4><ul><li><a href="#destinations">Destinations</a></li><li><a href="#envoyer">Envoyer un colis</a></li><li><a href="#tracking">Tracking</a></li><li><a href="#parrainage">Parrainage</a></li><li><a href="#contact">Contact</a></li></ul></div>
-    <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+639683135356">+63 968 313 5356</a></li><li><a href="tel:+639153857604">+63 915 385 7604</a></li><li><a href="tel:+237653622270">+237 6 53 62 22 70</a></li><li><a href="mailto:gomerjavan45@gmail.com">gomerjavan45@gmail.com</a></li><li><a href="#" onclick="openAdminLogin()">🔐 Espace Admin</a></li></ul></div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 GCC CARGO HANDLING INC — All rights reserved</p>
-    <p>Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines</p>
+    <div class="footer-bottom">
+      <span>© 2026 GCC CARGO HANDLING INC — <span data-fr="Tous droits réservés" data-en="All rights reserved">Tous droits réservés</span></span>
+      <span data-fr="Parañaque, Philippines 🇵🇭 → Afrique 🌍" data-en="Parañaque, Philippines 🇵🇭 → Africa 🌍">Parañaque, Philippines 🇵🇭 → Afrique 🌍</span>
+    </div>
   </div>
 </footer>
 
-<!-- ADMIN LOGIN -->
+<!-- ADMIN LOGIN MODAL -->
 <div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <button class="close-btn" onclick="closeAdminLogin()">✕</button>
-    <h2>Espace Admin</h2>
-    <p style="font-size:.85rem;color:var(--slate);margin-bottom:20px;">GCC CARGO HANDLING INC</p>
-    <div class="m-field"><label>Identifiant</label><input type="text" id="adminUser" placeholder="admin"></div>
-    <div class="m-field"><label>Mot de passe</label><input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
-    <button class="btn-login" onclick="doAdminLogin()">Se connecter →</button>
-    <p style="margin-top:12px;font-size:.75rem;color:var(--slate);">Démo : admin / gcc2026</p>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('adminModal')">✕</button>
+    <h2>⚙️ Admin GCC CARGO</h2>
+    <p data-fr="Accès réservé à l'équipe GCC CARGO" data-en="Access reserved for GCC CARGO team">Accès réservé à l'équipe GCC CARGO</p>
+    <div class="modal-error" id="login-error"></div>
+    <div class="modal-field">
+      <label data-fr="Nom d'utilisateur" data-en="Username">Nom d'utilisateur</label>
+      <input type="text" id="admin-user" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label data-fr="Mot de passe" data-en="Password">Mot de passe</label>
+      <input type="password" id="admin-pass" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="modal-btn" onclick="doLogin()" data-fr="🔐 Connexion" data-en="🔐 Login">🔐 Connexion</button>
   </div>
 </div>
 
 <!-- ADMIN PANEL -->
 <div class="admin-panel" id="adminPanel">
-  <div class="admin-topbar">
-    <div class="at-brand">GCC CARGO <span>ADMIN</span></div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <span style="font-size:.8rem;color:rgba(214,237,251,.6);">Admin GCC</span>
-      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
-    </div>
+  <div class="admin-header">
+    <h2>⚙️ GCC CARGO — <span data-fr="Interface Administration" data-en="Admin Interface">Interface Administration</span></h2>
+    <button class="admin-close-btn" onclick="closeAdmin()" data-fr="✕ Fermer" data-en="✕ Close">✕ Fermer</button>
   </div>
-  <div class="admin-body">
-    <div class="admin-section-title">Vue d'ensemble</div>
-    <div class="kpi-grid" id="admin-kpis">
-      <div class="kpi"><div class="kpi-val" id="kpi-total">—</div><div class="kpi-lbl">Total colis</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-transit">—</div><div class="kpi-lbl">En transit</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-arrived">—</div><div class="kpi-lbl">Arrivés</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-delivered">—</div><div class="kpi-lbl">Livrés</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-clients">—</div><div class="kpi-lbl">Clients</div></div>
-      <div class="kpi"><div class="kpi-val" id="kpi-departs">—</div><div class="kpi-lbl">Départs publiés</div></div>
-    </div>
-
-    <div class="admin-tabs">
-      <button class="adm-tab active" onclick="switchTab('colis',this)">📦 Colis</button>
-      <button class="adm-tab" onclick="switchTab('departs',this)">✈ Départs</button>
-      <button class="adm-tab" onclick="switchTab('clients',this)">👥 Clients</button>
-      <button class="adm-tab" onclick="switchTab('messages',this)">✉ Messages</button>
-    </div>
-
-    <!-- COLIS TAB -->
-    <div id="tab-colis">
-      <div class="admin-update-form">
-        <div style="font-weight:700;color:var(--navy);margin-bottom:12px;font-size:.95rem;">Mettre à jour le statut d'un colis</div>
-        <div class="au-row">
-          <div class="au-field"><label>N° de tracking</label><input type="text" id="upTrack" placeholder="GCC-2026-00XXX"></div>
-          <div class="au-field"><label>Nouveau statut</label>
-            <select id="upStatus">
-              <option>Enregistré</option><option>En transit</option>
-              <option>Arrivé à destination</option><option>Livré</option><option>Problème douanier</option>
-            </select>
-          </div>
-          <div class="au-field"><label>Remarque</label><input type="text" id="upNote" placeholder="Ex : Disponible à Yaoundé"></div>
-          <button class="btn-update" onclick="doUpdateColis()">Mettre à jour →</button>
-        </div>
-      </div>
-      <div class="admin-table-wrap" id="colis-table-wrap">
-        <p style="color:var(--slate);font-size:.88rem;">Chargement...</p>
-      </div>
-    </div>
-
-    <!-- DEPARTS TAB -->
-    <div id="tab-departs" style="display:none;">
-      <div class="depart-form">
-        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Publier une annonce de départ</div>
-        <div class="au-row" style="grid-template-columns:1fr 1fr 1fr auto;">
-          <div class="au-field"><label>Route</label>
-            <select id="dp-route">
-              <option>Manila → Yaoundé/Douala</option><option>Manila → Abidjan</option>
-              <option>Manila → Brazzaville</option><option>Manila → Libreville</option>
-              <option>Manila → Kinshasa</option><option>Manila → Lomé</option>
-            </select>
-          </div>
-          <div class="au-field"><label>Date de départ</label><input type="date" id="dp-date"></div>
-          <div class="au-field"><label>Statut</label>
-            <select id="dp-status"><option>Ouvert</option><option>Complet</option><option>Annulé</option></select>
-          </div>
-          <button class="btn-update" onclick="publishDepart()">Publier →</button>
-        </div>
-      </div>
-      <div class="admin-table-wrap" id="departs-table-wrap">
-        <p style="color:var(--slate);font-size:.88rem;">Chargement...</p>
-      </div>
-    </div>
-
-    <!-- CLIENTS TAB -->
-    <div id="tab-clients" style="display:none;">
-      <div class="admin-table-wrap" id="clients-table-wrap">
-        <p style="color:var(--slate);font-size:.88rem;">Chargement...</p>
-      </div>
-    </div>
-
-    <!-- MESSAGES TAB -->
-    <div id="tab-messages" style="display:none;">
-      <div class="admin-table-wrap" id="messages-table-wrap">
-        <p style="color:var(--slate);font-size:.88rem;">Chargement...</p>
-      </div>
-    </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="showAdminTab('colis')" data-fr="📦 Colis" data-en="📦 Packages">📦 Colis</button>
+    <button class="admin-tab" onclick="showAdminTab('messages')" data-fr="✉️ Messages" data-en="✉️ Messages">✉️ Messages</button>
+    <button class="admin-tab" onclick="showAdminTab('departures')" data-fr="🗓️ Départs" data-en="🗓️ Departures">🗓️ Départs</button>
+  </div>
+  <div class="admin-content" id="admin-content">
+    <p data-fr="Chargement..." data-en="Loading...">Chargement...</p>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"><strong id="toast-title"></strong><span id="toast-msg"></span></div>
-
 <script>
-// ═══════════════════════════════════════════════
-// SUPABASE INIT
-// ═══════════════════════════════════════════════
-const SUPA_URL = 'https://grtcebiusqczxloegpzs.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydGNlYml1c3Fjenhsb2VncHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzg3NzAsImV4cCI6MjEwNzYxNDc3MH0.2fwZzSyIfyHgNHi5NqYByWfA9Ecv9Mp9mi2JRqdjSgA';
+// ═══════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════
 const { createClient } = supabase;
-const db = createClient(SUPA_URL, SUPA_KEY);
+const sb = createClient(
+  'https://grtcebiusqczxloegpzs.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydGNlYml1c3Fjenhsb2VncHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzg3NzAsImV4cCI6MjEwNzYxNDc3MH0.2fwZzSyIfyHgNHi5NqYByWfA9Ecv9Mp9mi2JRqdjSgA'
+);
 
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
-function showToast(title, msg) {
-  document.getElementById('toast-title').textContent = title;
-  document.getElementById('toast-msg').textContent = msg;
-  const t = document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 4500);
-}
-function toggleMenu() {
-  const m = document.getElementById('mob-menu');
-  m.style.display = m.style.display === 'none' ? 'block' : 'none';
-}
-function closeMenu() { document.getElementById('mob-menu').style.display = 'none'; }
-function showFileName(inp, id) {
-  const el = document.getElementById(id);
-  el.textContent = '✓ ' + inp.files[0]?.name;
-  el.style.display = 'block';
-}
-function showFileNames(inp, id) {
-  const el = document.getElementById(id);
-  el.textContent = '✓ ' + [...inp.files].map(f => f.name).join(', ');
-  el.style.display = 'block';
-}
-function toggleSubmit() {
-  document.getElementById('submitBtn').disabled = !document.getElementById('consentCheck').checked;
-}
-function genTracking() {
-  const y = new Date().getFullYear();
-  const r = Math.floor(Math.random() * 90000) + 10000;
-  return `GCC-${y}-${r}`;
-}
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth',block:'start'}); }
+// ═══════════════════════════════════════
+// LANGUAGE SYSTEM
+// ═══════════════════════════════════════
+let LANG = localStorage.getItem('gcc_lang') || 'fr';
+
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem('gcc_lang', l);
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-fr]').forEach(el => {
+    const val = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+    if (!val) return;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.placeholder = val;
+    } else if (el.tagName === 'OPTION') {
+      el.textContent = val;
+    } else {
+      el.innerHTML = val;
+    }
   });
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === l.toUpperCase());
+  });
+  loadDepartures();
+}
+
+// Apply language on load
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(LANG);
 });
 
-// ═══════════════════════════════════════════════
-// LOAD DEPARTURES on hero board
-// ═══════════════════════════════════════════════
-async function loadDepartures() {
-  try {
-    const { data, error } = await db.from('departures')
-      .select('*').eq('statut','Ouvert').order('date_depart',{ascending:true}).limit(3);
-    const box = document.getElementById('departures-list');
-    const cnt = document.getElementById('depart-count');
-    if (error || !data || data.length === 0) {
-      box.innerHTML = '<div class="db-empty">Aucun départ annoncé pour le moment.<br>Inscrivez-vous pour être notifié.</div>';
-      cnt.textContent = 'Aucune annonce active';
-      return;
-    }
-    box.innerHTML = data.map(d => `
-      <div class="depart-item">
-        <div class="di-route">✈ ${d.route}</div>
-        <div class="di-date">📅 ${new Date(d.date_depart).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
-        <div class="di-status">Statut : ${d.statut}</div>
-      </div>`).join('');
-    cnt.textContent = `${data.length} départ${data.length>1?'s':''} programmé${data.length>1?'s':''}`;
-  } catch(e) { console.log('departures load error', e); }
-}
-
-// ═══════════════════════════════════════════════
-// LOAD STATS
-// ═══════════════════════════════════════════════
-async function loadStats() {
-  try {
-    const { count } = await db.from('colis').select('*', {count:'exact',head:true});
-    if (count !== null) document.getElementById('stat-colis').textContent = count + '+';
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════
-// SHIP FORM SUBMIT → SUPABASE
-// ═══════════════════════════════════════════════
-async function handleShipSubmit(e) {
-  e.preventDefault();
-  if (!document.getElementById('consentCheck').checked) return;
-  const btn = document.getElementById('submitBtn');
-  const status = document.getElementById('formStatus');
-  btn.disabled = true;
-  btn.innerHTML = 'Envoi en cours...<span class="loading-spinner"></span>';
-  const tracking = genTracking();
-  const payload = {
-    tracking_number: tracking,
-    expediteur_nom: document.getElementById('f_nom').value,
-    expediteur_tel: document.getElementById('f_tel').value,
-    expediteur_email: document.getElementById('f_email').value,
-    destination: document.getElementById('f_dest').value,
-    recepteur_nom: document.getElementById('f_recep_nom').value,
-    recepteur_tel: document.getElementById('f_recep_tel').value,
-    mode_envoi: document.getElementById('f_mode').value,
-    type_contenu: document.getElementById('f_type').value,
-    poids: parseFloat(document.getElementById('f_poids').value) || null,
-    valeur_declaree: parseFloat(document.getElementById('f_valeur').value) || null,
-    description: document.getElementById('f_desc').value,
-    code_parrainage: document.getElementById('f_referral').value,
-    statut: 'Enregistré'
-  };
-  try {
-    const { error } = await db.from('colis').insert([payload]);
-    if (error) throw error;
-    status.style.display = 'block';
-    status.className = 'form-status success';
-    status.innerHTML = `✅ Demande soumise avec succès !<br>Votre numéro de tracking : <strong>${tracking}</strong><br>Notre équipe vous contacte sous 24h.`;
-    e.target.reset();
-    document.getElementById('consentCheck').checked = false;
-    document.getElementById('id-name').style.display = 'none';
-    document.getElementById('colis-names').style.display = 'none';
-    showToast('✅ Colis enregistré !', `Tracking : ${tracking}`);
-    loadStats();
-  } catch(err) {
-    status.style.display = 'block';
-    status.className = 'form-status error';
-    status.textContent = '❌ Erreur : ' + (err.message || 'Veuillez réessayer.');
+// ═══════════════════════════════════════
+// SECRET ADMIN SHORTCUT — type "gcc"
+// ═══════════════════════════════════════
+let secretBuffer = '';
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  secretBuffer += e.key.toLowerCase();
+  if (secretBuffer.length > 10) secretBuffer = secretBuffer.slice(-10);
+  if (secretBuffer.includes('gcc')) {
+    secretBuffer = '';
+    openAdminLogin();
   }
-  btn.disabled = false;
-  btn.textContent = 'Soumettre ma demande d'expédition →';
-  toggleSubmit();
+});
+
+// ═══════════════════════════════════════
+// ADMIN AUTH
+// ═══════════════════════════════════════
+const ADMIN_USER = 'gcc.admin';
+const ADMIN_PASS = 'GCC@Cargo2026!';
+let loginAttempts = parseInt(sessionStorage.getItem('gcc_attempts') || '0');
+let lockUntil = parseInt(sessionStorage.getItem('gcc_lock') || '0');
+
+function openAdminLogin() {
+  const now = Date.now();
+  if (now < lockUntil) {
+    const mins = Math.ceil((lockUntil - now) / 60000);
+    alert(LANG === 'fr'
+      ? `Compte bloqué. Réessayez dans ${mins} minute(s).`
+      : `Account locked. Try again in ${mins} minute(s).`);
+    return;
+  }
+  document.getElementById('adminModal').classList.add('open');
+  setTimeout(() => document.getElementById('admin-user').focus(), 100);
 }
 
-// ═══════════════════════════════════════════════
-// TRACKING → SUPABASE
-// ═══════════════════════════════════════════════
-const STATUTS = ['Enregistré','En transit','Arrivé à destination','Livré'];
-async function doTrack() {
-  const v = document.getElementById('trackInput').value.trim();
-  if (!v) { showToast('⚠️','Entrez un numéro de tracking.'); return; }
-  const btn = document.querySelector('.btn-track');
-  btn.textContent = '...'; btn.disabled = true;
-  try {
-    const { data, error } = await db.from('colis').select('*').eq('tracking_number', v).single();
-    const res = document.getElementById('trackResult');
-    const num = document.getElementById('trackNum');
-    const steps = document.getElementById('trackSteps');
-    if (error || !data) {
-      res.style.display = 'block';
-      num.textContent = v;
-      steps.innerHTML = '<p style="color:var(--slate);font-size:.88rem;">Aucun colis trouvé avec ce numéro. Vérifiez le numéro et réessayez.</p>';
+function doLogin() {
+  const now = Date.now();
+  if (now < lockUntil) return;
+  const u = document.getElementById('admin-user').value.trim();
+  const p = document.getElementById('admin-pass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    loginAttempts = 0;
+    sessionStorage.setItem('gcc_attempts', '0');
+    closeModal('adminModal');
+    openAdminPanel();
+  } else {
+    loginAttempts++;
+    sessionStorage.setItem('gcc_attempts', loginAttempts);
+    if (loginAttempts >= 5) {
+      const until = Date.now() + 15 * 60 * 1000;
+      lockUntil = until;
+      sessionStorage.setItem('gcc_lock', until);
+      loginAttempts = 0;
+      sessionStorage.setItem('gcc_attempts', '0');
+      const err = document.getElementById('login-error');
+      err.textContent = LANG === 'fr'
+        ? 'Trop de tentatives. Compte bloqué 15 minutes.'
+        : 'Too many attempts. Account locked for 15 minutes.';
+      err.style.display = 'block';
     } else {
-      const curIdx = STATUTS.indexOf(data.statut);
-      res.style.display = 'block';
-      num.textContent = v;
-      steps.innerHTML = STATUTS.map((s, i) => {
-        const cls = i < curIdx ? 'ts-done' : i === curIdx ? 'ts-active' : 'ts-pending';
-        const icon = i < curIdx ? '✓' : i === curIdx ? '!' : '○';
-        const col = i === curIdx ? 'color:var(--orange);' : '';
-        return `<div class="track-step">
-          <div class="ts-dot ${cls}">${icon}</div>
-          <div class="ts-text"><h4 style="${col}">${s}</h4>
-          <p>${i === curIdx ? (data.notes || 'Statut actuel') : (i < curIdx ? 'Complété' : 'En attente')}</p></div>
-        </div>`;
-      }).join('');
-      if (data.statut === 'Arrivé à destination') {
-        showToast('📩 Notification', `Colis disponible à ${data.destination} — destinataire notifié.`);
-      }
+      const remaining = 5 - loginAttempts;
+      const err = document.getElementById('login-error');
+      err.textContent = LANG === 'fr'
+        ? `Identifiants incorrects. ${remaining} tentative(s) restante(s).`
+        : `Incorrect credentials. ${remaining} attempt(s) remaining.`;
+      err.style.display = 'block';
     }
-    res.scrollIntoView({behavior:'smooth',block:'nearest'});
-  } catch(err) { showToast('❌ Erreur', err.message); }
-  btn.textContent = 'Suivre →'; btn.disabled = false;
+  }
 }
 
-// ═══════════════════════════════════════════════
-// CONTACT MESSAGE → SUPABASE
-// ═══════════════════════════════════════════════
-async function sendContactMsg() {
-  const nom = document.getElementById('c_nom').value;
-  const contact = document.getElementById('c_contact').value;
-  const sujet = document.getElementById('c_sujet').value;
-  const msg = document.getElementById('c_msg').value;
-  if (!nom || !msg) { showToast('⚠️','Remplissez au moins votre nom et message.'); return; }
-  try {
-    await db.from('messages').insert([{nom, contact, sujet, message:msg}]);
-    showToast('✉️ Message envoyé','Notre équipe vous répondra sous 24h !');
-    document.getElementById('c_nom').value='';
-    document.getElementById('c_contact').value='';
-    document.getElementById('c_sujet').value='';
-    document.getElementById('c_msg').value='';
-  } catch(e) { showToast('❌','Erreur envoi message.'); }
+function openAdminPanel() {
+  document.getElementById('adminPanel').classList.add('open');
+  loadAdminColis();
 }
 
-// ═══════════════════════════════════════════════
-// ADMIN
-// ═══════════════════════════════════════════════
-function openAdminLogin() { document.getElementById('adminModal').classList.add('open'); }
-function closeAdminLogin() { document.getElementById('adminModal').classList.remove('open'); }
-function doAdminLogin() {
-  const u = document.getElementById('adminUser').value;
-  const p = document.getElementById('adminPass').value;
-  if (u === 'admin' && p === 'gcc2026') {
-    closeAdminLogin();
-    document.getElementById('adminPanel').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    loadAdminData();
-  } else { showToast('❌ Accès refusé','Identifiants incorrects.'); }
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('open');
 }
-function doLogout() {
-  document.getElementById('adminPanel').style.display = 'none';
-  document.body.style.overflow = '';
-  showToast('👋 Déconnecté','Session fermée.');
-}
-function switchTab(name, btn) {
-  ['colis','departs','clients','messages'].forEach(t => {
-    const el = document.getElementById('tab-'+t);
-    if (el) el.style.display = 'none';
+
+function showAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach((t,i) => {
+    t.classList.remove('active');
   });
-  document.getElementById('tab-'+name).style.display = 'block';
-  document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (name === 'clients') loadClients();
-  if (name === 'departs') loadDepartsAdmin();
-  if (name === 'messages') loadMessages();
+  event.target.classList.add('active');
+  if (tab === 'colis') loadAdminColis();
+  else if (tab === 'messages') loadAdminMessages();
+  else if (tab === 'departures') loadAdminDepartures();
 }
 
-async function loadAdminData() {
-  try {
-    const [c1,c2,c3,c4,c5,c6] = await Promise.all([
-      db.from('colis').select('*',{count:'exact',head:true}),
-      db.from('colis').select('*',{count:'exact',head:true}).eq('statut','En transit'),
-      db.from('colis').select('*',{count:'exact',head:true}).eq('statut','Arrivé à destination'),
-      db.from('colis').select('*',{count:'exact',head:true}).eq('statut','Livré'),
-      db.from('clients').select('*',{count:'exact',head:true}),
-      db.from('departures').select('*',{count:'exact',head:true}).eq('statut','Ouvert'),
-    ]);
-    document.getElementById('kpi-total').textContent = c1.count ?? '—';
-    document.getElementById('kpi-transit').textContent = c2.count ?? '—';
-    document.getElementById('kpi-arrived').textContent = c3.count ?? '—';
-    document.getElementById('kpi-delivered').textContent = c4.count ?? '—';
-    document.getElementById('kpi-clients').textContent = c5.count ?? '—';
-    document.getElementById('kpi-departs').textContent = c6.count ?? '—';
-    loadColisAdmin();
-  } catch(e) { console.log(e); }
-}
-
-async function loadColisAdmin() {
-  const wrap = document.getElementById('colis-table-wrap');
-  const { data } = await db.from('colis').select('*').order('created_at',{ascending:false}).limit(50);
-  if (!data || data.length === 0) { wrap.innerHTML='<p style="padding:16px;color:var(--slate);">Aucun colis enregistré.</p>'; return; }
-  const badges = {'Enregistré':'b-pending','En transit':'b-transit','Arrivé à destination':'b-arrived','Livré':'b-delivered','Problème douanier':'b-pending'};
-  wrap.innerHTML = `<table><thead><tr><th>Tracking</th><th>Expéditeur</th><th>Récepteur</th><th>Destination</th><th>Mode</th><th>Poids</th><th>Statut</th><th>Action</th></tr></thead><tbody>
-    ${data.map(c=>`<tr>
+async function loadAdminColis() {
+  const el = document.getElementById('admin-content');
+  el.innerHTML = '<p>Chargement...</p>';
+  const { data, error } = await sb.from('colis').select('*').order('created_at', {ascending: false});
+  if (error) { el.innerHTML = '<p style="color:red">Erreur: ' + error.message + '</p>'; return; }
+  if (!data.length) { el.innerHTML = '<p>Aucun colis enregistré.</p>'; return; }
+  const h = LANG === 'fr' ? 'Tous les Colis' : 'All Packages';
+  let html = `<h3>📦 ${h} (${data.length})</h3><div style="overflow-x:auto"><table>
+    <tr><th>#Tracking</th><th>Expéditeur</th><th>Destination</th><th>Mode</th><th>Poids</th><th>Statut</th><th>Action</th></tr>`;
+  data.forEach(c => {
+    const badge = c.statut?.includes('Livré') ? 'badge-green' :
+                  c.statut?.includes('transit') ? 'badge-yellow' :
+                  c.statut?.includes('Arrivé') ? 'badge-blue' : 'badge-orange';
+    html += `<tr>
       <td><strong>${c.tracking_number}</strong></td>
-      <td>${c.expediteur_nom}<br><small style="color:var(--slate)">${c.expediteur_tel}</small></td>
-      <td>${c.recepteur_nom}<br><small style="color:var(--slate)">${c.recepteur_tel}</small></td>
+      <td>${c.expediteur_nom}<br><small>${c.expediteur_tel}</small></td>
       <td>${c.destination}</td>
-      <td>${c.mode_envoi||'—'}</td>
-      <td>${c.poids ? c.poids+'kg' : '—'}</td>
-      <td><span class="badge ${badges[c.statut]||'b-pending'}">${c.statut}</span></td>
-      <td><button class="notif-btn" onclick="quickNotify('${c.tracking_number}','${c.recepteur_nom}','${c.destination}')">📩 Notifier</button></td>
-    </tr>`).join('')}
-  </tbody></table>`;
+      <td>${c.mode_envoi}</td>
+      <td>${c.poids} kg</td>
+      <td><span class="badge ${badge}">${c.statut}</span></td>
+      <td><select onchange="updateStatut('${c.id}',this.value)" style="padding:4px 8px;border-radius:6px;border:1px solid #d1d5db;font-size:.8rem;">
+        <option>Enregistré</option>
+        <option>En préparation</option>
+        <option>En transit</option>
+        <option>Arrivé à destination</option>
+        <option>Livré</option>
+      </select></td>
+    </tr>`;
+  });
+  html += '</table></div>';
+  el.innerHTML = html;
 }
 
-async function loadClients() {
-  const wrap = document.getElementById('clients-table-wrap');
-  const { data } = await db.from('clients').select('*').order('created_at',{ascending:false}).limit(50);
-  if (!data || data.length === 0) { wrap.innerHTML='<p style="padding:16px;color:var(--slate);">Aucun client enregistré.</p>'; return; }
-  wrap.innerHTML = `<table><thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Code Parrainage</th><th>Inscription</th></tr></thead><tbody>
-    ${data.map(c=>`<tr>
-      <td>${c.nom}</td><td>${c.telephone||'—'}</td><td>${c.email||'—'}</td>
-      <td><code>${c.code_referral||'—'}</code></td>
-      <td>${new Date(c.created_at).toLocaleDateString('fr-FR')}</td>
-    </tr>`).join('')}
-  </tbody></table>`;
+async function updateStatut(id, statut) {
+  const { error } = await sb.from('colis').update({ statut }).eq('id', id);
+  if (!error) {
+    const msg = LANG === 'fr' ? 'Statut mis à jour ✓' : 'Status updated ✓';
+    showAlert('form-alert', msg, 'success');
+    setTimeout(() => document.getElementById('form-alert').classList.remove('show'), 2500);
+  }
 }
 
-async function loadMessages() {
-  const wrap = document.getElementById('messages-table-wrap');
-  const { data } = await db.from('messages').select('*').order('created_at',{ascending:false}).limit(50);
-  if (!data || data.length === 0) { wrap.innerHTML='<p style="padding:16px;color:var(--slate);">Aucun message reçu.</p>'; return; }
-  wrap.innerHTML = `<table><thead><tr><th>Nom</th><th>Contact</th><th>Sujet</th><th>Message</th><th>Date</th></tr></thead><tbody>
-    ${data.map(m=>`<tr>
-      <td>${m.nom}</td><td>${m.contact||'—'}</td><td>${m.sujet||'—'}</td>
-      <td style="max-width:200px;word-break:break-word;">${m.message}</td>
-      <td>${new Date(m.created_at).toLocaleDateString('fr-FR')}</td>
-    </tr>`).join('')}
-  </tbody></table>`;
+async function loadAdminMessages() {
+  const el = document.getElementById('admin-content');
+  el.innerHTML = '<p>Chargement...</p>';
+  const { data, error } = await sb.from('messages').select('*').order('created_at', {ascending: false});
+  if (error) { el.innerHTML = '<p style="color:red">Erreur: ' + error.message + '</p>'; return; }
+  if (!data.length) { el.innerHTML = '<p>Aucun message.</p>'; return; }
+  const h = LANG === 'fr' ? 'Messages Reçus' : 'Received Messages';
+  let html = `<h3>✉️ ${h} (${data.length})</h3><div style="overflow-x:auto"><table>
+    <tr><th>Nom</th><th>Contact</th><th>Sujet</th><th>Message</th><th>Date</th></tr>`;
+  data.forEach(m => {
+    const date = new Date(m.created_at).toLocaleDateString(LANG === 'fr' ? 'fr-FR' : 'en-GB');
+    html += `<tr>
+      <td><strong>${m.nom}</strong></td>
+      <td>${m.contact}</td>
+      <td>${m.sujet}</td>
+      <td style="max-width:250px;white-space:pre-wrap">${m.message}</td>
+      <td>${date}</td>
+    </tr>`;
+  });
+  html += '</table></div>';
+  el.innerHTML = html;
 }
 
-async function loadDepartsAdmin() {
-  const wrap = document.getElementById('departs-table-wrap');
-  const { data } = await db.from('departures').select('*').order('date_depart',{ascending:false}).limit(20);
-  if (!data || data.length === 0) { wrap.innerHTML='<p style="padding:16px;color:var(--slate);">Aucun départ publié.</p>'; return; }
-  wrap.innerHTML = `<table><thead><tr><th>Route</th><th>Date départ</th><th>Statut</th><th>Publié le</th></tr></thead><tbody>
-    ${data.map(d=>`<tr>
-      <td>${d.route}</td>
-      <td>${new Date(d.date_depart).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</td>
-      <td><span class="badge ${d.statut==='Ouvert'?'b-arrived':d.statut==='Complet'?'b-transit':'b-pending'}">${d.statut}</span></td>
-      <td>${new Date(d.created_at).toLocaleDateString('fr-FR')}</td>
-    </tr>`).join('')}
-  </tbody></table>`;
+async function loadAdminDepartures() {
+  const el = document.getElementById('admin-content');
+  const h = LANG === 'fr' ? 'Gérer les Départs' : 'Manage Departures';
+  const lbl1 = LANG === 'fr' ? 'Route (ex: Manila → Yaoundé)' : 'Route (ex: Manila → Yaoundé)';
+  const lbl2 = LANG === 'fr' ? 'Date de départ' : 'Departure date';
+  const lbl3 = LANG === 'fr' ? 'Ajouter ce départ' : 'Add this departure';
+  el.innerHTML = `<h3>🗓️ ${h}</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:20px;align-items:end;">
+    <div><label style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px">${lbl1}</label>
+    <input id="dep-route" placeholder="Manila → Yaoundé" style="width:100%;padding:10px;border:1.5px solid #d1d5db;border-radius:8px;"></div>
+    <div><label style="font-size:.85rem;font-weight:600;display:block;margin-bottom:4px">${lbl2}</label>
+    <input id="dep-date" type="date" style="width:100%;padding:10px;border:1.5px solid #d1d5db;border-radius:8px;"></div>
+    <button onclick="addDeparture()" style="background:var(--orange);color:#fff;border:none;padding:11px 18px;border-radius:8px;cursor:pointer;font-weight:700;">${lbl3}</button>
+  </div>
+  <div id="dep-list">Chargement...</div>`;
+  const { data } = await sb.from('departures').select('*').order('date_depart');
+  if (!data || !data.length) {
+    document.getElementById('dep-list').innerHTML = '<p>Aucun départ programmé.</p>';
+    return;
+  }
+  let html = '<div style="overflow-x:auto"><table><tr><th>Route</th><th>Date</th><th>Statut</th></tr>';
+  data.forEach(d => {
+    html += `<tr><td>${d.route}</td><td>${d.date_depart}</td><td><span class="badge badge-green">${d.statut}</span></td></tr>`;
+  });
+  html += '</table></div>';
+  document.getElementById('dep-list').innerHTML = html;
 }
 
-async function doUpdateColis() {
-  const tracking = document.getElementById('upTrack').value.trim();
-  const statut = document.getElementById('upStatus').value;
-  const notes = document.getElementById('upNote').value;
-  if (!tracking) { showToast('⚠️','Entrez un numéro de tracking.'); return; }
-  const { error } = await db.from('colis').update({statut, notes}).eq('tracking_number', tracking);
-  if (error) { showToast('❌ Erreur', error.message); return; }
-  showToast('✅ Mis à jour', `${tracking} → "${statut}" — Client notifié.`);
-  loadColisAdmin();
-  loadAdminData();
-}
-
-async function publishDepart() {
-  const route = document.getElementById('dp-route').value;
-  const date_depart = document.getElementById('dp-date').value;
-  const statut = document.getElementById('dp-status').value;
-  if (!date_depart) { showToast('⚠️','Sélectionnez une date de départ.'); return; }
-  const { error } = await db.from('departures').insert([{route, date_depart, statut}]);
-  if (error) { showToast('❌ Erreur', error.message); return; }
-  showToast('✈ Départ publié !', `${route} — ${new Date(date_depart).toLocaleDateString('fr-FR')}`);
+async function addDeparture() {
+  const route = document.getElementById('dep-route').value.trim();
+  const date = document.getElementById('dep-date').value;
+  if (!route || !date) return alert(LANG === 'fr' ? 'Remplissez tous les champs.' : 'Fill in all fields.');
+  await sb.from('departures').insert({ route, date_depart: date, statut: 'Ouvert' });
+  loadAdminDepartures();
   loadDepartures();
-  loadDepartsAdmin();
-  loadAdminData();
 }
 
-function quickNotify(tracking, nom, dest) {
-  showToast('📩 Notification envoyée', `${nom} notifié : colis ${tracking} disponible à ${dest}.`);
+// ═══════════════════════════════════════
+// DEPARTURES BANNER
+// ═══════════════════════════════════════
+async function loadDepartures() {
+  const grid = document.getElementById('dep-grid');
+  const { data } = await sb.from('departures').select('*').eq('statut','Ouvert').order('date_depart').limit(5);
+  if (!data || !data.length) {
+    const msg = LANG === 'fr' ? 'Aucun départ annoncé pour le moment.' : 'No departure announced at this time.';
+    grid.innerHTML = `<div class="dep-card"><strong>${msg}</strong></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(d => {
+    const date = new Date(d.date_depart).toLocaleDateString(LANG === 'fr' ? 'fr-FR' : 'en-GB', {day:'2-digit',month:'short',year:'numeric'});
+    const lbl = LANG === 'fr' ? 'Départ:' : 'Departure:';
+    return `<div class="dep-card"><strong>${d.route}</strong>${lbl} ${date}</div>`;
+  }).join('');
 }
 
-// INIT
-loadDepartures();
-loadStats();
+// ═══════════════════════════════════════
+// TRACKING
+// ═══════════════════════════════════════
+async function trackPackage() {
+  const num = document.getElementById('track-input').value.trim().toUpperCase();
+  const result = document.getElementById('tracking-result');
+  if (!num) return;
+  result.innerHTML = '<p style="color:rgba(255,255,255,0.7);text-align:center;">⏳ Recherche...</p>';
+  const { data } = await sb.from('colis').select('*').eq('tracking_number', num).single();
+  if (!data) {
+    const msg = LANG === 'fr' ? 'Aucun colis trouvé avec ce numéro.' : 'No package found with this number.';
+    result.innerHTML = `<div class="tracking-card"><p style="color:#991b1b;font-weight:600;">❌ ${msg}</p></div>`;
+    return;
+  }
+  const badge = data.statut?.includes('Livré') ? 'stat-livre' :
+                data.statut?.includes('transit') ? 'stat-transit' :
+                data.statut?.includes('Arrivé') ? 'stat-arrive' : 'stat-enregistre';
+  const t = {
+    fr: { from:'Expéditeur',to:'Destinataire',dest:'Destination',mode:'Mode',weight:'Poids',val:'Valeur',status:'Statut',date:'Enregistré le' },
+    en: { from:'Sender',to:'Recipient',dest:'Destination',mode:'Mode',weight:'Weight',val:'Value',status:'Status',date:'Registered' }
+  }[LANG];
+  const date = new Date(data.created_at).toLocaleDateString(LANG === 'fr' ? 'fr-FR' : 'en-GB');
+  result.innerHTML = `<div class="tracking-card">
+    <strong style="font-size:1.1rem">${data.tracking_number}</strong>
+    <span class="track-status ${badge}" style="margin-left:12px">${data.statut}</span>
+    <div class="track-grid" style="margin-top:16px">
+      <div class="track-item"><label>${t.from}</label><p>${data.expediteur_nom} — ${data.expediteur_tel}</p></div>
+      <div class="track-item"><label>${t.to}</label><p>${data.recepteur_nom} — ${data.recepteur_tel}</p></div>
+      <div class="track-item"><label>${t.dest}</label><p>${data.destination}</p></div>
+      <div class="track-item"><label>${t.mode}</label><p>${data.mode_envoi}</p></div>
+      <div class="track-item"><label>${t.weight}</label><p>${data.poids} kg</p></div>
+      <div class="track-item"><label>${t.val}</label><p>PHP ${data.valeur_declaree?.toLocaleString()}</p></div>
+      <div class="track-item"><label>${t.date}</label><p>${date}</p></div>
+      ${data.description ? `<div class="track-item"><label>Description</label><p>${data.description}</p></div>` : ''}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// SHIPPING FORM
+// ═══════════════════════════════════════
+function genTracking() {
+  const n = Math.floor(Math.random() * 90000) + 10000;
+  return 'GCC-2026-' + n;
+}
+
+async function submitShipping(e) {
+  e.preventDefault();
+  const check = document.getElementById('accord-check');
+  if (!check.checked) {
+    const msg = LANG === 'fr' ? 'Veuillez accepter le protocole d'accord.' : 'Please accept the protocol agreement.';
+    showAlert('form-alert', msg, 'error');
+    return;
+  }
+  const tracking = genTracking();
+  const { error } = await sb.from('colis').insert({
+    tracking_number: tracking,
+    expediteur_nom: document.getElementById('exp-nom').value,
+    expediteur_tel: document.getElementById('exp-tel').value,
+    expediteur_email: document.getElementById('exp-email').value,
+    recepteur_nom: document.getElementById('rec-nom').value,
+    recepteur_tel: document.getElementById('rec-tel').value,
+    destination: document.getElementById('destination').value,
+    mode_envoi: document.getElementById('mode-envoi').value,
+    type_contenu: document.getElementById('type-contenu').value,
+    poids: parseFloat(document.getElementById('poids').value) || 0,
+    valeur_declaree: parseFloat(document.getElementById('valeur').value) || 0,
+    code_parrainage: document.getElementById('parrainage').value,
+    description: document.getElementById('description').value,
+    statut: 'Enregistré'
+  });
+  if (error) {
+    showAlert('form-alert', (LANG==='fr'?'Erreur: ':'Error: ') + error.message, 'error');
+    return;
+  }
+  const msg = LANG === 'fr'
+    ? `✅ Expédition enregistrée ! Numéro de suivi : ${tracking} — Conservez ce numéro précieusement.`
+    : `✅ Shipment registered! Tracking number: ${tracking} — Keep this number carefully.`;
+  showAlert('form-alert', msg, 'success');
+  document.getElementById('shipping-form').reset();
+}
+
+// ═══════════════════════════════════════
+// CONTACT FORM
+// ═══════════════════════════════════════
+async function submitContact(e) {
+  e.preventDefault();
+  const { error } = await sb.from('messages').insert({
+    nom: document.getElementById('c-nom').value,
+    contact: document.getElementById('c-contact').value,
+    sujet: document.getElementById('c-sujet').value,
+    message: document.getElementById('c-message').value
+  });
+  if (error) {
+    showAlert('contact-alert', (LANG==='fr'?'Erreur: ':'Error: ') + error.message, 'error');
+    return;
+  }
+  const msg = LANG === 'fr'
+    ? '✅ Message envoyé ! Notre équipe vous contactera sous 24h.'
+    : '✅ Message sent! Our team will contact you within 24 hours.';
+  showAlert('contact-alert', msg, 'success');
+  e.target.reset();
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'alert show alert-' + type;
+  setTimeout(() => el.classList.remove('show'), 6000);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  const err = document.getElementById('login-error');
+  if (err) err.style.display = 'none';
+}
 </script>
 </body>
 </html>
