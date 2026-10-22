@@ -373,6 +373,41 @@ var LANG = (function() {
   try { return localStorage.getItem('gcc_lang') || 'fr'; } catch(e) { return 'fr'; }
 })();
 
+  // ── Bilingual toast strings ──────────────────────────────────────────────
+  var T = {
+    locked:       {fr:'🔒 Bloqué',               en:'🔒 Locked'},
+    retryIn:      {fr:'Réessayez dans ',          en:'Retry in '},
+    retryMin:     {fr:' min.',                    en:' min.'},
+    connected:    {fr:'✅ Connecté',               en:'✅ Connected'},
+    welcomeAdmin: {fr:'Bienvenue Admin GCC CARGO.',en:'Welcome Admin GCC CARGO.'},
+    tooMany:      {fr:'🔒 Bloqué',                en:'🔒 Locked'},
+    tooManyMsg:   {fr:'Trop de tentatives. 15 min de blocage.',en:'Too many attempts. 15-minute lockout.'},
+    refused:      {fr:'❌ Refusé',                en:'❌ Refused'},
+    wrongCreds:   {fr:'Identifiants incorrects. ',en:'Incorrect credentials. '},
+    attempt:      {fr:' tentative(s).',           en:' attempt(s) remaining.'},
+    sent:         {fr:'✅ Demande envoyée !',      en:'✅ Request sent!'},
+    sentMsg:      {fr:'Votre référence : ',        en:'Your reference: '},
+    sentMsg2:     {fr:' — Notre équipe vous contacte sous 24h.',en:' — Our team will contact you within 24h.'},
+    statusUp:     {fr:'📦 Statut mis à jour',      en:'📦 Status updated'},
+    notif:        {fr:'📩 Notification',           en:'📩 Notification'},
+    notifMsg:     {fr:'Vous serez alerté dès le prochain départ !',en:'You will be notified on the next departure!'},
+    required:     {fr:'⚠️ Requis',                en:'⚠️ Required'},
+    requiredMsg:  {fr:"Veuillez lire et accepter le protocole d'accord avant de soumettre.",en:'Please read and accept the agreement before submitting.'},
+    submitted:    {fr:'✅ Demande soumise !',      en:'✅ Request submitted!'},
+    submittedMsg: {fr:"Notre équipe vous contactera sous 24h pour confirmer l'enlèvement et le paiement. Un email de confirmation vous sera envoyé.",en:'Our team will contact you within 24h to confirm pickup and payment. A confirmation email will be sent.'},
+    trackReq:     {fr:'⚠️',                       en:'⚠️'},
+    trackReqMsg:  {fr:'Entrez un numéro de tracking.',en:'Enter a tracking number.'},
+    colisMsg:     {fr:'Votre colis est disponible à Yaoundé. Le destinataire a été notifié par SMS.',en:'Your parcel is available in Yaoundé. The recipient has been notified by SMS.'},
+    emailReady:   {fr:'📧 Email préparé',          en:'📧 Email ready'},
+    emailReadyMsg:{fr:"Votre application email s'ouvre avec le message pré-rempli pour ",en:'Your email app opens with the pre-filled message for '},
+    updated:      {fr:'✅ Mis à jour',             en:'✅ Updated'},
+    updatedMsg1:  {fr:'Colis ',                   en:'Parcel '},
+    updatedMsg2:  {fr:' : statut "',              en:': status "'},
+    updatedMsg3:  {fr:'" — Client & destinataire notifiés par email et SMS.',en:'" — Client & recipient notified by email and SMS.'},
+  };
+  function tr(key) { return (T[key] && T[key][LANG]) || (T[key] && T[key]['fr']) || key; }
+
+
 function setLang(l) {
   LANG = l;
   try { localStorage.setItem('gcc_lang', l); } catch(e) {}
@@ -423,7 +458,7 @@ function openAdminLogin() {
   var now = Date.now();
   if (now < _lockUntil) {
     var mins = Math.ceil((_lockUntil - now) / 60000);
-    if (typeof showToast === 'function') showToast('🔒 Bloqué', 'Réessayez dans ' + mins + ' min.');
+    if (typeof showToast === 'function') showToast(tr('locked'), tr('retryIn') + mins + tr('retryMin'));
     return;
   }
   var m = document.getElementById('adminModal');
@@ -457,7 +492,7 @@ function doAdminLogin() {
     closeAdminLogin();
     var panel = document.getElementById('adminPanel');
     if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
-    if (typeof showToast === 'function') showToast('✅ Connecté', 'Bienvenue Admin GCC CARGO.');
+    if (typeof showToast === 'function') showToast(tr('connected'), tr('welcomeAdmin'));
   } else {
     _loginAttempts++;
     try { sessionStorage.setItem('gcc_attempts', String(_loginAttempts)); } catch(e) {}
@@ -466,10 +501,10 @@ function doAdminLogin() {
       try { sessionStorage.setItem('gcc_lock', String(_lockUntil)); } catch(e) {}
       _loginAttempts = 0;
       try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
-      if (typeof showToast === 'function') showToast('🔒 Bloqué', 'Trop de tentatives. 15 min de blocage.');
+      if (typeof showToast === 'function') showToast(tr('tooMany'), tr('tooManyMsg'));
     } else {
       var rem = 5 - _loginAttempts;
-      if (typeof showToast === 'function') showToast('❌ Refusé', 'Identifiants incorrects. ' + rem + ' tentative(s).');
+      if (typeof showToast === 'function') showToast(tr('refused'), tr('wrongCreds') + rem + tr('attempt'));
     }
     var err = document.getElementById('login-err');
     if (err) {
@@ -552,7 +587,7 @@ function doAdminLogin() {
     };
     _submissions.unshift(entry);
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
-    showToast('✅ Demande envoyée !', 'Votre référence : ' + ref + ' — Notre équipe vous contacte sous 24h.');
+    showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
     e.target.reset();
     handleModeDepot('');
     refreshAdminTable();
@@ -605,7 +640,7 @@ function doAdminLogin() {
     _submissions[i].statut = order[(order.indexOf(cur)+1) % order.length];
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
     refreshAdminTable();
-    showToast('📦 Statut mis à jour', _submissions[i].ref + ' → ' + _submissions[i].statut);
+    showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
   }
 
   // Apply language + init on DOM ready
@@ -700,7 +735,7 @@ function doAdminLogin() {
       </div>
       <div class="db-meta">
         <span data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
-        <button class="db-notify-btn" data-fr="Me notifier" data-en="Notify me" onclick="showToast('📩 Notification','Vous serez alerté dès le prochain départ !')">Me notifier</button>
+        <button class="db-notify-btn" data-fr="Me notifier" data-en="Notify me" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
       </div>
     </div>
   </div>
@@ -1327,8 +1362,8 @@ function toggleSubmit(){
 function handleShipSubmit(e){
   e.preventDefault();
   const cb=document.getElementById('consentCheck');
-  if(!cb.checked){showToast('⚠️ Requis','Veuillez lire et accepter le protocole d\'accord avant de soumettre.');return;}
-  showToast('✅ Demande soumise !','Notre équipe vous contactera sous 24h pour confirmer l\'enlèvement et le paiement. Un email de confirmation vous sera envoyé.');
+  if(!cb.checked){showToast(tr('required'), tr('requiredMsg'));return;}
+  showToast(tr('submitted'), tr('submittedMsg'));
   e.target.reset();
   document.getElementById('submitBtn').disabled=true;
   document.getElementById('id-name').style.display='none';
@@ -1338,11 +1373,11 @@ function handleShipSubmit(e){
 // Track
 function doTrack(){
   const v=document.getElementById('trackInput').value.trim();
-  if(!v){showToast('⚠️','Entrez un numéro de tracking.');return;}
+  if(!v){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
   document.getElementById('trackNum').textContent=v;
   document.getElementById('trackResult').style.display='block';
   document.getElementById('trackResult').scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>showToast('📩 Notification','Votre colis est disponible à Yaoundé. Le destinataire a été notifié par SMS.'),800);
+  setTimeout(()=>showToast(tr('notif'), tr('colisMsg')),800);
 }
 
 // Toast
@@ -1377,14 +1412,14 @@ function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
   var to = emailExp || '';
   var mailtoLink = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
   window.open(mailtoLink, '_blank');
-  showToast('📧 Email préparé', 'Votre application email s\'ouvre avec le message pré-rempli pour ' + (expediteurNom || ref) + '.');
+  showToast(tr('emailReady'), tr('emailReadyMsg') + (expediteurNom || ref) + '.');
 }
 
 function doUpdate(){
   const t=document.getElementById('upTrack').value;
-  if(!t){showToast('⚠️','Entrez un numéro de tracking.');return;}
+  if(!t){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
   const s=document.getElementById('upStatus').value;
-  showToast('✅ Mis à jour','Colis '+t+' : statut "'+s+'" — Client & destinataire notifiés par email et SMS.');
+  showToast(tr('updated'), tr('updatedMsg1')+t+tr('updatedMsg2')+s+tr('updatedMsg3'));
 }
 </script>
 </body>
