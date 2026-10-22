@@ -485,20 +485,23 @@ function doAdminLogin() {
   function handleModeDepot(val) {
     var lalamove   = document.getElementById('sectionLalamove');
     var presentiel = document.getElementById('sectionPresentiel');
+    var ecommerce  = document.getElementById('sectionEcommerce');
     var modeEnvoi  = document.getElementById('fieldModeEnvoi');
     if (!lalamove) return;
+    // Hide all first
+    lalamove.style.display   = 'none';
+    presentiel.style.display = 'none';
+    if (ecommerce) ecommerce.style.display = 'none';
     if (val === 'lalamove') {
       lalamove.style.display   = '';
-      presentiel.style.display = 'none';
       modeEnvoi.style.display  = '';
       handleModePaiement(document.getElementById('modePaiement') ? document.getElementById('modePaiement').value : 'transfer');
     } else if (val === 'presentiel') {
-      lalamove.style.display   = 'none';
       presentiel.style.display = '';
       modeEnvoi.style.display  = '';
-    } else {
-      lalamove.style.display   = 'none';
-      presentiel.style.display = 'none';
+    } else if (val === 'ecommerce') {
+      if (ecommerce) ecommerce.style.display = '';
+      modeEnvoi.style.display  = '';
     }
   }
 
@@ -770,8 +773,9 @@ function doAdminLogin() {
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
         <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
           <option value="">— Choisir le mode de dépôt —</option>
-          <option value="presentiel">🏢 En présentiel (bureaux GCC Parañaque)</option>
-          <option value="lalamove">🛵 Livraison Lalamove (collecte à domicile)</option>
+          <option value="presentiel">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
+          <option value="lalamove">🛵 Lalamove — collecte à mon domicile / adresse</option>
+          <option value="ecommerce">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
         </select>
       </div>
 
@@ -854,6 +858,35 @@ function doAdminLogin() {
           </p>
         </div>
       </div>
+      <!-- ═══ INFO SHOPEE/LAZADA ═══ -->
+      <div class="fg full" id="sectionEcommerce" style="display:none;">
+        <div style="background:linear-gradient(135deg,#fff5f0,#ffeee6);border:1.5px solid #e74c3c;border-radius:12px;padding:20px 22px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;">🛍️ COMMANDE SHOPEE / LAZADA</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;">
+            Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition.
+          </p>
+          <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
+            📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
+            🕗 Livraisons acceptées : Lun–Sam, 9h00 – 17h00<br>
+            📞 +63 968 313 5356
+          </div>
+          <!-- Avertissement responsabilité -->
+          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;">
+            ⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires.
+          </div>
+          <!-- Upload capture paiement -->
+          <div style="margin-top:16px;">
+            <label style="font-size:.83rem;font-weight:600;color:var(--navy);display:block;margin-bottom:8px;">📸 Capture d'écran du paiement OM / MoMo (si paiement à la livraison)</label>
+            <div class="upload-zone" onclick="document.getElementById('captureEcommerce').click()" style="padding:14px;">
+              <div class="uz-icon" style="font-size:1.4rem;">📸</div>
+              <p style="font-size:.8rem;">Chargez la capture OM ou MoMo confirmant le paiement de la livraison<br><small>JPG, PNG — max 5 MB</small></p>
+              <div class="uz-name" id="capture-ecommerce-name"></div>
+              <input id="captureEcommerce" type="file" accept=".jpg,.jpeg,.png" style="display:none" onchange="showFileName(this,'capture-ecommerce-name')">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="fg"><label data-fr="Type de contenu" data-en="Content type">Type de contenu</label>
         <select>
           <option>Marchandises générales</option>
@@ -910,7 +943,7 @@ function doAdminLogin() {
             <p>Le présent protocole d'accord régit les droits et obligations entre <strong>GCC CARGO HANDLING INC</strong> (ci-après « GCC CARGO ») et le client expéditeur pour tout envoi de colis ou marchandise via les services de fret aérien ou maritime proposés par la société.</p>
 
             <h4>4. COMMANDES VIA PLATEFORMES E-COMMERCE (Lazada, Shopee, etc.)</h4>
-            <p>Le client qui passe commande via Lazada, Shopee ou toute autre plateforme e-commerce est <strong>seul et entièrement responsable</strong> du contenu, de l'état, de la conformité et de la légalité du colis commandé. GCC CARGO HANDLING INC décline toute responsabilité quant au contenu de ces livraisons, à leur état à réception et à leur conformité réglementaire. Le client reconnaît qu'il s'expose à des poursuites judiciaires en cas de contenu illicite ou non conforme à la réglementation douanière des pays de destination.</p>
+            <p>Lorsqu'un client passe commande via Lazada, Shopee ou toute autre plateforme e-commerce, le colis est livré <strong>directement dans les locaux de GCC CARGO HANDLING INC</strong> par le livreur de la plateforme. Dans ce cas, <strong>GCC CARGO HANDLING INC décline toute responsabilité</strong> quant au contenu du colis, à son état à réception, à sa conformité et à sa légalité. Le client qui passe commande est <strong>seul et entièrement responsable</strong> du contenu de ce colis et de sa conformité à la réglementation douanière des pays de destination. Le client reconnaît expressément qu'il s'expose à des poursuites judiciaires en cas de contenu illicite, dangereux ou non conforme. GCC CARGO HANDLING INC se réserve le droit de refuser tout colis dont le contenu paraît suspect ou non déclaré.</p>
 
             <h4 data-fr="2. OBLIGATIONS DU CLIENT" data-en="2. CLIENT OBLIGATIONS">2. OBLIGATIONS DU CLIENT</h4>
             <p>Le client s'engage à : (a) fournir une déclaration exacte et complète du contenu et de la valeur des marchandises ; (b) présenter une pièce d'identité valide lors de l'enregistrement ; (c) s'assurer que les articles sont conformes aux législations du pays d'origine (Philippines) et du pays de destination ; (d) emballer correctement les colis pour éviter tout dommage pendant le transport.</p>
