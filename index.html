@@ -545,6 +545,7 @@ function doAdminLogin() {
       modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
       modePaiement:paymentSel ? paymentSel.options[paymentSel.selectedIndex].text : '',
       adresse:     (document.getElementById('adresseLalamove') || {value:''}).value,
+      adresseClient:(document.getElementById('adresseClient') || {value:''}).value,
       dateColl:    (document.getElementById('dateLalamove') || {value:''}).value,
       creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
       statut:      'En attente',
@@ -578,16 +579,26 @@ function doAdminLogin() {
         '<td>' + (s.destination||'—') + '</td>' +
         '<td style="font-size:.8rem;">' + (s.modeDepot||'—') + '</td>' +
         '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
-        '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('présentiel') ? '🏢 En bureau' : '—')) + '</td>' +
+        '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('sentiel') ? '🏢 En bureau' : '—')) + '</td>' +
         '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>' +
         '<td style="white-space:nowrap;">' +
-        '<button class="notif-btn" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;" onclick="cycleStatut(' + i + ')">🔄 Statut</button>' +
-        '<button class="notif-btn" style="font-size:.72rem;background:var(--blue);display:block;width:100%;" onclick="sendEmailNotif('' + s.ref + '','' + (s.expediteur||'').replace(/'/g,'\\\'\') + '','' + (s.email_exp||'').replace(/'/g,'\\\'\') + '','' + s.statut + '','')">📧 Email</button>' +
+        '<button class="notif-btn adm-statut-btn" data-i="' + i + '" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;">🔄 Statut</button>' +
+        '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;">📧 Email</button>' +
         '</td>' +
         '</tr>';
     }).join('');
+    // Attach click handlers via event delegation
+    tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
+    });
+    tbody.querySelectorAll('.adm-email-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var s = _submissions[idx];
+        if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
+      });
+    });
   }
-
   function cycleStatut(i) {
     var order = ['En attente','En transit','Arrivé','Livré'];
     var cur = _submissions[i].statut;
@@ -845,7 +856,7 @@ function doAdminLogin() {
       <!-- ═══ INFO PRESENTIEL ═══ -->
       <div class="fg full" id="sectionPresentiel" style="display:none;">
         <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--sky);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--blue);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
           <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;">
             Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
           </p>
@@ -1153,7 +1164,7 @@ function doAdminLogin() {
       </div>
       <!-- KPIs demandes -->
       <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px;">
-        <div class="kpi" style="border-top-color:var(--blue);">
+        <div class="kpi" style="border-top-color:var(--sky);">
           <div class="kpi-val" id="kpi-demandes">0</div>
           <div class="kpi-lbl">Total demandes</div>
         </div>
