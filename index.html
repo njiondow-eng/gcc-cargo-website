@@ -506,10 +506,10 @@ function doAdminLogin() {
   }
 
   var PAIEMENT_INFO = {
-    transfer: '🏦 <strong>Bank Transfer</strong><br>Banque : BPI · BDO · Metrobank<br>Titulaire : GCC CARGO HANDLING INC<br>Envoyez la capture d'écran de votre virement.',
-    gcash:    '📱 <strong>GCash / Maya</strong><br>Numéro : <strong>+63 968 313 5356</strong><br>Nom : WILLIAM NJIONDO<br>Envoyez la capture d'écran de la transaction.',
-    momo:     '💚 <strong>MoMo Money</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d'écran du dépôt.',
-    om:       '🧡 <strong>Orange Money (OM)</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d'écran du dépôt.',
+    transfer: '🏦 <strong>Bank Transfer</strong><br>Banque : BPI · BDO · Metrobank<br>Titulaire : GCC CARGO HANDLING INC<br>Envoyez la capture d\'écran de votre virement.',
+    gcash:    '📱 <strong>GCash / Maya</strong><br>Numéro : <strong>+63 968 313 5356</strong><br>Nom : WILLIAM NJIONDO<br>Envoyez la capture d\'écran de la transaction.',
+    momo:     '💚 <strong>MoMo Money</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
+    om:       '🧡 <strong>Orange Money (OM)</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
   };
 
   function handleModePaiement(val) {
@@ -750,6 +750,7 @@ function doAdminLogin() {
       <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
       <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input type="tel" placeholder="+63 968 313 5356" required></div>
       <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" placeholder="votre@email.com"></div>
+      <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select>
           <option>🇨🇲 Yaoundé — Cameroun</option>
@@ -843,7 +844,7 @@ function doAdminLogin() {
 
       <!-- ═══ INFO PRESENTIEL ═══ -->
       <div class="fg full" id="sectionPresentiel" style="display:none;">
-        <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--blue);border-radius:12px;padding:20px 22px;">
+        <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--sky);border-radius:12px;padding:20px 22px;">
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--blue);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
           <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;">
             Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
@@ -1315,8 +1316,8 @@ function toggleSubmit(){
 function handleShipSubmit(e){
   e.preventDefault();
   const cb=document.getElementById('consentCheck');
-  if(!cb.checked){showToast('⚠️ Requis','Veuillez lire et accepter le protocole d'accord avant de soumettre.');return;}
-  showToast('✅ Demande soumise !','Notre équipe vous contactera sous 24h pour confirmer l'enlèvement et le paiement. Un email de confirmation vous sera envoyé.');
+  if(!cb.checked){showToast('⚠️ Requis','Veuillez lire et accepter le protocole d\'accord avant de soumettre.');return;}
+  showToast('✅ Demande soumise !','Notre équipe vous contactera sous 24h pour confirmer l\'enlèvement et le paiement. Un email de confirmation vous sera envoyé.');
   e.target.reset();
   document.getElementById('submitBtn').disabled=true;
   document.getElementById('id-name').style.display='none';
@@ -1358,14 +1359,14 @@ function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
     '▶ Nouveau statut : ' + statut + '\n' +
     (note ? '📝 Note : ' + note + '\n' : '') +
     '\nPour suivre votre colis en temps réel, rendez-vous sur notre site.\n\n' +
-    'Cordialement,\nL'équipe GCC CARGO HANDLING INC\n' +
+    'Cordialement,\nL\'équipe GCC CARGO HANDLING INC\n' +
     'Tél : +63 968 313 5356 | +63 915 385 7604\n' +
     'Trimar Building, Multinational Ave, Parañaque, Metro Manila'
   );
   var to = emailExp || '';
   var mailtoLink = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
   window.open(mailtoLink, '_blank');
-  showToast('📧 Email préparé', 'Votre application email s'ouvre avec le message pré-rempli pour ' + (expediteurNom || ref) + '.');
+  showToast('📧 Email préparé', 'Votre application email s\'ouvre avec le message pré-rempli pour ' + (expediteurNom || ref) + '.');
 }
 
 function doUpdate(){
