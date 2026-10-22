@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GCC CARGO HANDLING INC — Livraison Philippines-Afrique</title>
 <meta name="description" content="GCC CARGO HANDLING INC — Expédition de colis des Philippines vers l'Afrique. Air & Sea Shipping.">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root {
   --orange:#E8660A;
@@ -727,11 +727,17 @@ tr:hover td{background:#fafafa;}
 // ═══════════════════════════════════════
 // SUPABASE
 // ═══════════════════════════════════════
-const { createClient } = supabase;
-const sb = createClient(
-  'https://grtcebiusqczxloegpzs.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydGNlYml1c3Fjenhsb2VncHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzg3NzAsImV4cCI6MjEwNzYxNDc3MH0.2fwZzSyIfyHgNHi5NqYByWfA9Ecv9Mp9mi2JRqdjSgA'
-);
+// Init Supabase safely
+let sb;
+function initSupabase() {
+  try {
+    const { createClient } = window.supabase;
+    sb = createClient(
+      'https://grtcebiusqczxloegpzs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydGNlYml1c3Fjenhsb2VncHpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzg3NzAsImV4cCI6MjEwNzYxNDc3MH0.2fwZzSyIfyHgNHi5NqYByWfA9Ecv9Mp9mi2JRqdjSgA'
+    );
+  } catch(e) { console.error('Supabase init error:', e); }
+}
 
 // ═══════════════════════════════════════
 // LANGUAGE SYSTEM
@@ -761,6 +767,7 @@ function setLang(l) {
 
 // Apply language on load
 window.addEventListener('DOMContentLoaded', () => {
+  initSupabase();
   setLang(LANG);
 });
 
@@ -769,8 +776,12 @@ window.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════
 let secretBuffer = '';
 document.addEventListener('keydown', e => {
-  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-  secretBuffer += e.key.toLowerCase();
+  // Ignore when typing in a field
+  const tag = (e.target.tagName || '').toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.key && e.key.length === 1) {
+    secretBuffer += e.key.toLowerCase();
+  }
   if (secretBuffer.length > 10) secretBuffer = secretBuffer.slice(-10);
   if (secretBuffer.includes('gcc')) {
     secretBuffer = '';
