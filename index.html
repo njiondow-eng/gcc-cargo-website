@@ -45,6 +45,10 @@ nav{
 .btn-nav-cta{background:var(--orange);color:var(--white);font-weight:700;padding:10px 20px;border-radius:4px;font-size:.88rem;white-space:nowrap;transition:opacity .2s;}
 .btn-nav-cta:hover{opacity:.88;}
 .hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.6rem;cursor:pointer;padding:4px;}
+.lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,.12);border-radius:6px;padding:3px;}
+.lang-btn{background:transparent;border:none;color:rgba(255,255,255,.65);font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .18s;letter-spacing:.04em;}
+.lang-btn:hover{color:var(--white);}
+.lang-btn.active{background:var(--orange);color:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.25);}
 
 /* ═══ HERO ═══ */
 .hero{
@@ -335,6 +339,15 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
 .adm-form-row .fg{flex:1;min-width:130px;}
 .adm-input{width:100%;padding:8px 11px;border:1.5px solid #dce3ec;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.86rem;color:var(--navy);background:#fafbfd;box-sizing:border-box;}
 .adm-input:focus{outline:none;border-color:var(--sky);}
+/* Inputs formulaire client sur fond clair (Lalamove, paiement) */
+#sectionLalamove .fg input,#sectionLalamove .fg select,#sectionLalamove .fg textarea,
+#sectionPresentiel .fg input,#sectionEcommerce .fg input{
+  background:#fff;border:1.5px solid #c8d6e8;color:var(--navy);
+}
+#sectionLalamove .fg input::placeholder,#sectionLalamove .fg textarea::placeholder{color:#94a3b8;}
+#sectionLalamove .fg label,#sectionPresentiel .fg label{color:var(--navy);}
+/* QR code paiement */
+.pay-qr{max-width:130px;max-height:130px;border-radius:8px;border:2px solid #e0e6ef;display:block;margin:8px auto 0;}
 .adm-btn-primary{background:var(--orange);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
 .adm-btn-secondary{background:var(--sky);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
 .adm-btn-danger{background:#e74c3c;color:white;border:none;padding:7px 14px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
@@ -536,17 +549,30 @@ function doAdminLogin() {
     }
   }
 
-  var PAIEMENT_INFO = {
-    transfer: '🏦 <strong>Bank Transfer</strong><br>Banque : BPI · BDO · Metrobank<br>Titulaire : GCC CARGO HANDLING INC<br>Envoyez la capture d\'écran de votre virement.',
-    gcash:    '📱 <strong>GCash / Maya</strong><br>Numéro : <strong>+63 968 313 5356</strong><br>Nom : WILLIAM NJIONDO<br>Envoyez la capture d\'écran de la transaction.',
-    momo:     '💚 <strong>MoMo Money</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
-    om:       '🧡 <strong>Orange Money (OM)</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
+  /* ── Config paiement dynamique (éditable en admin) ── */
+  var _PAY_DEFAULTS = {
+    transfer: {label:'Bank Transfer',    ico:'🏦', note:'Banque : BPI · BDO · Metrobank — Titulaire : GCC CARGO HANDLING INC', num:'', nom:'GCC CARGO HANDLING INC', qr:''},
+    gcash:    {label:'GCash / Maya',     ico:'📱', note:'Envoyez la capture d\'écran de la transaction.',                         num:'+63 968 313 5356',   nom:'', qr:''},
+    momo:     {label:'MoMo Money',       ico:'💚', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
+    om:       {label:'Orange Money (OM)',ico:'🧡', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
   };
+  var _payConfig = {};
+  try { _payConfig = JSON.parse(localStorage.getItem('gcc_pay_config') || '{}'); } catch(e){}
+  function getPayCfg(key) {
+    return Object.assign({}, _PAY_DEFAULTS[key]||{}, _payConfig[key]||{});
+  }
 
   function handleModePaiement(val) {
     var infoEl = document.getElementById('infoPaiement');
     if (!infoEl) return;
-    infoEl.innerHTML = PAIEMENT_INFO[val] || '';
+    var c = getPayCfg(val);
+    if (!c.label) { infoEl.innerHTML = ''; return; }
+    var html = '<div style="font-weight:800;font-size:.9rem;margin-bottom:6px;">' + c.ico + ' ' + c.label + '</div>';
+    if (c.num)  html += '<div>Numéro : <strong>' + c.num + '</strong></div>';
+    if (c.nom)  html += '<div>Nom : <strong>' + c.nom + '</strong></div>';
+    if (c.note) html += '<div style="margin-top:4px;font-size:.8rem;color:var(--slate);">' + c.note + '</div>';
+    if (c.qr)   html += '<img src="' + c.qr + '" class="pay-qr" alt="QR ' + c.label + '">';
+    infoEl.innerHTML = html;
   }
 
   // ─── FORM SUBMIT: collect & store ────────────────────────────────────────
@@ -656,13 +682,13 @@ function doAdminLogin() {
     var pg = document.getElementById('adm-' + page);
     if (pg) pg.classList.add('active');
     if (page === 'dash') refreshDashboard();
-    if (page === 'colis') filterColis();
+    if (page === 'colis') { try { var _s2=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_s2)) _submissions=_s2; } catch(e){} filterColis(); }
     if (page === 'finance') refreshFinance();
     if (page === 'depenses') refreshDepenses();
     if (page === 'clients') refreshClients();
     if (page === 'parrainage') refreshParrainage();
     if (page === 'departs') refreshAnnonces();
-    if (page === 'parametres') loadTarifs();
+    if (page === 'parametres') { loadTarifs(); loadPayConfig(); }
   }
   function admNav(page, el) { showAdmTab(page, el); }
 
@@ -683,6 +709,9 @@ function doAdminLogin() {
     var now = new Date();
     var dd = document.getElementById('adm-date-display');
     if (dd) dd.textContent = now.toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+    /* recharger les soumissions depuis localStorage (cas multi-onglets) */
+    try { var _sr=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sr)) _submissions=_sr; } catch(e){}
 
     var _revenues = [];
     var _depenses_data = [];
@@ -972,6 +1001,7 @@ function doAdminLogin() {
 
   /* ═══ CLIENTS ═══ */
   function refreshClients() {
+    try { var _sc=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sc)) _submissions=_sc; } catch(e){}
     var clientMap = {};
     _submissions.forEach(function(s) {
       var nom = s.expediteur || 'Inconnu';
@@ -1077,15 +1107,44 @@ function doAdminLogin() {
   var _annonces = [];
   try { _annonces = JSON.parse(localStorage.getItem('gcc_annonces') || '[]'); } catch(e) {}
 
+  // Stockage base64 pour la photo/doc d'annonce
+  var _annDocData = null; // {name, dataUrl}
+  function annDocPreview(input) {
+    var file = input.files[0];
+    var prev = document.getElementById('ann-doc-preview');
+    if (!file) { _annDocData = null; if(prev) prev.style.display='none'; return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      _annDocData = {name: file.name, dataUrl: e.target.result, type: file.type};
+      if (prev) {
+        prev.style.display = 'flex';
+        var img = document.getElementById('ann-doc-img');
+        var fname = document.getElementById('ann-doc-fname');
+        if (fname) fname.textContent = file.name;
+        if (img) {
+          if (file.type.startsWith('image/')) { img.src = e.target.result; img.style.display='block'; }
+          else { img.src=''; img.style.display='none'; }
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   function addAnnonce() {
     var dest = (document.getElementById('ann-dest')||{}).value || '';
     var date = (document.getElementById('ann-date')||{}).value || '';
     var heure = (document.getElementById('ann-heure')||{}).value || '16:00';
     var note = (document.getElementById('ann-note')||{}).value || '';
+    var mode = (document.getElementById('ann-mode')||{}).value || 'avion';
     if (!dest || !date) { showToast('⚠️','Destination et date requises'); return; }
-    _annonces.unshift({dest:dest, date:date, heure:heure, note:note, id:Date.now()});
+    _annonces.unshift({dest:dest, date:date, heure:heure, note:note, mode:mode, doc:_annDocData, id:Date.now()});
     try { localStorage.setItem('gcc_annonces', JSON.stringify(_annonces)); } catch(e) {}
     ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    var fi = document.getElementById('ann-doc-file');
+    if(fi) fi.value='';
+    _annDocData = null;
+    var prev = document.getElementById('ann-doc-preview');
+    if(prev) prev.style.display='none';
     showToast('✅','Annonce publiée pour ' + dest);
     refreshAnnonces();
   }
@@ -1099,18 +1158,29 @@ function doAdminLogin() {
   function refreshAnnonces() {
     var listEl = document.getElementById('annonces-list');
     if (!listEl) return;
-    if (_annonces.length === 0) { listEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;">Aucune annonce publiée</p>'; return; }
+    if (_annonces.length === 0) { listEl.innerHTML = '<div style="text-align:center;padding:32px 16px;color:#b0bec5;"><div style="font-size:2rem;margin-bottom:8px;">📭</div><div style="font-size:.85rem;">Aucune annonce publiée</div></div>'; return; }
     listEl.innerHTML = _annonces.map(function(a) {
       var d = new Date(a.date + 'T12:00:00');
       var isPast = d < new Date();
-      return '<div class="ann-card" style="' + (isPast?'opacity:.55;':'') + '">'
-        + '<div class="ann-info">'
-        + '<div class="ann-dest">' + a.dest + (isPast?' <span style="font-size:.7rem;color:#e74c3c;">[PASSÉ]</span>':'') + '</div>'
-        + '<div class="ann-date">🗓 ' + d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' — Limite: ' + a.heure + '</div>'
-        + (a.note ? '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;">📝 ' + a.note + '</div>' : '')
+      var modeIco = a.mode === 'bateau' ? '🚢' : '✈️';
+      var docHtml = '';
+      if (a.doc && a.doc.dataUrl) {
+        if (a.doc.type && a.doc.type.startsWith('image/')) {
+          docHtml = '<div style="margin-top:8px;"><img src="' + a.doc.dataUrl + '" style="max-width:100%;max-height:120px;border-radius:6px;border:1px solid #e0e6ef;object-fit:cover;"></div>';
+        } else {
+          docHtml = '<div style="margin-top:8px;"><a href="' + a.doc.dataUrl + '" download="' + (a.doc.name||'document') + '" style="font-size:.78rem;color:var(--sky);display:flex;align-items:center;gap:5px;text-decoration:none;">📄 ' + (a.doc.name||'document') + '</a></div>';
+        }
+      }
+      return '<div style="background:#fff;border:1.5px solid ' + (isPast?'#f5c6c6':'#dce3ec') + ';border-radius:10px;padding:14px 16px;margin-bottom:10px;' + (isPast?'opacity:.6;':'') + '">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="flex:1;">'
+        + '<div style="font-weight:800;color:var(--navy);font-size:.92rem;">' + modeIco + ' ' + a.dest + (isPast?' <span style="font-size:.68rem;background:#fde8e8;color:#c0392b;padding:2px 7px;border-radius:10px;">PASSÉ</span>':'') + '</div>'
+        + '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;">🗓 ' + d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' · ⏰ Limite: ' + a.heure + '</div>'
+        + (a.note ? '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;font-style:italic;">📝 ' + a.note + '</div>' : '')
+        + docHtml
         + '</div>'
-        + '<button onclick="deleteAnnonce(' + a.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:1rem;">✕</button>'
-        + '</div>';
+        + '<button onclick="deleteAnnonce(' + a.id + ')" style="background:#fde8e8;border:none;cursor:pointer;color:#e74c3c;font-size:.8rem;padding:4px 9px;border-radius:5px;font-weight:700;margin-left:10px;flex-shrink:0;">✕</button>'
+        + '</div></div>';
     }).join('');
   }
 
@@ -1133,6 +1203,59 @@ function doAdminLogin() {
     });
     try { localStorage.setItem('gcc_tarifs', JSON.stringify(tarifs)); } catch(e) {}
     showToast('✅','Tarifs sauvegardés');
+  }
+
+  /* ── Gestion config paiement admin ── */
+  function switchPayTab(key, btn) {
+    ['transfer','gcash','momo','om'].forEach(function(k) {
+      var p = document.getElementById('ppanel-'+k);
+      var b = document.getElementById('ptab-'+k);
+      if (p) p.style.display = (k===key) ? 'block' : 'none';
+      if (b) { b.style.background = (k===key) ? 'var(--navy)' : '#e8edf3'; b.style.color = (k===key) ? '#fff' : 'var(--navy)'; }
+    });
+  }
+
+  function loadPayConfig() {
+    var keys = ['transfer','gcash','momo','om'];
+    keys.forEach(function(k) {
+      var c = getPayCfg(k);
+      var elNum = document.getElementById('pay-num-'+k);
+      var elNom = document.getElementById('pay-nom-'+k);
+      var elNote= document.getElementById('pay-note-'+k);
+      var prev  = document.getElementById('pay-qr-prev-'+k);
+      if (elNum)  elNum.value  = c.num  || '';
+      if (elNom)  elNom.value  = c.nom  || '';
+      if (elNote) elNote.value = c.note || '';
+      if (prev && c.qr) { prev.src = c.qr; prev.style.display = 'block'; }
+      else if (prev)    { prev.style.display = 'none'; }
+    });
+  }
+
+  function payQrPreview(key, input) {
+    var file = input.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      if (!_payConfig[key]) _payConfig[key] = {};
+      _payConfig[key].qr = e.target.result;
+      var prev = document.getElementById('pay-qr-prev-'+key);
+      if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function savePayConfig() {
+    var keys = ['transfer','gcash','momo','om'];
+    keys.forEach(function(k) {
+      if (!_payConfig[k]) _payConfig[k] = {};
+      var elNum  = document.getElementById('pay-num-'+k);
+      var elNom  = document.getElementById('pay-nom-'+k);
+      var elNote = document.getElementById('pay-note-'+k);
+      if (elNum)  _payConfig[k].num  = elNum.value.trim();
+      if (elNom)  _payConfig[k].nom  = elNom.value.trim();
+      if (elNote) _payConfig[k].note = elNote.value.trim();
+    });
+    try { localStorage.setItem('gcc_pay_config', JSON.stringify(_payConfig)); } catch(e) {}
+    showToast('✅','Infos paiement sauvegardées');
   }
 
   function changePass() {
@@ -1383,32 +1506,32 @@ function doLogout() {
       <!-- ═══ SECTION LALAMOVE (masquée par défaut) ═══ -->
       <div class="fg full" id="sectionLalamove" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid var(--orange);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;">🛵 INFORMATIONS LALAMOVE</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;" data-fr="🛵 INFORMATIONS LALAMOVE" data-en="🛵 LALAMOVE INFORMATION">🛵 INFORMATIONS LALAMOVE</div>
           <div class="form-grid" style="gap:14px;">
             <div class="fg full">
-              <label>Adresse de collecte (Philippines)</label>
-              <input type="text" id="adresseLalamove" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
+              <label data-fr="Adresse de collecte (Philippines)" data-en="Pickup address (Philippines)">Adresse de collecte (Philippines)</label>
+              <input type="text" id="adresseLalamove" data-fr="Ex : 123 Naga Rd, Parañaque, Metro Manila" data-en="E.g.: 123 Naga Rd, Parañaque, Metro Manila" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label>Date souhaitée de collecte</label>
+              <label data-fr="Date souhaitée de collecte" data-en="Preferred pickup date">Date souhaitée de collecte</label>
               <input type="date" id="dateLalamove" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label>Créneau horaire préféré</label>
+              <label data-fr="Créneau horaire préféré" data-en="Preferred time slot">Créneau horaire préféré</label>
               <select id="creneauLalamove" style="font-size:.9rem;">
-                <option>Matin (8h – 12h)</option>
-                <option>Après-midi (12h – 17h)</option>
-                <option>Soir (17h – 20h)</option>
+                <option data-fr="Matin (8h – 12h)" data-en="Morning (8 AM – 12 PM)">Matin (8h – 12h)</option>
+                <option data-fr="Après-midi (12h – 17h)" data-en="Afternoon (12 PM – 5 PM)">Après-midi (12h – 17h)</option>
+                <option data-fr="Soir (17h – 20h)" data-en="Evening (5 PM – 8 PM)">Soir (17h – 20h)</option>
               </select>
             </div>
           </div>
 
           <!-- PAIEMENT -->
           <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(232,119,34,.25);">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;">💳 MODE DE PAIEMENT</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;" data-fr="💳 MODE DE PAIEMENT" data-en="💳 PAYMENT METHOD">💳 MODE DE PAIEMENT</div>
             <div class="form-grid" style="gap:14px;">
               <div class="fg full">
-                <label>Méthode de paiement</label>
+                <label data-fr="Méthode de paiement" data-en="Payment method">Méthode de paiement</label>
                 <select id="modePaiement" onchange="handleModePaiement(this.value)" style="font-size:.9rem;">
                   <option value="transfer">🏦 Bank Transfer (BPI, BDO, Metrobank…)</option>
                   <option value="gcash">📱 GCash / Maya</option>
@@ -1420,10 +1543,10 @@ function doLogout() {
               <div class="fg full" id="infoPaiement" style="background:#f0f6ff;border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--navy);line-height:1.7;"></div>
               <!-- Upload capture de paiement -->
               <div class="fg full" id="sectionCapturePaiement">
-                <label>📸 Capture d'écran du paiement / dépôt</label>
+                <label data-fr="📸 Capture d'écran du paiement / dépôt" data-en="📸 Payment / deposit screenshot">📸 Capture d'écran du paiement / dépôt</label>
                 <div class="upload-zone" onclick="document.getElementById('captureFile').click()" style="padding:16px;">
                   <div class="uz-icon" style="font-size:1.6rem;">📸</div>
-                  <p>Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
+                  <p data-fr="Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Upload your transfer or deposit screenshot<br><small>JPG, PNG or PDF — max 5 MB</small>">Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
                   <div class="uz-name" id="capture-name"></div>
                   <input id="captureFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'capture-name')">
                 </div>
@@ -1436,16 +1559,16 @@ function doLogout() {
       <!-- ═══ INFO PRESENTIEL ═══ -->
       <div class="fg full" id="sectionPresentiel" style="display:none;">
         <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--sky);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;" data-fr="🏢 DÉPÔT EN PRÉSENTIEL" data-en="🏢 DROP-OFF IN PERSON">🏢 DÉPÔT EN PRÉSENTIEL</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;" data-fr="Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement." data-en="Bring your parcel directly to our office. Our team checks, weighs and issues your invoice on the spot. You pay and receive your receipt immediately.">
             Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 Horaires : Lun–Sam, 9h00 – 18h00<br>
+            🕗 <span data-fr="Horaires : Lun–Sam, 9h00 – 18h00" data-en="Hours: Mon–Sat, 9:00 AM – 6:00 PM">Horaires : Lun–Sam, 9h00 – 18h00</span><br>
             📞 +63 968 313 5356 / +63 915 385 7604
           </div>
-          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;">
+          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash/Maya · Bank Transfer">
             💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer
           </p>
         </div>
@@ -1453,17 +1576,17 @@ function doLogout() {
       <!-- ═══ INFO SHOPEE/LAZADA ═══ -->
       <div class="fg full" id="sectionEcommerce" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff5f0,#ffeee6);border:1.5px solid #e74c3c;border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;">🛍️ COMMANDE SHOPEE / LAZADA</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;" data-fr="🛍️ COMMANDE SHOPEE / LAZADA" data-en="🛍️ SHOPEE / LAZADA ORDER">🛍️ COMMANDE SHOPEE / LAZADA</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;" data-fr="Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition." data-en="Your online order will be delivered <strong>directly to our premises</strong> by the platform courier (Shopee, Lazada, etc.). GCC CARGO receives, checks, weighs and prepares it for shipment.">
             Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 Livraisons acceptées : Lun–Sam, 9h00 – 17h00<br>
+            🕗 <span data-fr="Livraisons acceptées : Lun–Sam, 9h00 – 17h00" data-en="Deliveries accepted: Mon–Sat, 9:00 AM – 5:00 PM">Livraisons acceptées : Lun–Sam, 9h00 – 17h00</span><br>
             📞 +63 968 313 5356
           </div>
           <!-- Avertissement responsabilité -->
-          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;">
+          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;" data-fr="⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires." data-en="⚠️ <strong>CLIENT RESPONSIBILITY:</strong> By choosing this mode, you acknowledge that you are <strong>solely and entirely responsible</strong> for the contents of the ordered parcel, its legal and customs compliance. GCC CARGO HANDLING INC cannot be held responsible for the content, condition or legality of the parcel delivered by the platform. Any illegal or non-compliant content exposes the client to legal proceedings.">
             ⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires.
           </div>
           <!-- Upload capture paiement -->
@@ -1937,30 +2060,79 @@ function doLogout() {
       <!-- PAGE: ANNONCES -->
       <div class="adm-page" id="adm-departs">
         <div class="adm-page-title">&#128226; Annonces &amp; Départs</div>
-        <div class="adm-page-sub">Planification des départs cargo et communications</div>
+        <div class="adm-page-sub">Planification des départs cargo et communications clients</div>
         <div class="adm-grid-2">
+
+          <!-- FORMULAIRE -->
           <div class="adm-card">
             <div class="adm-card-title">&#10133; Planifier un départ</div>
-            <div class="adm-form-row"><div class="fg"><label>Destination</label>
-              <select class="adm-input" id="ann-dest">
-                <option>&#127464;&#127474; Yaoundé — Cameroun</option>
-                <option>&#127464;&#127474; Douala — Cameroun</option>
-                <option>&#127464;&#127468; Brazzaville — Congo</option>
-                <option>&#127464;&#127465; Kinshasa — RDC</option>
-                <option>&#127468;&#127462; Libreville — Gabon</option>
-                <option>&#127463;&#127471; Cotonou — Bénin</option>
+
+            <!-- Destination -->
+            <div style="margin-bottom:12px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🌍 Destination</label>
+              <select class="adm-input" id="ann-dest" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
+                <option value="Yaoundé — Cameroun">🇨🇲 Yaoundé — Cameroun</option>
+                <option value="Douala — Cameroun">🇨🇲 Douala — Cameroun</option>
+                <option value="Brazzaville — Congo">🇨🇬 Brazzaville — Congo</option>
+                <option value="Kinshasa — RDC">🇨🇩 Kinshasa — RDC</option>
+                <option value="Libreville — Gabon">🇬🇦 Libreville — Gabon</option>
+                <option value="Cotonou — Bénin">🇧🇯 Cotonou — Bénin</option>
               </select>
-            </div></div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Date de départ</label><input class="adm-input" type="date" id="ann-date"></div>
-              <div class="fg"><label>Limite dépôt</label><input class="adm-input" type="time" id="ann-heure" value="16:00"></div>
             </div>
-            <div class="adm-form-row"><div class="fg"><label>Note</label><input class="adm-input" id="ann-note" placeholder="Ex: Places limitées — dépôt avant vendredi 16h"></div></div>
-            <button class="adm-btn-primary" onclick="addAnnonce()">Publier</button>
+
+            <!-- Mode transport -->
+            <div style="margin-bottom:12px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🚀 Mode de transport</label>
+              <select class="adm-input" id="ann-mode" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
+                <option value="avion">✈️ Fret Aérien</option>
+                <option value="bateau">🚢 Fret Maritime</option>
+              </select>
+            </div>
+
+            <!-- Date + heure limite -->
+            <div style="display:flex;gap:11px;margin-bottom:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:130px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📅 Date de départ</label>
+                <input class="adm-input" type="date" id="ann-date" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
+              </div>
+              <div style="flex:1;min-width:120px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">⏰ Limite de dépôt</label>
+                <input class="adm-input" type="time" id="ann-heure" value="16:00" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
+              </div>
+            </div>
+
+            <!-- Note -->
+            <div style="margin-bottom:12px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📝 Message / Note</label>
+              <textarea class="adm-input" id="ann-note" rows="2" placeholder="Ex: Places limitées — tarif spécial cette semaine…" style="border:1.5px solid #c8d3e0;background:#f4f7fb;resize:vertical;"></textarea>
+            </div>
+
+            <!-- Upload document / flyer -->
+            <div style="margin-bottom:16px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📎 Flyer / Document (optionnel)</label>
+              <label style="display:flex;align-items:center;gap:10px;border:2px dashed #c8d3e0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#f8fafd;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--sky)'" onmouseout="this.style.borderColor='#c8d3e0'">
+                <span style="font-size:1.4rem;">🖼️</span>
+                <div>
+                  <div style="font-size:.82rem;font-weight:700;color:var(--navy);">Cliquer pour ajouter une image ou PDF</div>
+                  <div style="font-size:.72rem;color:var(--slate);">JPG, PNG ou PDF — max 5 MB</div>
+                </div>
+                <input type="file" id="ann-doc-file" accept=".jpg,.jpeg,.png,.pdf" style="display:none;" onchange="annDocPreview(this)">
+              </label>
+              <!-- Prévisualisation -->
+              <div id="ann-doc-preview" style="display:none;align-items:center;gap:10px;margin-top:8px;background:#f0f6ff;border-radius:7px;padding:10px 12px;border:1px solid #d0e4f7;">
+                <img id="ann-doc-img" src="" alt="" style="max-height:56px;max-width:80px;border-radius:5px;object-fit:cover;display:none;">
+                <span style="font-size:.8rem;color:var(--navy);font-weight:600;" id="ann-doc-fname"></span>
+                <button onclick="_annDocData=null;document.getElementById('ann-doc-file').value='';document.getElementById('ann-doc-preview').style.display='none';" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.9rem;">✕</button>
+              </div>
+            </div>
+
+            <button class="adm-btn-primary" onclick="addAnnonce()" style="width:100%;font-size:.9rem;padding:11px;">🚀 Publier l'annonce</button>
           </div>
+
+          <!-- LISTE -->
           <div class="adm-card">
             <div class="adm-card-title">&#128197; Départs planifiés</div>
-            <div id="annonces-list" style="font-size:.84rem;max-height:320px;overflow-y:auto;"></div>
+            <div id="annonces-list" style="font-size:.84rem;max-height:440px;overflow-y:auto;"></div>
           </div>
         </div>
       </div>
@@ -1993,6 +2165,119 @@ function doLogout() {
             </div>
           </div>
         </div>
+        <!-- BLOC CONFIG PAIEMENT -->
+        <div class="adm-card" style="margin-top:0;">
+          <div class="adm-card-title">💳 Informations de paiement (affichées aux clients)</div>
+          <p style="font-size:.8rem;color:var(--slate);margin-bottom:16px;">Ces infos apparaissent automatiquement selon le mode de paiement choisi par le client. Ajoutez vos numéros et QR codes ici.</p>
+
+          <!-- Tabs internes paiement -->
+          <div style="display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;">
+            <button onclick="switchPayTab('transfer',this)" id="ptab-transfer" style="background:var(--navy);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🏦 Bank Transfer</button>
+            <button onclick="switchPayTab('gcash',this)" id="ptab-gcash" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">📱 GCash/Maya</button>
+            <button onclick="switchPayTab('momo',this)" id="ptab-momo" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">💚 MoMo</button>
+            <button onclick="switchPayTab('om',this)" id="ptab-om" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🧡 Orange Money</button>
+          </div>
+
+          <!-- Panneaux par méthode -->
+          <div id="ppanel-transfer" class="ppanel">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du titulaire</label>
+                <input class="adm-input" id="pay-nom-transfer" placeholder="GCC CARGO HANDLING INC">
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Banques acceptées</label>
+                <input class="adm-input" id="pay-num-transfer" placeholder="BPI · BDO · Metrobank">
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
+              <input class="adm-input" id="pay-note-transfer" placeholder="Envoyez la capture d'écran de votre virement.">
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code (optionnel)</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
+                📤 Uploader QR <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('transfer',this)">
+              </label>
+              <img id="pay-qr-prev-transfer" src="" style="display:none;max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <div id="ppanel-gcash" class="ppanel" style="display:none;">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro GCash / Maya</label>
+                <input class="adm-input" id="pay-num-gcash" placeholder="+63 9XX XXX XXXX">
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
+                <input class="adm-input" id="pay-nom-gcash" placeholder="Nom affiché sur GCash">
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
+              <input class="adm-input" id="pay-note-gcash" placeholder="Envoyez la capture d'écran de la transaction.">
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code GCash (recommandé)</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
+                📤 Uploader QR GCash <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('gcash',this)">
+              </label>
+              <img id="pay-qr-prev-gcash" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <div id="ppanel-momo" class="ppanel" style="display:none;">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro MoMo</label>
+                <input class="adm-input" id="pay-num-momo" placeholder="+237 6XX XXX XXX">
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
+                <input class="adm-input" id="pay-nom-momo" placeholder="Nom MoMo Money">
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
+              <input class="adm-input" id="pay-note-momo" placeholder="Envoyez la capture d'écran du dépôt.">
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code MoMo (optionnel)</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
+                📤 Uploader QR MoMo <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('momo',this)">
+              </label>
+              <img id="pay-qr-prev-momo" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <div id="ppanel-om" class="ppanel" style="display:none;">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro Orange Money</label>
+                <input class="adm-input" id="pay-num-om" placeholder="+237 6XX XXX XXX">
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
+                <input class="adm-input" id="pay-nom-om" placeholder="Nom Orange Money">
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
+              <input class="adm-input" id="pay-note-om" placeholder="Envoyez la capture d'écran du dépôt.">
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code OM (optionnel)</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
+                📤 Uploader QR Orange Money <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('om',this)">
+              </label>
+              <img id="pay-qr-prev-om" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <button class="adm-btn-primary" onclick="savePayConfig()" style="margin-top:18px;">💾 Sauvegarder les infos paiement</button>
+        </div>
+
         <div class="adm-card">
           <div class="adm-card-title">&#128202; Export données</div>
           <div style="display:flex;gap:12px;flex-wrap:wrap;">
