@@ -170,7 +170,7 @@ nav{
 #modePaiement option,#modePaiement optgroup,
 #modeDepot option,#modeDepot optgroup,
 #selectDestination option,#selectDestination optgroup,
-#selectModeEnvoi option,#ann-dest option,#ann-dest optgroup{
+#selectModeEnvoi option,#selectTypeContenu option,#ann-dest option,#ann-dest optgroup{
   background:#fff !important;color:#0B1F3A !important;
 }
 .upload-zone{
@@ -1792,7 +1792,7 @@ function doLogout() {
       </div>
 
       <div class="fg"><label data-fr="Type de contenu" data-en="Content type">Type de contenu</label>
-        <select>
+        <select id="selectTypeContenu">
           <option>Marchandises générales</option>
           <option>Électronique</option>
           <option>Médicaments</option>
