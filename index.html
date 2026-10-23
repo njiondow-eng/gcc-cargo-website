@@ -41,6 +41,7 @@ nav{
 .nav-links a:hover{color:var(--orange);border-bottom-color:var(--orange);}
 .nav-actions{display:flex;gap:10px;align-items:center;}
 .btn-admin{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--ice);font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
+#nav-logo-trigger{cursor:pointer;user-select:none;}
 .btn-admin:hover{background:rgba(255,255,255,.1);}
 .btn-nav-cta{background:var(--orange);color:var(--white);font-weight:700;padding:10px 20px;border-radius:4px;font-size:.88rem;white-space:nowrap;transition:opacity .2s;}
 .btn-nav-cta:hover{opacity:.88;}
@@ -608,7 +609,7 @@ function doAdminLogin() {
 
   // ─── SUPABASE CONFIG ─────────────────────────────────────────────────────
   var SUPA_URL = 'https://voxgdylvevwfpomamhjo.supabase.co';
-  var SUPA_KEY = 'sb_publishable_HT5VpsnIWjBEK2lrbpomUg_1G7CtCZG';
+  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZveGdkeWx2ZXZ3ZnBvbWFtaGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NDkzMjcsImV4cCI6MjEwODMyNTMyN30.yXR3WFsSUBnQ9O6XpXAYdKspRf29Mq33EZBlebWnU8U';
 
   function supaFetch(path, opts) {
     return fetch(SUPA_URL + '/rest/v1/' + path, Object.assign({
@@ -681,6 +682,24 @@ function doAdminLogin() {
 
   function handleShipSubmit(e) {
     e.preventDefault();
+    // ── Validation champs obligatoires ──
+    var _nomExp   = (document.querySelector('input[placeholder="Ex : William Tabi"]')||{value:''}).value.trim();
+    var _telExp   = (document.querySelector('input[placeholder="+63 968 313 5356"]')||{value:''}).value.trim();
+    var _emailExp = (document.querySelector('input[type="email"]')||{value:''}).value.trim();
+    var _nomRec   = (document.querySelector('input[placeholder="Ex : Marie Mbeu"]')||{value:''}).value.trim();
+    var _telRec   = (document.querySelector('input[placeholder="+237 6XX XXX XXX"]')||{value:''}).value.trim();
+    var _destEl   = document.getElementById('selectDestination');
+    var _dest     = _destEl ? _destEl.value.trim() : '';
+    var _chk      = document.querySelector('input[type="checkbox"]');
+    var _errs = [];
+    if (!_nomExp)   _errs.push('Nom expéditeur');
+    if (!_telExp)   _errs.push('Tél expéditeur');
+    if (!_emailExp) _errs.push('Email');
+    if (!_nomRec)   _errs.push('Nom destinataire');
+    if (!_telRec)   _errs.push('Tél destinataire');
+    if (!_dest)     _errs.push('Destination');
+    if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
+    if (_errs.length) { showToast('⚠️ Champs manquants', _errs.join(' • ')); return; }
     var now = new Date();
     var ref = 'GCC-' + now.getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
     var depotSel = document.getElementById('modeDepot');
@@ -711,11 +730,20 @@ function doAdminLogin() {
     };
     // Sauvegarder dans Supabase (backend partagé)
     supaInsert(entry)
-      .then(function(r){ return r.json(); })
-      .then(function(rows){
-        if (Array.isArray(rows) && rows[0]) entry.id = rows[0].id;
+      .then(function(r){
+        if (!r.ok) {
+          r.text().then(function(t){ showToast('⚠️ Supabase erreur', t.substring(0,120)); });
+          return [];
+        }
+        return r.json();
       })
-      .catch(function(){});
+      .then(function(rows){
+        if (Array.isArray(rows) && rows[0]) {
+          entry.id = rows[0].id;
+          showToast('☁️ Sync OK', 'Demande enregistrée dans le cloud');
+        }
+      })
+      .catch(function(err){ showToast('⚠️ Réseau', String(err).substring(0,120)); });
     // Aussi en local comme fallback
     _submissions.unshift(entry);
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
@@ -779,6 +807,18 @@ function doAdminLogin() {
     }
     refreshAdminTable();
     showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
+  }
+
+  // ─── TRIPLE-CLIC LOGO → ADMIN ─────────────────────────────────────────
+  var _logoClicks = 0, _logoTimer = null;
+  function _logoClick() {
+    _logoClicks++;
+    if (_logoTimer) clearTimeout(_logoTimer);
+    _logoTimer = setTimeout(function(){ _logoClicks = 0; }, 600);
+    if (_logoClicks >= 3) {
+      _logoClicks = 0;
+      openAdminLogin();
+    }
   }
 
   // Apply language + init on DOM ready
@@ -1449,7 +1489,7 @@ function doLogout() {
 
 <!-- ░░ NAV ░░ -->
 <nav id="main-nav">
-  <div class="nav-logo">
+  <div class="nav-logo" id="nav-logo-trigger" onclick="_logoClick()">
     <img src="data:image/webp;base64,UklGRvoIAABXRUJQVlA4IO4IAAAwJwCdASpQAFAAPm0sj0WkIqEXrf7EQAbEtgBjVgqoTaEviPw/whlM+U/yx/r/uA9+PqO+2b3APFJ/Wb3WeYb+Pf1H9nfeV9FvoAfz3/Cekd7FnoAeWv+5nwd/t7+1XwE/sX//84A/kHVz8F/Dl6j9tfTvxD2kfQH9Z5Yd6/v71AvWf+h/LTgQa+egF7GfS+8x1RL0//UeVV4FPmHsB/mv/i/bl9L/9P+0PnW+lPYJ/m39h/4PYU/bP2aP2MdRffI/AdrM7UXdpGaZqfoVW1Ae07ej3rUV4jwZD8/fK0XpLvf2kkZ2U8vDtB2tauZ+pQAejWbZSs0BEVlFn9lq9tB0psmDd1ZF5br0WdhS8p5WFWN/FhR7sRSeMoQIgGqkb58qbKdExJl1VR2XtiFUiL5LlOXLTxUcaBn/dV3N/gi4mTsgAP7+iRheb2nrOe/KAQqC6sW/RpoB0TtU6ugbQuU+67GwN5gQNMVo9NxE1468M+6lSaNQp49wXQQ5DI9ZBl7HhUKY6Ul07adLmPulyvAoR+LbjjvYcDMbU13v0c2ROhcKCMO/me6LKrTfRaD96MLjSbMktdNtzpgnSgP0V8c+H1eIS4K658VxNbm0pQQ2P4YdC6rvWkH/OlDa/Wy7MaV9mj4/A7u08TzE8cjF/MNeH4BiPZB+g0N1NAB+3QOjR+GpLlWjrt03PopStPFLGL0f9J2E21N/0N7DY+Muih/0AgKSMaEzZa2Cx5FT8MXvxdEOWzjd9UQrLv4iRMZpyck0CE3kxp6udlBBQLK0UgVc6BYI4aGIV1x8QRM3R0C3fBVkGial4+1Xm+4ygeHs42bcw7+RcQADiUpCV7Ym4ssGJCPV5uy8PZGctR84KxDFS4ZcnSQBQ83OLUYeKUalAthf1KRyjwFxhBeHIUv7u/D6ovll38rm0CfmmG9mzbuxuKAg5olRnhMkacBjQsIVdqSBUYEDaoi/sNYrIm8ItpjGRslD4c/BFmeih/PLHhjAgzygazOm+WhacKOI0l92+3HUA6vP+gc/o8fDGIvzXJ2T+xSSg+mQR/fTBQWHfI6eZS/pl93OVYAI2ypsvPh6HtgBeHkzukWN3bjpQj/klwFtT12BjeXvMfaWCw8N0f+hC9J9xYv3+m4n1fUIc0P//smqp/kP/btvqW/sPjHCdOJOn72jx5wgEEY1R6+V5H7/BA6fzLR8nkKsTut/AErgb0Qu3Wn9QLujiX4bDHR9foy4D3I5uxn4ONkDd0sjan/fPpYfE93tSWpW6XycV1VSXiFjaDcLmsImRgk5FuizhN4/WsEdsFPWCsKvw3rINrSWEjVX0ZmqcaSCKKI5ZfaYZhh4qpQL887r/4xfs+p9jisZgZTQLzv4rPDLdIv/1IRf3nz0td3gFcIhaTwMLYG6bD4XLRHxUHTXeA2mf8H0vay8/xYJgCG7H/74g3qF56ycmaP0Ns5WRM4aRj3gkhisDJ5Pc6Gq+EGAsQ6dCY+hzN68dx1xla5FzB/AYqpTQaMK6OzXbxOYiR/8lZ0wankJ70qD+JJTWRedDh1avhPZw4OTV9JCYY1W+/9qKvbEbwrVgMCXQBFTXy2jgk7F+Be8iIwl/9p3i6gax/BQ22xCrj1BmX5jkJFDjMBKA21IBp7PnEDMRuivjmzfXP/JcmUBu2iP6hHL+MZBbbP6wDP7yGUwJYYnKW5vr42NMz7d+s/6b9Ma/AmTyN6JKOXOAvFAZc9+lbLSrzM0khDIxo/cmRLHtZwXw+rSBzrNWEP3OdLCrb247x1jxnOjjCArkK3w+Zm/W+RcvgXGpRjsyESXMYLXGhboSOighBRwLkJuCcGkz6zgk2Ri9Bz1rRkV4cmw47sIgMKxdp+F+dCD10iTzn4c/lNW9sZC5v3S6fzAxjoG5mO4/HnlwoCYiQ+EkvoIlgzVjdEoBAPkFkI4usilM+fwQyOmUdXUtfpcrA1UPZxqmrsjaS+/NoNtV5ZjWnNflPwX+dxnYoanZYyWNdcOdsLNkT+gA2NgMjBV9atlNqnWUhU+LEwOmR/kJzFKP32/uCcw5VbutHSWiYALQzZZ15zyVfvo2b27OvQ5T2/Nt9ZjDn01thAtVqg1JdNs4+4jEXUI3JJHVQrG5OwDRr5jTWZ9nzobVxkke2IjAhcAN4tx0KFvt33/J7Sn/Lnjgs8Y4z/n9b9PcyzyOUT1+tkACzcxBFsMFKHMs1Sqc3YZ4E3G58j+hFV+C1e/S3HOmbF4YBS1SjiKSWDiCOjdmqnnzNSBuIxQCArQFdlVEh+8lP9Rh0l6nzf8LmMW/aZRmPMIqTYQNM44yqNiWepA4lca/I035lznMTA8i+4owwmMPQBaS8O6eQhdCbG0gsNyrp8oF0NOy67D0DoBzziGdmgybKcXx8vVaOYmdelJqEiLKL7DGxIDwUSD9CStdkYOas/WWURggpn8jZmTNS8Pws0SIRWrQPpiy6b3KEMMLYD3dSNVN+InbBm8qtMJ2PPPI5C8pexeTGxRk6lUA/oSqWF0e1BgUJR6x35ynifAp1ye0qV5CmzaKuSkahLlNG9ghutGBVl5gMH+9u0qVHaAJ24p7tiV9V1v+XIDmvAveCKtXbn6qJEbZq03UFKvfBcNptBelbwWCfruoSOq1RPb+HjhIC9K7kMM51F3F/4hQv7nAjdkXECYK/0IYRg/lwFcts0ciwwbDnRqnqUETdK4Y/GLQ2sVvhP5j4pQvxx4+/M/CmJgA7c4J1GtZQ3ywTB9o2+lELX7MfHON+FeRYoTDcTIyGL+GiV/8eG1AjsRthQP/qCz1b9xgMU1+7QyEjH7f9poG8p0Xp5Gj+McemrQwQhI0f8tFG805UXRgYgi++RZGJEIGL1/l043mYKgS0PSXAxxn86UfBrVVTexvFIhRKmpOYySZ/fEqfrI+J+8UZsTEdeAwNPd6dz9wRiP8gVS8HnT6ZrioGVKCiVCUADQyZ52eoWnmvmKnLiGK/h1KTEXTsyZxTS9lHMHSMhGzJFPvxbPReUMsYgt5uMTB1qzwHm9EnsRxJyPaohYwXhbmHZQAAA=" alt="GCC Cargo">
     <div class="nav-logo-text">
       <div class="gcc">GCC CARGO</div>
@@ -1465,7 +1505,7 @@ function doLogout() {
     <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
   </ul>
   <div class="nav-actions"><div class="lang-switcher"><button class="lang-btn active" onclick="setLang('fr')">FR</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
-    <button class="btn-admin" onclick="openAdminLogin()">🔐 Admin</button>
+    <button class="btn-admin" onclick="openAdminLogin()" style="display:none;">🔐 Admin</button>
     <a href="#envoyer" class="btn-nav-cta" data-fr="Envoyer un colis" data-en="Ship a package">Envoyer un colis</a>
     <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
   </div>
