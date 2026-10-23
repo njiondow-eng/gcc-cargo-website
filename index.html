@@ -2570,18 +2570,6 @@ function toggleSubmit(){
   document.getElementById('submitBtn').disabled=!cb.checked;
 }
 
-// Ship submit
-function handleShipSubmit(e){
-  e.preventDefault();
-  const cb=document.getElementById('consentCheck');
-  if(!cb.checked){showToast(tr('required'), tr('requiredMsg'));return;}
-  showToast(tr('submitted'), tr('submittedMsg'));
-  e.target.reset();
-  document.getElementById('submitBtn').disabled=true;
-  document.getElementById('id-name').style.display='none';
-  document.getElementById('colis-names').style.display='none';
-}
-
 // Track
 function doTrack(){
   const v=document.getElementById('trackInput').value.trim();
