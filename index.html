@@ -837,6 +837,8 @@ function doAdminLogin() {
 
   /* ═══ COLIS FILTER ═══ */
   function filterColis() {
+    /* toujours recharger depuis localStorage pour être à jour */
+    try { var _sf=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sf)) _submissions=_sf; } catch(e){}
     var q = (document.getElementById('search-colis')||{value:''}).value.toLowerCase();
     var st = (document.getElementById('filter-statut')||{value:''}).value;
     var tbody = document.getElementById('admin-submissions-tbody');
