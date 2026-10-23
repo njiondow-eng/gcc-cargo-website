@@ -458,18 +458,20 @@ try {
 
 function openAdminLogin() {
   var now = Date.now();
-  if (now < _lockUntil) {
-    var mins = Math.ceil((_lockUntil - now) / 60000);
-    if (typeof showToast === 'function') showToast(tr('locked'), tr('retryIn') + mins + tr('retryMin'));
-    return;
-  }
   var m = document.getElementById('adminModal');
   if (m) {
     m.classList.add('open');
-    setTimeout(function() {
-      var u = document.getElementById('adminUser');
-      if (u) u.focus();
-    }, 120);
+    var err = document.getElementById('login-err');
+    if (now < _lockUntil) {
+      var mins = Math.ceil((_lockUntil - now) / 60000);
+      if (err) { err.textContent = '🔒 Trop de tentatives — réessayez dans ' + mins + ' min.'; err.style.display = 'block'; }
+    } else {
+      if (err) err.style.display = 'none';
+      setTimeout(function() {
+        var u = document.getElementById('adminUser');
+        if (u) u.focus();
+      }, 120);
+    }
   }
 }
 
@@ -506,7 +508,7 @@ function doAdminLogin() {
     _loginAttempts++;
     try { sessionStorage.setItem('gcc_attempts', String(_loginAttempts)); } catch(e) {}
     if (_loginAttempts >= 5) {
-      _lockUntil = Date.now() + 15 * 60 * 1000;
+      _lockUntil = Date.now() + 5 * 60 * 1000;
       try { sessionStorage.setItem('gcc_lock', String(_lockUntil)); } catch(e) {}
       _loginAttempts = 0;
       try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
@@ -517,9 +519,12 @@ function doAdminLogin() {
     }
     var err = document.getElementById('login-err');
     if (err) {
-      err.textContent = _loginAttempts >= 5
-        ? 'Compte bloqué 15 min.'
-        : 'Identifiants incorrects. ' + (5 - _loginAttempts) + ' tentative(s) restante(s).';
+      if (_loginAttempts === 0 && _lockUntil > Date.now()) {
+        var minsLeft = Math.ceil((_lockUntil - Date.now()) / 60000);
+        err.textContent = '🔒 Trop de tentatives — réessayez dans ' + minsLeft + ' min.';
+      } else {
+        err.textContent = '❌ Identifiants incorrects. ' + (5 - _loginAttempts) + ' tentative(s) restante(s).';
+      }
       err.style.display = 'block';
     }
   }
@@ -1487,10 +1492,10 @@ function doLogout() {
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
         <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
-          <option value="">— Choisir le mode de dépôt —</option>
-          <option value="presentiel">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
-          <option value="lalamove">🛵 Lalamove — collecte à mon domicile / adresse</option>
-          <option value="ecommerce">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
+          <option value="" data-fr="— Choisir le mode de dépôt —" data-en="— Choose drop-off mode —">— Choisir le mode de dépôt —</option>
+          <option value="presentiel" data-fr="🏢 En présentiel — je dépose moi-même aux bureaux GCC" data-en="🏢 In person — I drop off at GCC offices">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
+          <option value="lalamove" data-fr="🛵 Lalamove — collecte à mon domicile / adresse" data-en="🛵 Lalamove — pickup from my home / address">🛵 Lalamove — collecte à mon domicile / adresse</option>
+          <option value="ecommerce" data-fr="🛍️ Shopee / Lazada (livraison aux locaux GCC)" data-en="🛍️ Shopee / Lazada (delivered to GCC premises)">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
         </select>
       </div>
 
