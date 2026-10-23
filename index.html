@@ -682,22 +682,20 @@ function doAdminLogin() {
 
   function handleShipSubmit(e) {
     e.preventDefault();
-    // ── Validation champs obligatoires ──
-    var _nomExp   = (document.querySelector('input[placeholder="Ex : William Tabi"]')||{value:''}).value.trim();
-    var _telExp   = (document.querySelector('input[placeholder="+63 968 313 5356"]')||{value:''}).value.trim();
-    var _emailExp = (document.querySelector('input[type="email"]')||{value:''}).value.trim();
-    var _nomRec   = (document.querySelector('input[placeholder="Ex : Marie Mbeu"]')||{value:''}).value.trim();
-    var _telRec   = (document.querySelector('input[placeholder="+237 6XX XXX XXX"]')||{value:''}).value.trim();
+    // ── Validation champs obligatoires (par id, indépendant de la langue) ──
+    var _nomExp   = (document.getElementById('nomExp')||{value:''}).value.trim();
+    var _telExp   = (document.getElementById('telExp')||{value:''}).value.trim();
+    var _emailExp = (document.getElementById('emailExp')||{value:''}).value.trim();
+    var _nomRec   = (document.getElementById('nomRec')||{value:''}).value.trim();
+    var _telRec   = (document.getElementById('telRec')||{value:''}).value.trim();
     var _destEl   = document.getElementById('selectDestination');
     var _dest     = _destEl ? _destEl.value.trim() : '';
-    var _chk      = document.querySelector('input[type="checkbox"]');
+    var _chk      = document.getElementById('consentCheck');
     var _errs = [];
     if (!_nomExp)   _errs.push('Nom expéditeur');
     if (!_telExp)   _errs.push('Tél expéditeur');
-    if (!_emailExp) _errs.push('Email');
     if (!_nomRec)   _errs.push('Nom destinataire');
     if (!_telRec)   _errs.push('Tél destinataire');
-    if (!_dest)     _errs.push('Destination');
     if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
     if (_errs.length) { showToast('⚠️ Champs manquants', _errs.join(' • ')); return; }
     var now = new Date();
@@ -708,19 +706,19 @@ function doAdminLogin() {
     var entry = {
       ref:         ref,
       date:        now.toLocaleDateString('fr-FR'),
-      expediteur:  (document.querySelector('input[placeholder="Ex : William Tabi"]') || {value:''}).value,
-      tel_exp:     (document.querySelector('input[placeholder="+63 968 313 5356"]') || {value:''}).value,
-      email_exp:   (document.querySelector('input[type="email"]') || {value:''}).value,
-      recepteur:   (document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
-      tel_rec:     (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
+      expediteur:  _nomExp,
+      tel_exp:     _telExp,
+      email_exp:   _emailExp,
+      recepteur:   _nomRec,
+      tel_rec:     _telRec,
       destination: destSel ? destSel.value : '',
       mode:        depotSel ? depotSel.value : '',
       modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
       modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
       paiement:    (document.getElementById('modePaiement') || {value:''}).value,
       modePaiement:paymentSel ? paymentSel.options[paymentSel.selectedIndex].text : '',
-      destinataire:(document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
-      tel_dest:    (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
+      destinataire:_nomRec,
+      tel_dest:    _telRec,
       adresse:     (document.getElementById('adresseLalamove') || {value:''}).value,
       adresse_lalamove:(document.getElementById('adresseLalamove') || {value:''}).value,
       adresseClient:(document.getElementById('adresseClient') || {value:''}).value,
@@ -1629,9 +1627,9 @@ function doLogout() {
   <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input type="tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" placeholder="votre@email.com"></div>
+      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
+      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input id="emailExp" type="email" placeholder="votre@email.com"></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select id="selectDestination">
@@ -1669,8 +1667,8 @@ function doLogout() {
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
+      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
