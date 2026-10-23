@@ -346,6 +346,23 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
 }
 #sectionLalamove .fg input::placeholder,#sectionLalamove .fg textarea::placeholder{color:#94a3b8;}
 #sectionLalamove .fg label,#sectionPresentiel .fg label{color:var(--navy);}
+/* Inputs admin panel sur fond clair — couvre TOUS les onglets */
+.adm-page .fg input,.adm-page .fg select,.adm-page .fg textarea,
+.adm-page .adm-input,
+.adm-page input[type=text],.adm-page input[type=number],
+.adm-page input[type=date],.adm-page input[type=time],
+.adm-page input[type=password],.adm-page input[type=email],
+.adm-page select,.adm-page textarea{
+  background:#f4f7fb !important;border:1.5px solid #c8d3e0 !important;color:var(--navy) !important;
+  border-radius:7px !important;padding:8px 11px !important;
+  font-family:'Barlow',sans-serif !important;font-size:.86rem !important;
+  box-sizing:border-box !important;width:100% !important;
+}
+.adm-page .fg label,.adm-page label{color:var(--navy) !important;}
+.adm-page .fg input::placeholder,.adm-page .adm-input::placeholder,
+.adm-page input::placeholder,.adm-page textarea::placeholder{color:#94a3b8 !important;}
+.adm-page input:focus,.adm-page select:focus,.adm-page textarea:focus,
+.adm-page .adm-input:focus{outline:none !important;border-color:var(--sky) !important;}
 /* QR code paiement */
 .pay-qr{max-width:130px;max-height:130px;border-radius:8px;border:2px solid #e0e6ef;display:block;margin:8px auto 0;}
 .adm-btn-primary{background:var(--orange);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
@@ -560,6 +577,7 @@ function doAdminLogin() {
     gcash:    {label:'GCash / Maya',     ico:'📱', note:'Envoyez la capture d\'écran de la transaction.',                         num:'+63 968 313 5356',   nom:'', qr:''},
     momo:     {label:'MoMo Money',       ico:'💚', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
     om:       {label:'Orange Money (OM)',ico:'🧡', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
+    crypto:   {label:'Crypto (USDT/BTC)', ico:'₿',  note:'Envoyez la capture d\'écran de la transaction blockchain.',              num:'',                   nom:'', qr:''},
   };
   var _payConfig = {};
   try { _payConfig = JSON.parse(localStorage.getItem('gcc_pay_config') || '{}'); } catch(e){}
@@ -1212,7 +1230,7 @@ function doAdminLogin() {
 
   /* ── Gestion config paiement admin ── */
   function switchPayTab(key, btn) {
-    ['transfer','gcash','momo','om'].forEach(function(k) {
+    ['transfer','gcash','momo','om','crypto'].forEach(function(k) {
       var p = document.getElementById('ppanel-'+k);
       var b = document.getElementById('ptab-'+k);
       if (p) p.style.display = (k===key) ? 'block' : 'none';
@@ -1221,7 +1239,7 @@ function doAdminLogin() {
   }
 
   function loadPayConfig() {
-    var keys = ['transfer','gcash','momo','om'];
+    var keys = ['transfer','gcash','momo','om','crypto'];
     keys.forEach(function(k) {
       var c = getPayCfg(k);
       var elNum = document.getElementById('pay-num-'+k);
@@ -1249,7 +1267,7 @@ function doAdminLogin() {
   }
 
   function savePayConfig() {
-    var keys = ['transfer','gcash','momo','om'];
+    var keys = ['transfer','gcash','momo','om','crypto'];
     keys.forEach(function(k) {
       if (!_payConfig[k]) _payConfig[k] = {};
       var elNum  = document.getElementById('pay-num-'+k);
@@ -1388,6 +1406,7 @@ function doLogout() {
       <span class="rpill">🇹🇬 Togo</span>
       <span class="rpill">🇧🇫 Burkina</span>
       <span class="rpill">🇬🇭 Ghana</span>
+      <span class="rpill">🇹🇩 Tchad</span>
     </div>
   </div>
   <div class="hero-right">
@@ -1426,7 +1445,7 @@ function doLogout() {
 <section class="destinations" id="destinations">
   <div class="section-eyebrow" data-fr="ZONES DE LIVRAISON" data-en="DELIVERY ZONES">ZONES DE LIVRAISON</div>
   <h2 class="section-title" data-fr="Où nous livrons" data-en="Where we deliver">Où nous livrons</h2>
-  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 8 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves countries in Central and West Africa from the Philippines via Manila's airports and ports.">GCC CARGO HANDLING INC dessert 8 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
+  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves 12 countries in Central and West Africa from the Philippines via Manila's airports and ports.">GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
   <div class="dest-grid">
     <div class="dest-card"><div class="dest-flag">🇨🇲</div><h3>Cameroun</h3><p>Yaoundé & Douala</p></div>
     <div class="dest-card"><div class="dest-flag">🇨🇬</div><h3>Congo Brazzaville</h3><p>Brazzaville</p></div>
@@ -1439,6 +1458,7 @@ function doLogout() {
     <div class="dest-card"><div class="dest-flag">🇹🇬</div><h3>Togo</h3><p>Lomé</p></div>
     <div class="dest-card"><div class="dest-flag">🇧🇫</div><h3>Burkina Faso</h3><p>Ouagadougou</p></div>
     <div class="dest-card"><div class="dest-flag">🇬🇭</div><h3>Ghana</h3><p>Accra</p></div>
+    <div class="dest-card"><div class="dest-flag">🇹🇩</div><h3>Tchad</h3><p>N'Djamena</p></div>
   </div>
 </section>
 
@@ -1472,18 +1492,38 @@ function doLogout() {
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select id="selectDestination">
-          <option>🇨🇲 Yaoundé — Cameroun</option>
-          <option>🇨🇲 Douala — Cameroun</option>
-          <option>🇨🇬 Brazzaville — Congo</option>
-          <option>🇨🇩 Kinshasa — RDC</option>
-          <option>🇬🇦 Libreville — Gabon</option>
-          <option>🇬🇶 Malabo — Guinée Équatoriale</option>
-          <option>🇧🇯 Cotonou — Bénin</option>
-          <option>🇨🇮 Abidjan — Côte d'Ivoire</option>
-          <option>🇨🇫 Bangui — RCA</option>
-          <option>🇹🇬 Lomé — Togo</option>
-          <option>🇧🇫 Ouagadougou — Burkina Faso</option>
-          <option>🇬🇭 Accra — Ghana</option>
+          <optgroup label="🇵🇭 Philippines → Afrique">
+            <option>🇵🇭 Manille → 🇨🇲 Yaoundé</option>
+            <option>🇵🇭 Manille → 🇨🇲 Douala</option>
+            <option>🇵🇭 Manille → 🇨🇬 Brazzaville</option>
+            <option>🇵🇭 Manille → 🇨🇩 Kinshasa</option>
+            <option>🇵🇭 Manille → 🇬🇦 Libreville</option>
+            <option>🇵🇭 Manille → 🇬🇶 Malabo</option>
+            <option>🇵🇭 Manille → 🇧🇯 Cotonou</option>
+            <option>🇵🇭 Manille → 🇨🇮 Abidjan</option>
+            <option>🇵🇭 Manille → 🇨🇫 Bangui</option>
+            <option>🇵🇭 Manille → 🇹🇬 Lomé</option>
+            <option>🇵🇭 Manille → 🇧🇫 Ouagadougou</option>
+            <option>🇵🇭 Manille → 🇬🇭 Accra</option>
+            <option>🇵🇭 Manille → 🇸🇳 Dakar</option>
+            <option>🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)</option>
+          </optgroup>
+          <optgroup label="🌍 Afrique → Philippines">
+            <option>🇨🇲 Yaoundé → 🇵🇭 Manille</option>
+            <option>🇨🇲 Douala → 🇵🇭 Manille</option>
+            <option>🇨🇬 Brazzaville → 🇵🇭 Manille</option>
+            <option>🇨🇩 Kinshasa → 🇵🇭 Manille</option>
+            <option>🇬🇦 Libreville → 🇵🇭 Manille</option>
+            <option>🇬🇶 Malabo → 🇵🇭 Manille</option>
+            <option>🇧🇯 Cotonou → 🇵🇭 Manille</option>
+            <option>🇨🇮 Abidjan → 🇵🇭 Manille</option>
+            <option>🇨🇫 Bangui → 🇵🇭 Manille</option>
+            <option>🇹🇬 Lomé → 🇵🇭 Manille</option>
+            <option>🇧🇫 Ouagadougou → 🇵🇭 Manille</option>
+            <option>🇬🇭 Accra → 🇵🇭 Manille</option>
+            <option>🇸🇳 Dakar → 🇵🇭 Manille</option>
+            <option>🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille</option>
+          </optgroup>
         </select>
       </div>
       <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
@@ -1542,6 +1582,7 @@ function doLogout() {
                   <option value="gcash">📱 GCash / Maya</option>
                   <option value="momo">💚 MoMo Money</option>
                   <option value="om">🧡 Orange Money (OM)</option>
+                  <option value="crypto">₿ Crypto (USDT / BTC / ETH)</option>
                 </select>
               </div>
               <!-- Infos bancaires dynamiques -->
@@ -2075,13 +2116,29 @@ function doLogout() {
             <!-- Destination -->
             <div style="margin-bottom:12px;">
               <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🌍 Destination</label>
-              <select class="adm-input" id="ann-dest" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
-                <option value="Yaoundé — Cameroun">🇨🇲 Yaoundé — Cameroun</option>
-                <option value="Douala — Cameroun">🇨🇲 Douala — Cameroun</option>
-                <option value="Brazzaville — Congo">🇨🇬 Brazzaville — Congo</option>
-                <option value="Kinshasa — RDC">🇨🇩 Kinshasa — RDC</option>
-                <option value="Libreville — Gabon">🇬🇦 Libreville — Gabon</option>
-                <option value="Cotonou — Bénin">🇧🇯 Cotonou — Bénin</option>
+              <select class="adm-input" id="ann-dest">
+                <optgroup label="🇵🇭 Manille → Afrique">
+                  <option value="🇵🇭 Manille → 🇨🇲 Yaoundé">🇵🇭 Manille → 🇨🇲 Yaoundé</option>
+                  <option value="🇵🇭 Manille → 🇨🇲 Douala">🇵🇭 Manille → 🇨🇲 Douala</option>
+                  <option value="🇵🇭 Manille → 🇨🇬 Brazzaville">🇵🇭 Manille → 🇨🇬 Brazzaville</option>
+                  <option value="🇵🇭 Manille → 🇨🇩 Kinshasa">🇵🇭 Manille → 🇨🇩 Kinshasa</option>
+                  <option value="🇵🇭 Manille → 🇬🇦 Libreville">🇵🇭 Manille → 🇬🇦 Libreville</option>
+                  <option value="🇵🇭 Manille → 🇧🇯 Cotonou">🇵🇭 Manille → 🇧🇯 Cotonou</option>
+                  <option value="🇵🇭 Manille → 🇸🇳 Dakar">🇵🇭 Manille → 🇸🇳 Dakar</option>
+                  <option value="🇵🇭 Manille → 🇨🇮 Abidjan">🇵🇭 Manille → 🇨🇮 Abidjan</option>
+                  <option value="🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)">🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)</option>
+                </optgroup>
+                <optgroup label="🇨🇲 Afrique → Manille">
+                  <option value="🇨🇲 Yaoundé → 🇵🇭 Manille">🇨🇲 Yaoundé → 🇵🇭 Manille</option>
+                  <option value="🇨🇲 Douala → 🇵🇭 Manille">🇨🇲 Douala → 🇵🇭 Manille</option>
+                  <option value="🇨🇬 Brazzaville → 🇵🇭 Manille">🇨🇬 Brazzaville → 🇵🇭 Manille</option>
+                  <option value="🇨🇩 Kinshasa → 🇵🇭 Manille">🇨🇩 Kinshasa → 🇵🇭 Manille</option>
+                  <option value="🇬🇦 Libreville → 🇵🇭 Manille">🇬🇦 Libreville → 🇵🇭 Manille</option>
+                  <option value="🇧🇯 Cotonou → 🇵🇭 Manille">🇧🇯 Cotonou → 🇵🇭 Manille</option>
+                  <option value="🇸🇳 Dakar → 🇵🇭 Manille">🇸🇳 Dakar → 🇵🇭 Manille</option>
+                  <option value="🇨🇮 Abidjan → 🇵🇭 Manille">🇨🇮 Abidjan → 🇵🇭 Manille</option>
+                  <option value="🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille">🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille</option>
+                </optgroup>
               </select>
             </div>
 
@@ -2181,6 +2238,7 @@ function doLogout() {
             <button onclick="switchPayTab('gcash',this)" id="ptab-gcash" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">📱 GCash/Maya</button>
             <button onclick="switchPayTab('momo',this)" id="ptab-momo" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">💚 MoMo</button>
             <button onclick="switchPayTab('om',this)" id="ptab-om" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🧡 Orange Money</button>
+            <button onclick="switchPayTab('crypto',this)" id="ptab-crypto" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">₿ Crypto</button>
           </div>
 
           <!-- Panneaux par méthode -->
@@ -2277,6 +2335,33 @@ function doLogout() {
                 📤 Uploader QR Orange Money <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('om',this)">
               </label>
               <img id="pay-qr-prev-om" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <div id="ppanel-crypto" class="ppanel" style="display:none;">
+            <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;color:#92400e;">
+              ⚠️ Vérifiez toujours l'adresse wallet avant de confirmer un paiement crypto. Les transactions sont irréversibles.
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Réseau / Token</label>
+                <input class="adm-input" id="pay-nom-crypto" placeholder="Ex: USDT (TRC-20) · BTC · ETH">
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Adresse Wallet</label>
+                <input class="adm-input" id="pay-num-crypto" placeholder="0x... ou T... ou bc1...">
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
+              <input class="adm-input" id="pay-note-crypto" placeholder="Envoyez la capture d'écran de la transaction blockchain.">
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code Wallet (recommandé)</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
+                📤 Uploader QR Wallet <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('crypto',this)">
+              </label>
+              <img id="pay-qr-prev-crypto" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
             </div>
           </div>
 
