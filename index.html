@@ -288,80 +288,73 @@ footer{background:var(--navy);color:var(--ice);padding:48px 8vw 24px;border-top:
 .btn-login:hover{background:var(--sky);}
 
 /* ═══ ADMIN DASHBOARD ═══ */
-.admin-panel{display:none;position:fixed;inset:0;background:var(--light);z-index:400;overflow-y:auto;}
-.admin-topbar{background:var(--navy);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:10;}
-.admin-topbar .at-brand{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--white);}
+.admin-panel{display:none;position:fixed;inset:0;background:#f0f4f8;z-index:400;overflow-y:auto;}
+.admin-topbar{background:var(--navy);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:10;}
+.admin-topbar .at-brand{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.15rem;color:var(--white);letter-spacing:.04em;}
 .admin-topbar .at-brand span{color:var(--orange);}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--ice);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;}
-.admin-body{padding:32px;}
-.admin-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:20px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:36px;}
-.kpi{background:var(--white);border-radius:10px;padding:20px 22px;border-top:4px solid var(--orange);box-shadow:0 2px 12px rgba(11,31,58,.06);}
-.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:var(--navy);}
-.kpi-lbl{font-size:.8rem;color:var(--slate);font-weight:600;margin-top:2px;}
-.kpi-trend{font-size:.78rem;color:var(--green);font-weight:700;margin-top:6px;}
-.admin-tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--white);border-radius:8px;padding:4px;width:fit-content;box-shadow:0 2px 8px rgba(11,31,58,.08);}
-.adm-tab{background:none;border:none;padding:9px 20px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.88rem;color:var(--slate);transition:background .2s,color .2s;}
-.adm-tab.active{background:var(--orange);color:var(--white);}
-.admin-table-wrap{background:var(--white);border-radius:10px;padding:20px;overflow-x:auto;box-shadow:0 2px 12px rgba(11,31,58,.06);}
-table{width:100%;border-collapse:collapse;font-size:.87rem;}
-th{text-align:left;padding:10px 14px;font-weight:700;color:var(--slate);border-bottom:2px solid var(--light);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
-td{padding:12px 14px;border-bottom:1px solid var(--light);color:var(--navy);}
-tr:last-child td{border:none;}
-.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:700;}
-.b-transit{background:#e3f2fd;color:var(--sky);}
-.b-arrived{background:#e8f5e9;color:var(--green);}
-.b-pending{background:#fff8e1;color:#e65100;}
-.b-delivered{background:#f3e5f5;color:#7b1fa2;}
-.notif-btn{background:var(--orange);color:var(--white);border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:'Barlow',sans-serif;}
-.admin-update-form{background:var(--white);border-radius:10px;padding:24px;box-shadow:0 2px 12px rgba(11,31,58,.06);}
-.au-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
-.au-field{display:flex;flex-direction:column;gap:5px;}
-.au-field label{font-size:.8rem;font-weight:600;color:var(--slate);}
-.au-field input,.au-field select{background:var(--light);border:1px solid #d0dbe6;color:var(--navy);padding:10px 13px;border-radius:6px;font-size:.88rem;font-family:'Barlow',sans-serif;}
-.btn-update{background:var(--navy);color:var(--white);font-weight:700;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.88rem;align-self:flex-end;}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--ice);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
+.btn-logout:hover{background:rgba(255,255,255,.12);}
+.admin-layout{display:flex;min-height:calc(100vh - 62px);}
+.admin-sidebar{width:210px;flex-shrink:0;background:var(--navy);padding:20px 0;display:flex;flex-direction:column;gap:2px;}
+.adm-nav-item{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);font-size:.87rem;font-weight:600;cursor:pointer;border-left:3px solid transparent;transition:all .18s;font-family:'Barlow',sans-serif;}
+.adm-nav-item:hover{color:var(--white);background:rgba(255,255,255,.07);}
+.adm-nav-item.active{color:var(--white);border-left-color:var(--orange);background:rgba(232,119,34,.15);}
+.adm-nav-item .nav-ico{font-size:1rem;width:20px;text-align:center;}
+.adm-nav-sep{height:1px;background:rgba(255,255,255,.1);margin:10px 14px;}
+.adm-nav-version{padding:10px 20px;font-size:.7rem;color:rgba(255,255,255,.3);margin-top:auto;}
+.admin-main{flex:1;padding:26px 30px;overflow:hidden;min-width:0;}
+.adm-page{display:none;}
+.adm-page.active{display:block;}
+.adm-page-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.55rem;color:var(--navy);margin-bottom:4px;}
+.adm-page-sub{font-size:.84rem;color:var(--slate);margin-bottom:22px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:13px;margin-bottom:26px;}
+.kpi{background:var(--white);border-radius:12px;padding:16px 18px;border-top:4px solid var(--orange);box-shadow:0 2px 10px rgba(11,31,58,.07);}
+.kpi.sky{border-top-color:var(--sky);}.kpi.green{border-top-color:#27ae60;}.kpi.red{border-top-color:#e74c3c;}.kpi.gold{border-top-color:#f39c12;}
+.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:900;color:var(--navy);}
+.kpi-lbl{font-size:.76rem;color:var(--slate);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
+.kpi-trend{font-size:.74rem;font-weight:700;margin-top:5px;}
+.kpi-trend.up{color:#27ae60;}.kpi-trend.down{color:#e74c3c;}.kpi-trend.neutral{color:var(--slate);}
+.adm-card{background:var(--white);border-radius:12px;padding:20px 22px;box-shadow:0 2px 10px rgba(11,31,58,.07);margin-bottom:18px;}
+.adm-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.02rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.adm-card-title .tag{font-size:.7rem;background:var(--orange);color:white;padding:2px 8px;border-radius:20px;font-family:'Barlow',sans-serif;font-weight:700;}
+.adm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.adm-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.admin-table-wrap{background:var(--white);border-radius:12px;padding:16px;overflow-x:auto;box-shadow:0 2px 10px rgba(11,31,58,.07);}
+table.adm-tbl{width:100%;border-collapse:collapse;font-size:.83rem;}
+table.adm-tbl th{text-align:left;padding:9px 11px;background:#f5f7fa;color:var(--navy);font-weight:700;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #e8edf3;}
+table.adm-tbl td{padding:9px 11px;border-bottom:1px solid #f0f3f7;vertical-align:top;}
+table.adm-tbl tr:hover td{background:#fafbfd;}
+table.adm-tbl tr:last-child td{border-bottom:none;}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.71rem;font-weight:700;}
+.b-pending{background:#fff3e0;color:#e65100;}.b-transit{background:#e3f2fd;color:#1565c0;}.b-arrived{background:#f3e5f5;color:#6a1b9a;}.b-delivered{background:#e8f5e9;color:#2e7d32;}
+.notif-btn{background:var(--orange);color:white;border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.73rem;margin-bottom:3px;display:inline-block;}
+.notif-btn:hover{filter:brightness(1.1);}
+.finance-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f3f7;}
+.finance-row:last-child{border-bottom:none;}
+.finance-label{font-size:.86rem;color:var(--navy);font-weight:600;}
+.finance-amount{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;}
+.finance-amount.income{color:#27ae60;}.finance-amount.expense{color:#e74c3c;}.finance-amount.balance{color:var(--sky);}
+.adm-form-row{display:flex;gap:11px;margin-bottom:11px;flex-wrap:wrap;align-items:flex-end;}
+.adm-form-row label{font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;}
+.adm-form-row .fg{flex:1;min-width:130px;}
+.adm-input{width:100%;padding:8px 11px;border:1.5px solid #dce3ec;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.86rem;color:var(--navy);background:#fafbfd;box-sizing:border-box;}
+.adm-input:focus{outline:none;border-color:var(--sky);}
+.adm-btn-primary{background:var(--orange);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
+.adm-btn-secondary{background:var(--sky);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
+.adm-btn-danger{background:#e74c3c;color:white;border:none;padding:7px 14px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
+.parrain-card{background:linear-gradient(135deg,#f8faff,#eef4fb);border:1.5px solid #d0e4f7;border-radius:10px;padding:14px;margin-bottom:10px;}
+.parrain-name{font-weight:800;color:var(--navy);font-size:.93rem;}
+.parrain-stats{display:flex;gap:18px;margin-top:7px;}
+.parrain-stat{font-size:.78rem;color:var(--slate);}
+.parrain-stat strong{color:var(--sky);font-family:'Barlow Condensed',sans-serif;font-size:.98rem;}
+.prog-bar{height:7px;background:#e8edf3;border-radius:4px;overflow:hidden;margin-top:5px;}
+.prog-fill{height:100%;border-radius:4px;background:var(--orange);transition:width .4s;}
+.ann-card{background:#f8faff;border:1.5px solid #d0e4f7;border-radius:9px;padding:13px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.ann-info{flex:1;}
+.ann-dest{font-weight:800;color:var(--navy);font-size:.9rem;}
+.ann-date{font-size:.78rem;color:var(--slate);margin-top:3px;}
+@media(max-width:768px){.admin-sidebar{width:52px;}.adm-nav-item .nav-lbl{display:none;}.admin-main{padding:14px;}.adm-grid-2,.adm-grid-3{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
 
-/* ═══ TOAST ═══ */
-.toast{
-  position:fixed;bottom:24px;right:24px;
-  background:var(--navy);color:var(--white);
-  padding:16px 22px;border-radius:10px;
-  border-left:4px solid var(--orange);
-  box-shadow:0 8px 32px rgba(11,31,58,.3);
-  z-index:600;max-width:320px;
-  transform:translateY(120%);transition:transform .35s ease;
-  font-size:.9rem;line-height:1.5;
-}
-.toast.show{transform:translateY(0);}
-.toast strong{display:block;margin-bottom:4px;color:var(--orange);}
-
-/* ═══ MOBILE ═══ */
-@media(max-width:860px){
-  .nav-links{display:none;}
-  .btn-admin{display:none;}
-  .hamburger{display:block;}
-  .hero{grid-template-columns:1fr;min-height:unset;padding:40px 5vw 60px;}
-  .hero-right{display:none;}
-  .stats-bar{grid-template-columns:repeat(2,1fr);}
-  .referral{grid-template-columns:1fr;}
-  .contact{grid-template-columns:1fr;}
-  .footer-grid{grid-template-columns:1fr 1fr;}
-  .form-grid{grid-template-columns:1fr;}
-  .track-form{flex-direction:column;}
-  .au-row{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-}
-@media(max-width:480px){
-  .footer-grid{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:1fr;}
-}
-
-.lang-switcher{display:flex;align-items:center;gap:4px;margin-right:8px;}
-.lang-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
-  color:#fff;padding:5px 11px;border-radius:5px;cursor:pointer;font-size:.8rem;
-  font-weight:700;transition:.2s;font-family:'Barlow',sans-serif;}
-.lang-btn.active{background:var(--orange);border-color:var(--orange);}
-.lang-btn:hover{background:var(--orange);border-color:var(--orange);}
 </style>
 <script>
 // ══════════════════════════════════════════════════
@@ -490,8 +483,15 @@ function doAdminLogin() {
     _loginAttempts = 0;
     try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
     closeAdminLogin();
+    try { localStorage.setItem('gcc_admin_session', '1'); } catch(e) {}
     var panel = document.getElementById('adminPanel');
     if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+    if (typeof startAdmClock === 'function') startAdmClock();
+    if (typeof refreshDashboard === 'function') refreshDashboard();
+    if (typeof refreshFinance === 'function') { refreshFinance(); refreshDepenses(); }
+    if (typeof refreshParrainage === 'function') refreshParrainage();
+    if (typeof refreshAnnonces === 'function') refreshAnnonces();
+    if (typeof loadTarifs === 'function') loadTarifs();
     if (typeof showToast === 'function') showToast(tr('connected'), tr('welcomeAdmin'));
   } else {
     _loginAttempts++;
@@ -566,7 +566,7 @@ function doAdminLogin() {
     var ref = 'GCC-' + now.getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
     var depotSel = document.getElementById('modeDepot');
     var paymentSel = document.getElementById('modePaiement');
-    var destSel = document.querySelectorAll('#envoyer select')[0];
+    var destSel = document.getElementById('selectDestination');
     var entry = {
       ref:         ref,
       date:        now.toLocaleDateString('fr-FR'),
@@ -576,10 +576,15 @@ function doAdminLogin() {
       recepteur:   (document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
       tel_rec:     (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
       destination: destSel ? destSel.value : '',
+      mode:        depotSel ? depotSel.value : '',
       modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
       modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
+      paiement:    (document.getElementById('modePaiement') || {value:''}).value,
       modePaiement:paymentSel ? paymentSel.options[paymentSel.selectedIndex].text : '',
+      destinataire:(document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
+      tel_dest:    (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
       adresse:     (document.getElementById('adresseLalamove') || {value:''}).value,
+      adresse_lalamove:(document.getElementById('adresseLalamove') || {value:''}).value,
       adresseClient:(document.getElementById('adresseClient') || {value:''}).value,
       dateColl:    (document.getElementById('dateLalamove') || {value:''}).value,
       creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
@@ -633,6 +638,8 @@ function doAdminLogin() {
         if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
       });
     });
+    // Also update dashboard KPIs
+    if (typeof refreshDashboard === 'function') refreshDashboard();
   }
   function cycleStatut(i) {
     var order = ['En attente','En transit','Arrivé','Livré'];
@@ -644,10 +651,551 @@ function doAdminLogin() {
   }
 
   // Apply language + init on DOM ready
+  
+  /* ═══ ADMIN NAVIGATION ═══ */
+  function admNav(page, el) {
+    document.querySelectorAll('.adm-nav-item').forEach(function(n){n.classList.remove('active');});
+    if (el) el.classList.add('active');
+    document.querySelectorAll('.adm-page').forEach(function(p){p.classList.remove('active');});
+    var pg = document.getElementById('adm-' + page);
+    if (pg) pg.classList.add('active');
+    // Refresh relevant page data
+    if (page === 'dash') refreshDashboard();
+    if (page === 'finance') refreshFinance();
+    if (page === 'depenses') refreshDepenses();
+    if (page === 'clients') refreshClients();
+    if (page === 'parrainage') refreshParrainage();
+    if (page === 'annonces') refreshAnnonces();
+    if (page === 'parametres') loadTarifs();
+  }
+
+  /* ═══ CLOCK ═══ */
+  function startAdmClock() {
+    function tick() {
+      var el = document.getElementById('adm-clock');
+      if (!el) return;
+      var now = new Date();
+      el.textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  /* ═══ DASHBOARD ═══ */
+  function refreshDashboard() {
+    var now = new Date();
+    var dd = document.getElementById('adm-date-display');
+    if (dd) dd.textContent = now.toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+    var _revenues = [];
+    var _depenses_data = [];
+    try { _revenues = JSON.parse(localStorage.getItem('gcc_revenus') || '[]'); } catch(e) {}
+    try { _depenses_data = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
+
+    var totalRev = _revenues.reduce(function(s,r){return s + (parseFloat(r.montant)||0);}, 0);
+    var totalDep = _depenses_data.reduce(function(s,d){return s + (parseFloat(d.montant)||0);}, 0);
+    var marge = totalRev - totalDep;
+    var livres = _submissions.filter(function(s){return s.statut === 'Livré';}).length;
+
+    var setKpi = function(id, val) { var el = document.getElementById(id); if(el) el.textContent = val; };
+    setKpi('kpi-demandes', _submissions.length);
+    setKpi('kpi-attente', _submissions.filter(function(s){return s.statut==='En attente';}).length);
+    setKpi('kpi-livres', livres);
+    setKpi('kpi-revenue', '₱' + totalRev.toLocaleString('fr-FR', {minimumFractionDigits:0}));
+    setKpi('kpi-depenses-total', '₱' + totalDep.toLocaleString('fr-FR', {minimumFractionDigits:0}));
+    setKpi('kpi-marge', '₱' + marge.toLocaleString('fr-FR', {minimumFractionDigits:0}));
+
+    // Recent activity
+    var recentEl = document.getElementById('dash-recent-list');
+    if (recentEl) {
+      if (_submissions.length === 0) {
+        recentEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:16px;">Aucune activité</p>';
+      } else {
+        var recent = _submissions.slice(-5).reverse();
+        recentEl.innerHTML = recent.map(function(s) {
+          var cls = {En_attente:'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'}[s.statut.replace(' ','_')] || 'b-pending';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f3f7;">'
+            + '<span><strong style="color:var(--navy);">' + (s.expediteur||'—') + '</strong><br><span style="font-size:.76rem;color:var(--slate);">' + (s.ref||'') + ' → ' + (s.destination||'').split('—')[1]||'' + '</span></span>'
+            + '<span class="badge ' + cls + '">' + s.statut + '</span>'
+            + '</div>';
+        }).join('');
+      }
+    }
+
+    // Statut chart
+    var statEl = document.getElementById('dash-statut-chart');
+    if (statEl) {
+      var stats = {'En attente':0,'En transit':0,'Arrivé':0,'Livré':0};
+      _submissions.forEach(function(s){ if(stats[s.statut]!==undefined) stats[s.statut]++; });
+      var total = _submissions.length || 1;
+      var colors = {'En attente':'#e65100','En transit':'#1565c0','Arrivé':'#6a1b9a','Livré':'#2e7d32'};
+      statEl.innerHTML = Object.keys(stats).map(function(k) {
+        var pct = Math.round(stats[k]/total*100);
+        return '<div style="margin-bottom:10px;">'
+          + '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">'
+          + '<span style="font-weight:600;color:var(--navy);">' + k + '</span>'
+          + '<span style="color:var(--slate);">' + stats[k] + ' (' + pct + '%)</span></div>'
+          + '<div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%;background:' + colors[k] + ';"></div></div>'
+          + '</div>';
+      }).join('');
+    }
+
+    // Top destinations
+    var destEl = document.getElementById('dash-destinations');
+    if (destEl) {
+      var destMap = {};
+      _submissions.forEach(function(s){ var d = (s.destination||'Inconnue').split('—')[0].trim(); destMap[d]=(destMap[d]||0)+1; });
+      var sorted = Object.keys(destMap).sort(function(a,b){return destMap[b]-destMap[a];}).slice(0,5);
+      if (sorted.length === 0) { destEl.innerHTML = '<p style="color:#aaa;text-align:center;">Aucune donnée</p>'; }
+      else {
+        var maxD = destMap[sorted[0]] || 1;
+        destEl.innerHTML = sorted.map(function(d) {
+          var pct = Math.round(destMap[d]/maxD*100);
+          return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px;"><span style="font-weight:600;color:var(--navy);">' + d + '</span><span style="color:var(--slate);">' + destMap[d] + '</span></div>'
+            + '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:var(--sky);"></div></div></div>';
+        }).join('');
+      }
+    }
+
+    // Modes dépôt
+    var modesEl = document.getElementById('dash-modes');
+    if (modesEl) {
+      var modesMap = {};
+      _submissions.forEach(function(s){ var m = s.mode||'Inconnu'; modesMap[m]=(modesMap[m]||0)+1; });
+      var mKeys = Object.keys(modesMap).sort(function(a,b){return modesMap[b]-modesMap[a];});
+      var mColors = {presentiel:'var(--orange)',lalamove:'#27ae60',ecommerce:'var(--sky)'};
+      if (mKeys.length === 0) { modesEl.innerHTML = '<p style="color:#aaa;text-align:center;">Aucune donnée</p>'; }
+      else {
+        var mTotal = _submissions.length || 1;
+        modesEl.innerHTML = mKeys.map(function(m) {
+          var pct = Math.round(modesMap[m]/mTotal*100);
+          var col = mColors[m] || 'var(--slate)';
+          var lbl = {presentiel:'En présentiel',lalamove:'Lalamove',ecommerce:'Shopee/Lazada'}[m] || m;
+          return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px;"><span style="font-weight:600;color:var(--navy);">' + lbl + '</span><span style="color:var(--slate);">' + modesMap[m] + ' (' + pct + '%)</span></div>'
+            + '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
+        }).join('');
+      }
+    }
+  }
+
+  /* ═══ COLIS FILTER ═══ */
+  function filterColis() {
+    var q = (document.getElementById('search-colis')||{value:''}).value.toLowerCase();
+    var st = (document.getElementById('filter-statut')||{value:''}).value;
+    var tbody = document.getElementById('admin-submissions-tbody');
+    if (!tbody) return;
+    var filtered = _submissions.filter(function(s,i) {
+      var matchQ = !q || (s.ref||'').toLowerCase().includes(q) || (s.expediteur||'').toLowerCase().includes(q) || (s.destination||'').toLowerCase().includes(q);
+      var matchS = !st || s.statut === st;
+      return matchQ && matchS;
+    });
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucun résultat</td></tr>';
+      return;
+    }
+    var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
+    tbody.innerHTML = filtered.map(function(s) {
+      var i = _submissions.indexOf(s);
+      var cls = statClasses[s.statut] || 'b-pending';
+      return '<tr><td><strong style="color:var(--sky);font-size:.8rem;">' + (s.ref||'—') + '</strong></td>'
+        + '<td>' + (s.expediteur||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_exp||'') + '</span></td>'
+        + '<td>' + (s.destinataire||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_dest||'') + '</span></td>'
+        + '<td style="font-size:.8rem;">' + (s.destination||'—').split('—')[0] + '</td>'
+        + '<td style="font-size:.8rem;">' + ({presentiel:'Présentiel',lalamove:'Lalamove',ecommerce:'Shopee/Lazada'}[s.mode]||s.mode||'—') + '</td>'
+        + '<td style="font-size:.8rem;">' + ({transfer:'Virement',cash:'Cash',westernunion:'Western Union',moneygram:'MoneyGram',remitly:'Remitly',wave:'Wave'}[s.paiement]||s.paiement||'—') + '</td>'
+        + '<td style="font-size:.78rem;max-width:120px;word-break:break-word;">' + (s.adresseClient||s.adresse_lalamove||'—') + '</td>'
+        + '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>'
+        + '<td><button class="notif-btn adm-statut-btn" data-i="' + i + '" style="background:var(--navy);">🔄</button><br>'
+        + '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="background:var(--sky);">📧</button></td></tr>';
+    }).join('');
+    tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
+    });
+    tbody.querySelectorAll('.adm-email-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var s = _submissions[idx];
+        if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
+      });
+    });
+  }
+
+  /* ═══ FINANCE - REVENUS ═══ */
+  var _revenues = [];
+  try { _revenues = JSON.parse(localStorage.getItem('gcc_revenus') || '[]'); } catch(e) {}
+
+  function addRevenu() {
+    var desc = (document.getElementById('rev-desc')||{}).value || '';
+    var montant = parseFloat((document.getElementById('rev-montant')||{}).value || '0');
+    var date = (document.getElementById('rev-date')||{}).value || new Date().toISOString().split('T')[0];
+    var cat = (document.getElementById('rev-cat')||{}).value || 'autre';
+    if (!desc || !montant) { showToast('⚠️','Remplissez description et montant'); return; }
+    _revenues.push({desc:desc, montant:montant, date:date, cat:cat, id:Date.now()});
+    try { localStorage.setItem('gcc_revenus', JSON.stringify(_revenues)); } catch(e) {}
+    ['rev-desc','rev-montant'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast('✅','Revenu enregistré : ₱' + montant.toFixed(2));
+    refreshFinance();
+    refreshDashboard();
+  }
+
+  function deleteRevenu(id) {
+    _revenues = _revenues.filter(function(r){return r.id !== id;});
+    try { localStorage.setItem('gcc_revenus', JSON.stringify(_revenues)); } catch(e) {}
+    refreshFinance();
+    refreshDashboard();
+  }
+
+  function refreshFinance() {
+    var list = document.getElementById('revenus-list');
+    var totalEl = document.getElementById('revenus-total-display');
+    var total = _revenues.reduce(function(s,r){return s+(parseFloat(r.montant)||0);},0);
+    var catIcons = {envoi:'📦',lalamove:'🛵',assurance:'🛡',emballage:'📦',autre:'💼'};
+    if (list) {
+      if (_revenues.length === 0) { list.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucun revenu</p>'; }
+      else {
+        list.innerHTML = _revenues.slice().reverse().map(function(r) {
+          return '<div class="finance-row">'
+            + '<span class="finance-label">' + (catIcons[r.cat]||'💼') + ' ' + r.desc + '<br><span style="font-size:.73rem;color:var(--slate);">' + r.date + '</span></span>'
+            + '<span style="display:flex;align-items:center;gap:8px;">'
+            + '<span class="finance-amount income">₱' + parseFloat(r.montant).toFixed(2) + '</span>'
+            + '<button onclick="deleteRevenu(' + r.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.85rem;">✕</button>'
+            + '</span></div>';
+        }).join('');
+      }
+    }
+    if (totalEl) totalEl.textContent = '₱' + total.toFixed(2);
+
+    // KPI updates
+    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    var _depenses_data = [];
+    try { _depenses_data = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
+    var totalDep = _depenses_data.reduce(function(s,d){return s+(parseFloat(d.montant)||0);},0);
+    var marge = total - totalDep;
+    setEl('fin-revenus-total','₱'+total.toLocaleString('fr-FR',{minimumFractionDigits:0}));
+    setEl('fin-dep-total','₱'+totalDep.toLocaleString('fr-FR',{minimumFractionDigits:0}));
+    setEl('fin-marge-total','₱'+marge.toLocaleString('fr-FR',{minimumFractionDigits:0}));
+    setEl('fin-nb-rev',_revenues.length);
+
+    // Monthly bar chart
+    var chartEl = document.getElementById('monthly-chart');
+    var labelsEl = document.getElementById('monthly-labels');
+    if (chartEl) {
+      var months = {};
+      var now = new Date();
+      for (var m = 11; m >= 0; m--) {
+        var d = new Date(now.getFullYear(), now.getMonth()-m, 1);
+        var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+        months[key] = 0;
+      }
+      _revenues.forEach(function(r){ var k=(r.date||'').slice(0,7); if(months[k]!==undefined) months[k]+=(parseFloat(r.montant)||0); });
+      var vals = Object.values(months);
+      var maxV = Math.max.apply(null, vals) || 1;
+      chartEl.innerHTML = vals.map(function(v) {
+        var h = Math.max(4, Math.round(v/maxV*80));
+        return '<div style="flex:1;background:var(--sky);border-radius:3px 3px 0 0;height:'+h+'px;opacity:.8;position:relative;cursor:default;" title="₱'+v.toFixed(0)+'"></div>';
+      }).join('');
+      if (labelsEl) {
+        var keys = Object.keys(months);
+        labelsEl.innerHTML = keys.map(function(k){
+          return '<div style="flex:1;font-size:.63rem;color:var(--slate);text-align:center;">'+k.slice(5)+'</div>';
+        }).join('');
+      }
+    }
+  }
+
+  /* ═══ FINANCE - DÉPENSES ═══ */
+  var _depenses = [];
+  try { _depenses = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
+
+  function addDepense() {
+    var desc = (document.getElementById('dep-desc')||{}).value || '';
+    var montant = parseFloat((document.getElementById('dep-montant')||{}).value || '0');
+    var date = (document.getElementById('dep-date')||{}).value || new Date().toISOString().split('T')[0];
+    var cat = (document.getElementById('dep-cat')||{}).value || 'autre';
+    var recurrence = (document.getElementById('dep-recurrence')||{}).value || 'unique';
+    if (!desc || !montant) { showToast('⚠️','Remplissez description et montant'); return; }
+    _depenses.push({desc:desc, montant:montant, date:date, cat:cat, recurrence:recurrence, id:Date.now()});
+    try { localStorage.setItem('gcc_depenses', JSON.stringify(_depenses)); } catch(e) {}
+    ['dep-desc','dep-montant'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast('✅','Dépense enregistrée : ₱' + montant.toFixed(2));
+    refreshDepenses();
+    refreshDashboard();
+  }
+
+  function deleteDepense(id) {
+    _depenses = _depenses.filter(function(d){return d.id !== id;});
+    try { localStorage.setItem('gcc_depenses', JSON.stringify(_depenses)); } catch(e) {}
+    refreshDepenses();
+    refreshDashboard();
+  }
+
+  function refreshDepenses() {
+    var list = document.getElementById('depenses-list');
+    var totalEl = document.getElementById('depenses-total-display');
+    var total = _depenses.reduce(function(s,d){return s+(parseFloat(d.montant)||0);},0);
+    var catIcons = {loyer:'🏢',transport:'🚛',fournitures:'📦',communication:'📱',salaire:'👷',douane:'🛃',marketing:'📣',autre:'💼'};
+    if (list) {
+      if (_depenses.length === 0) { list.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucune dépense</p>'; }
+      else {
+        list.innerHTML = _depenses.slice().reverse().map(function(d) {
+          var recBadge = d.recurrence !== 'unique' ? ' <span style="font-size:.68rem;background:#e3f2fd;color:#1565c0;padding:1px 6px;border-radius:10px;">' + d.recurrence + '</span>' : '';
+          return '<div class="finance-row">'
+            + '<span class="finance-label">' + (catIcons[d.cat]||'💼') + ' ' + d.desc + recBadge + '<br><span style="font-size:.73rem;color:var(--slate);">' + d.date + '</span></span>'
+            + '<span style="display:flex;align-items:center;gap:8px;">'
+            + '<span class="finance-amount expense">₱' + parseFloat(d.montant).toFixed(2) + '</span>'
+            + '<button onclick="deleteDepense(' + d.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.85rem;">✕</button>'
+            + '</span></div>';
+        }).join('');
+      }
+    }
+    if (totalEl) totalEl.textContent = '₱' + total.toFixed(2);
+
+    // By category
+    var catEl = document.getElementById('dep-by-cat');
+    if (catEl) {
+      var catMap = {};
+      _depenses.forEach(function(d){ catMap[d.cat]=(catMap[d.cat]||0)+(parseFloat(d.montant)||0); });
+      var cats = Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a];});
+      var catIcons2 = {loyer:'🏢',transport:'🚛',fournitures:'📦',communication:'📱',salaire:'👷',douane:'🛃',marketing:'📣',autre:'💼'};
+      var catNames = {loyer:'Loyer/Bureau',transport:'Transport',fournitures:'Fournitures',communication:'Communication',salaire:'Salaires',douane:'Douane/Port',marketing:'Marketing',autre:'Autre'};
+      if (cats.length === 0) { catEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucune dépense</p>'; }
+      else {
+        var maxC = catMap[cats[0]] || 1;
+        catEl.innerHTML = cats.map(function(c) {
+          var pct = Math.round(catMap[c]/total*100);
+          return '<div style="margin-bottom:10px;display:flex;align-items:center;gap:12px;">'
+            + '<span style="width:130px;font-size:.82rem;font-weight:600;color:var(--navy);">' + (catIcons2[c]||'') + ' ' + (catNames[c]||c) + '</span>'
+            + '<div style="flex:1;"><div class="prog-bar"><div class="prog-fill" style="width:'+Math.round(catMap[c]/maxC*100)+'%;background:#e74c3c;"></div></div></div>'
+            + '<span style="font-size:.8rem;color:var(--slate);min-width:80px;text-align:right;">₱' + catMap[c].toFixed(0) + ' (' + pct + '%)</span>'
+            + '</div>';
+        }).join('');
+      }
+    }
+  }
+
+  /* ═══ CLIENTS ═══ */
+  function refreshClients() {
+    var clientMap = {};
+    _submissions.forEach(function(s) {
+      var nom = s.expediteur || 'Inconnu';
+      if (!clientMap[nom]) clientMap[nom] = {nom:nom, tel:s.tel_exp||'', email:s.email_exp||'', envois:[], dests:[]};
+      clientMap[nom].envois.push(s.ref||'');
+      var dest = (s.destination||'').split('—')[0].trim();
+      if (dest && !clientMap[nom].dests.includes(dest)) clientMap[nom].dests.push(dest);
+    });
+    var clients = Object.values(clientMap);
+    var tbody = document.getElementById('clients-tbody');
+    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    setEl('cli-total', clients.length);
+    setEl('cli-actifs', clients.filter(function(c){return c.envois.length>=2;}).length);
+    var topC = clients.sort(function(a,b){return b.envois.length-a.envois.length;})[0];
+    setEl('cli-top', topC ? topC.nom + ' (' + topC.envois.length + ')' : '—');
+    setEl('cli-moy', clients.length ? (Math.round(_submissions.length/clients.length*10)/10).toString() : '0');
+    if (!tbody) return;
+    if (clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>'; return; }
+    var sorted = clients.slice().sort(function(a,b){return b.envois.length-a.envois.length;});
+    tbody.innerHTML = sorted.map(function(c) {
+      var last = _submissions.filter(function(s){return s.expediteur===c.nom;}).slice(-1)[0];
+      return '<tr><td><strong style="color:var(--navy);">' + c.nom + '</strong>'
+        + (c.envois.length >= 2 ? ' <span style="font-size:.68rem;background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:10px;">Fidèle</span>' : '')
+        + '</td><td style="font-size:.83rem;">' + (c.tel||'—') + '</td>'
+        + '<td style="font-size:.83rem;">' + (c.email||'—') + '</td>'
+        + '<td><strong style="color:var(--sky);">' + c.envois.length + '</strong></td>'
+        + '<td style="font-size:.8rem;">' + (last ? (last.ref||'—') : '—') + '</td>'
+        + '<td style="font-size:.78rem;">' + c.dests.slice(0,3).join(', ') + '</td></tr>';
+    }).join('');
+  }
+
+  /* ═══ PARRAINAGE ═══ */
+  var _parrains = [];
+  try { _parrains = JSON.parse(localStorage.getItem('gcc_parrains') || '[]'); } catch(e) {}
+
+  function addParrain() {
+    var nom = (document.getElementById('par-nom')||{}).value || '';
+    var tel = (document.getElementById('par-tel')||{}).value || '';
+    var code = (document.getElementById('par-code')||{}).value || '';
+    var commission = parseFloat((document.getElementById('par-commission')||{}).value || '200');
+    if (!nom || !code) { showToast('⚠️','Nom et code parrain requis'); return; }
+    if (_parrains.find(function(p){return p.code===code;})) { showToast('⚠️','Code parrain déjà utilisé'); return; }
+    _parrains.push({nom:nom, tel:tel, code:code, commission:commission, filleuls:[], id:Date.now()});
+    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
+    ['par-nom','par-tel','par-code'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast('✅','Parrain ' + nom + ' enregistré !');
+    refreshParrainage();
+  }
+
+  function addFilleul() {
+    var code = (document.getElementById('filleul-parrain-code')||{}).value || '';
+    var nom = (document.getElementById('filleul-nom')||{}).value || '';
+    var paye = (document.getElementById('filleul-paye')||{}).value || 'non';
+    if (!code || !nom) { showToast('⚠️','Code parrain et nom filleul requis'); return; }
+    var parrain = _parrains.find(function(p){return p.code===code;});
+    if (!parrain) { showToast('❌','Parrain introuvable avec ce code'); return; }
+    parrain.filleuls.push({nom:nom, date:new Date().toISOString().split('T')[0], paye:paye, id:Date.now()});
+    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
+    ['filleul-parrain-code','filleul-nom'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast('✅','Filleul ajouté à ' + parrain.nom);
+    refreshParrainage();
+  }
+
+  function deleteParrain(id) {
+    if (!confirm('Supprimer ce parrain ?')) return;
+    _parrains = _parrains.filter(function(p){return p.id !== id;});
+    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
+    refreshParrainage();
+  }
+
+  function refreshParrainage() {
+    var totalFilleuls = _parrains.reduce(function(s,p){return s+p.filleuls.length;},0);
+    var commDues = _parrains.reduce(function(s,p){
+      return s + p.filleuls.filter(function(f){return f.paye==='non';}).length * (p.commission||0);
+    },0);
+    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+    setEl('par-total', _parrains.length);
+    setEl('par-filleuls', totalFilleuls);
+    setEl('par-commissions', '₱' + commDues.toFixed(0));
+    var listEl = document.getElementById('parrains-list');
+    if (!listEl) return;
+    if (_parrains.length === 0) { listEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucun parrain enregistré</p>'; return; }
+    listEl.innerHTML = _parrains.map(function(p) {
+      var nonPaids = p.filleuls.filter(function(f){return f.paye==='non';}).length;
+      return '<div class="parrain-card">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div><div class="parrain-name">' + p.nom + '</div>'
+        + '<div style="font-size:.75rem;color:var(--slate);">Code: <strong style="color:var(--sky);">' + p.code + '</strong> &middot; ' + (p.tel||'') + '</div></div>'
+        + '<button onclick="deleteParrain(' + p.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;">✕</button></div>'
+        + '<div class="parrain-stats">'
+        + '<span class="parrain-stat"><strong>' + p.filleuls.length + '</strong> filleul(s)</span>'
+        + '<span class="parrain-stat"><strong style="color:#e74c3c;">₱' + (nonPaids*(p.commission||0)).toFixed(0) + '</strong> dues</span>'
+        + '<span class="parrain-stat"><strong>₱' + (p.commission||0) + '</strong>/filleul</span>'
+        + '</div>'
+        + (p.filleuls.length > 0 ? '<div style="margin-top:8px;font-size:.76rem;color:var(--slate);">'
+          + p.filleuls.map(function(f){return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:10px;background:'+(f.paye==='oui'?'#e8f5e9':'#fff3e0')+';color:'+(f.paye==='oui'?'#2e7d32':'#e65100')+';font-weight:600;">' + f.nom + (f.paye==='oui'?' ✓':'') + '</span>';}).join('')
+          + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  /* ═══ ANNONCES ═══ */
+  var _annonces = [];
+  try { _annonces = JSON.parse(localStorage.getItem('gcc_annonces') || '[]'); } catch(e) {}
+
+  function addAnnonce() {
+    var dest = (document.getElementById('ann-dest')||{}).value || '';
+    var date = (document.getElementById('ann-date')||{}).value || '';
+    var heure = (document.getElementById('ann-heure')||{}).value || '16:00';
+    var note = (document.getElementById('ann-note')||{}).value || '';
+    if (!dest || !date) { showToast('⚠️','Destination et date requises'); return; }
+    _annonces.unshift({dest:dest, date:date, heure:heure, note:note, id:Date.now()});
+    try { localStorage.setItem('gcc_annonces', JSON.stringify(_annonces)); } catch(e) {}
+    ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast('✅','Annonce publiée pour ' + dest);
+    refreshAnnonces();
+  }
+
+  function deleteAnnonce(id) {
+    _annonces = _annonces.filter(function(a){return a.id !== id;});
+    try { localStorage.setItem('gcc_annonces', JSON.stringify(_annonces)); } catch(e) {}
+    refreshAnnonces();
+  }
+
+  function refreshAnnonces() {
+    var listEl = document.getElementById('annonces-list');
+    if (!listEl) return;
+    if (_annonces.length === 0) { listEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;">Aucune annonce publiée</p>'; return; }
+    listEl.innerHTML = _annonces.map(function(a) {
+      var d = new Date(a.date + 'T12:00:00');
+      var isPast = d < new Date();
+      return '<div class="ann-card" style="' + (isPast?'opacity:.55;':'') + '">'
+        + '<div class="ann-info">'
+        + '<div class="ann-dest">' + a.dest + (isPast?' <span style="font-size:.7rem;color:#e74c3c;">[PASSÉ]</span>':'') + '</div>'
+        + '<div class="ann-date">🗓 ' + d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' — Limite: ' + a.heure + '</div>'
+        + (a.note ? '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;">📝 ' + a.note + '</div>' : '')
+        + '</div>'
+        + '<button onclick="deleteAnnonce(' + a.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:1rem;">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+
+  /* ═══ PARAMÈTRES / TARIFS ═══ */
+  function loadTarifs() {
+    var tarifs = {};
+    try { tarifs = JSON.parse(localStorage.getItem('gcc_tarifs') || '{}'); } catch(e) {}
+    var fields = {air:350,sea:180,lalamove:150,assurance:2};
+    Object.keys(fields).forEach(function(k) {
+      var el = document.getElementById('tarif-' + k);
+      if (el) el.value = tarifs[k] !== undefined ? tarifs[k] : fields[k];
+    });
+  }
+
+  function saveTarifs() {
+    var tarifs = {};
+    ['air','sea','lalamove','assurance'].forEach(function(k) {
+      var el = document.getElementById('tarif-' + k);
+      if (el) tarifs[k] = parseFloat(el.value) || 0;
+    });
+    try { localStorage.setItem('gcc_tarifs', JSON.stringify(tarifs)); } catch(e) {}
+    showToast('✅','Tarifs sauvegardés');
+  }
+
+  function changePass() {
+    var p1 = (document.getElementById('new-pass')||{}).value || '';
+    var p2 = (document.getElementById('new-pass2')||{}).value || '';
+    if (!p1 || p1.length < 6) { showToast('⚠️','Mot de passe trop court (min. 6 caractères)'); return; }
+    if (p1 !== p2) { showToast('❌','Les mots de passe ne correspondent pas'); return; }
+    try { localStorage.setItem('gcc_admin_pass', p1); } catch(e) {}
+    showToast('✅','Mot de passe mis à jour');
+    document.getElementById('new-pass').value = '';
+    document.getElementById('new-pass2').value = '';
+  }
+
+  /* ═══ EXPORT CSV ═══ */
+  function exportCSV(type) {
+    var rows, headers, filename;
+    if (type === 'demandes') {
+      headers = ['Référence','Expéditeur','Tél Exp','Destinataire','Tél Dest','Destination','Mode','Paiement','Statut'];
+      rows = _submissions.map(function(s){return [s.ref,s.expediteur,s.tel_exp,s.destinataire,s.tel_dest,s.destination,s.mode,s.paiement,s.statut];});
+      filename = 'gcc_demandes.csv';
+    } else {
+      var revRows = _revenues.map(function(r){return ['Revenu',r.date,r.cat,r.desc,r.montant];});
+      var depRows = _depenses.map(function(d){return ['Dépense',d.date,d.cat,d.desc,d.montant];});
+      headers = ['Type','Date','Catégorie','Description','Montant'];
+      rows = revRows.concat(depRows);
+      filename = 'gcc_finance.csv';
+    }
+    var csv = [headers.join(',')].concat(rows.map(function(r){return r.map(function(c){return '"'+(c||'').toString().replace(/"/g,'""')+'"';}).join(',');})).join('\n');
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+    showToast('📥','Export CSV téléchargé : ' + filename);
+  }
+
+function doLogout() {
+    try { localStorage.removeItem('gcc_admin_session'); } catch(e) {}
+    var panel = document.getElementById('adminPanel');
+    if (panel) { panel.style.display = 'none'; document.body.style.overflow = ''; }
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     setLang(LANG);
     handleModePaiement('transfer');
     refreshAdminTable();
+    // Restore admin session if still active
+    try {
+      if (localStorage.getItem('gcc_admin_session') === '1') {
+        var panel = document.getElementById('adminPanel');
+        if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+        // Boot dashboard
+        if (typeof startAdmClock === 'function') startAdmClock();
+        if (typeof refreshDashboard === 'function') refreshDashboard();
+        if (typeof refreshFinance === 'function') { refreshFinance(); refreshDepenses(); }
+        if (typeof refreshParrainage === 'function') refreshParrainage();
+        if (typeof refreshAnnonces === 'function') refreshAnnonces();
+        if (typeof loadTarifs === 'function') loadTarifs();
+      }
+    } catch(e) {}
   });
 </script>
 </head>
@@ -727,17 +1275,14 @@ function doAdminLogin() {
           <div class="dh2" data-fr="Annonces & Arrivées" data-en="Announcements & Arrivals">Annonces & Arrivées</div>
         </div>
       </div>
-      <div class="db-body" id="dbBody">
-        <div class="db-placeholder" id="dbPlaceholder">
+      <div class="db-body">
+        <div class="db-placeholder">
           <div class="db-icon">📋</div>
           <p data-fr="Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé." data-en="Upcoming departure dates<br>will be announced here.<br><br>Sign up to be notified when a departure is scheduled.">Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé.</p>
         </div>
-        <div id="dbFlyerWrap" style="display:none;text-align:center;padding:8px 0;">
-          <img id="dbFlyerImg" src="" alt="Flyer" style="max-width:100%;max-height:320px;border-radius:8px;object-fit:contain;">
-        </div>
       </div>
-      <div class="db-meta" id="dbMeta">
-        <span id="dbMetaLabel" data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
+      <div class="db-meta">
+        <span data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
         <button class="db-notify-btn" data-fr="Me notifier" data-en="Notify me" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
       </div>
     </div>
@@ -801,7 +1346,7 @@ function doAdminLogin() {
       <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" placeholder="votre@email.com"></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
-        <select>
+        <select id="selectDestination">
           <option>🇨🇲 Yaoundé — Cameroun</option>
           <option>🇨🇲 Douala — Cameroun</option>
           <option>🇨🇬 Brazzaville — Congo</option>
@@ -1169,181 +1714,302 @@ function doAdminLogin() {
   <div class="admin-topbar">
     <div class="at-brand">GCC CARGO <span>ADMIN</span></div>
     <div style="display:flex;gap:10px;align-items:center;">
-      <span style="font-size:.82rem;color:rgba(214,237,251,.6);">Connecté en tant que : <strong style="color:var(--ice);">Admin GCC</strong></span>
-      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
+      <span id="adm-clock" style="font-size:.78rem;color:rgba(214,237,251,.5);font-family:'Barlow Condensed',sans-serif;"></span>
+      <span style="font-size:.8rem;color:rgba(214,237,251,.6);">Admin GCC</span>
+      <button class="btn-logout" onclick="doLogout()">&#9211; Déconnexion</button>
     </div>
   </div>
-  <div class="admin-body">
-    <!-- KPIs -->
-    <div class="admin-section-title">Vue d'ensemble</div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-val">47</div><div class="kpi-lbl">Colis ce mois</div><div class="kpi-trend">↑ +12% vs mois précédent</div></div>
-      <div class="kpi"><div class="kpi-val">₱ 186K</div><div class="kpi-lbl">Revenus (mois)</div><div class="kpi-trend">↑ +8% vs mois précédent</div></div>
-      <div class="kpi"><div class="kpi-val">14</div><div class="kpi-lbl">En transit</div><div class="kpi-trend">→ Stable</div></div>
-      <div class="kpi"><div class="kpi-val">8</div><div class="kpi-lbl">Arrivés — à notifier</div><div class="kpi-trend" style="color:#e65100;">⚠ Action requise</div></div>
-      <div class="kpi"><div class="kpi-val">23</div><div class="kpi-lbl">Parrains actifs</div><div class="kpi-trend">↑ +4 ce mois</div></div>
-      <div class="kpi"><div class="kpi-val">₱ 14.2K</div><div class="kpi-lbl">Commissions à payer</div><div class="kpi-trend" style="color:#e65100;">⚠ À traiter</div></div>
-    </div>
+  <div class="admin-layout">
+    <nav class="admin-sidebar">
+      <div class="adm-nav-item active" onclick="admNav('dash',this)"><span class="nav-ico">&#128202;</span><span class="nav-lbl">Dashboard</span></div>
+      <div class="adm-nav-item" onclick="admNav('colis',this)"><span class="nav-ico">&#128230;</span><span class="nav-lbl">Colis en cours</span></div>
+      <div class="adm-nav-sep"></div>
+      <div class="adm-nav-item" onclick="admNav('finance',this)"><span class="nav-ico">&#128176;</span><span class="nav-lbl">Finance</span></div>
+      <div class="adm-nav-item" onclick="admNav('depenses',this)"><span class="nav-ico">&#129534;</span><span class="nav-lbl">Dépenses</span></div>
+      <div class="adm-nav-sep"></div>
+      <div class="adm-nav-item" onclick="admNav('clients',this)"><span class="nav-ico">&#128101;</span><span class="nav-lbl">Clients</span></div>
+      <div class="adm-nav-item" onclick="admNav('parrainage',this)"><span class="nav-ico">&#129309;</span><span class="nav-lbl">Parrainage</span></div>
+      <div class="adm-nav-sep"></div>
+      <div class="adm-nav-item" onclick="admNav('annonces',this)"><span class="nav-ico">&#128226;</span><span class="nav-lbl">Annonces</span></div>
+      <div class="adm-nav-item" onclick="admNav('parametres',this)"><span class="nav-ico">&#9881;</span><span class="nav-lbl">Paramètres</span></div>
+      <div class="adm-nav-version">v2.0 &middot; GCC Cargo</div>
+    </nav>
+    <main class="admin-main">
 
-    <!-- Tabs -->
-    <div class="admin-tabs">
-      <button class="adm-tab active" onclick="showTab('demandes',this)">📬 Demandes clients</button>
-      <button class="adm-tab" onclick="showTab('colis',this)">📦 Colis en cours</button>
-      <button class="adm-tab" onclick="showTab('clients',this)">👥 Clients</button>
-      <button class="adm-tab" onclick="showTab('parrainage',this)">💰 Parrainage</button>
-      <button class="adm-tab" onclick="showTab('departs',this)">✈ Départs</button>
-    </div>
-
-    <!-- ═══ DEMANDES CLIENTS TAB ═══ -->
-    <div id="tab-demandes" class="adm-content" style="display:block;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:0;">Demandes reçues via le formulaire</div>
-        <button class="notif-btn" style="background:var(--navy);" onclick="if(confirm('Effacer toutes les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();}">🗑 Vider</button>
-      </div>
-      <!-- KPIs demandes -->
-      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px;">
-        <div class="kpi" style="border-top-color:var(--sky);">
-          <div class="kpi-val" id="kpi-demandes">0</div>
-          <div class="kpi-lbl">Total demandes</div>
+      <!-- PAGE: DASHBOARD -->
+      <div class="adm-page active" id="adm-dash">
+        <div class="adm-page-title">&#128202; Tableau de bord</div>
+        <div class="adm-page-sub" id="adm-date-display">Chargement...</div>
+        <div class="kpi-grid">
+          <div class="kpi sky"><div class="kpi-val" id="kpi-demandes">0</div><div class="kpi-lbl">Demandes totales</div><div class="kpi-trend neutral">Toutes périodes</div></div>
+          <div class="kpi"><div class="kpi-val" id="kpi-attente">0</div><div class="kpi-lbl">En attente</div><div class="kpi-trend neutral">À traiter</div></div>
+          <div class="kpi green"><div class="kpi-val" id="kpi-livres">0</div><div class="kpi-lbl">Livrés</div><div class="kpi-trend up">&#8593; Complétés</div></div>
+          <div class="kpi gold"><div class="kpi-val" id="kpi-revenue">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div><div class="kpi-trend up">Enregistrés</div></div>
+          <div class="kpi red"><div class="kpi-val" id="kpi-depenses-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div><div class="kpi-trend neutral">Ce mois</div></div>
+          <div class="kpi green"><div class="kpi-val" id="kpi-marge">&#8369;0</div><div class="kpi-lbl">Marge nette</div><div class="kpi-trend up" id="kpi-marge-trend">Revenus - Dépenses</div></div>
         </div>
-        <div class="kpi" style="border-top-color:#e65100;">
-          <div class="kpi-val" id="kpi-attente">0</div>
-          <div class="kpi-lbl">En attente</div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#128230; Activité récente <span class="tag">Live</span></div>
+            <div id="dash-recent-list" style="font-size:.84rem;color:var(--slate);"></div>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128202; Répartition par statut</div>
+            <div id="dash-statut-chart"></div>
+          </div>
+        </div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#127758; Top destinations</div>
+            <div id="dash-destinations" style="font-size:.84rem;"></div>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128179; Modes de dépôt</div>
+            <div id="dash-modes" style="font-size:.84rem;"></div>
+          </div>
         </div>
       </div>
-      <div class="admin-table-wrap" style="overflow-x:auto;">
-        <table style="min-width:900px;">
-          <thead>
-            <tr>
-              <th>Réf / Date</th>
-              <th>Expéditeur</th>
-              <th>Récepteur</th>
-              <th>Destination</th>
-              <th>Mode dépôt</th>
-              <th>Paiement</th>
-              <th>Adresse / Créneau</th>
-              <th>Statut</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="admin-submissions-tbody">
-            <tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- COLIS TAB -->
-    <div id="tab-colis" class="adm-content" style="display:none;">
-      <div style="margin-bottom:16px;">
-        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:12px;">Mettre à jour un colis</div>
-        <div class="admin-update-form">
-          <div class="au-row">
-            <div class="au-field"><label>N° de tracking</label><input type="text" placeholder="GCC-2026-00XXX" id="upTrack"></div>
-            <div class="au-field"><label>Nouveau statut</label>
-              <select id="upStatus">
-                <option>Enregistré</option>
-                <option>En transit</option>
-                <option>Arrivé à destination</option>
-                <option>Livré</option>
-                <option>Problème douanier</option>
+      <!-- PAGE: COLIS EN COURS -->
+      <div class="adm-page" id="adm-colis">
+        <div class="adm-page-title">&#128230; Colis en cours</div>
+        <div class="adm-page-sub">Gestion et suivi de toutes les demandes d'expédition</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+          <input class="adm-input" id="search-colis" placeholder="&#128269; Rechercher ref, nom, destination..." oninput="filterColis()" style="max-width:270px;flex:1;">
+          <select class="adm-input" id="filter-statut" onchange="filterColis()" style="max-width:155px;">
+            <option value="">Tous les statuts</option>
+            <option>En attente</option><option>En transit</option><option>Arrivé</option><option>Livré</option>
+          </select>
+          <button class="adm-btn-danger" onclick="if(confirm('Vider TOUTES les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();showToast('&#128465;','Données effacées');}">&#128465; Vider</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="adm-tbl" id="admin-submissions-tbl">
+            <thead><tr>
+              <th>Réf.</th><th>Expéditeur</th><th>Destinataire</th><th>Destination</th>
+              <th>Dépôt</th><th>Paiement</th><th>Adresse</th><th>Statut</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="admin-submissions-tbody">
+              <tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAGE: FINANCE -->
+      <div class="adm-page" id="adm-finance">
+        <div class="adm-page-title">&#128176; Finance &amp; Revenus</div>
+        <div class="adm-page-sub">Suivi des entrées d'argent et rentabilité</div>
+        <div class="kpi-grid">
+          <div class="kpi green"><div class="kpi-val" id="fin-revenus-total">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div></div>
+          <div class="kpi red"><div class="kpi-val" id="fin-dep-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div></div>
+          <div class="kpi sky"><div class="kpi-val" id="fin-marge-total">&#8369;0</div><div class="kpi-lbl">Marge nette</div></div>
+          <div class="kpi gold"><div class="kpi-val" id="fin-nb-rev">0</div><div class="kpi-lbl">Nb entrées</div></div>
+        </div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#10133; Enregistrer un revenu</div>
+            <div class="adm-form-row"><div class="fg"><label>Description</label><input class="adm-input" id="rev-desc" placeholder="Ex: Envoi GCC-2026-12345"></div></div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Montant (&#8369;)</label><input class="adm-input" type="number" id="rev-montant" placeholder="0.00" min="0"></div>
+              <div class="fg"><label>Date</label><input class="adm-input" type="date" id="rev-date"></div>
+            </div>
+            <div class="adm-form-row"><div class="fg"><label>Catégorie</label>
+              <select class="adm-input" id="rev-cat">
+                <option value="envoi">&#128230; Frais d'envoi</option>
+                <option value="lalamove">&#128757; Collecte Lalamove</option>
+                <option value="assurance">&#128737; Assurance colis</option>
+                <option value="emballage">&#128188; Emballage</option>
+                <option value="autre">&#128188; Autre</option>
               </select>
+            </div></div>
+            <button class="adm-btn-primary" onclick="addRevenu()">Enregistrer</button>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128203; Historique revenus</div>
+            <div id="revenus-list" style="max-height:240px;overflow-y:auto;font-size:.83rem;"></div>
+            <div class="finance-row" style="margin-top:10px;"><span class="finance-label">TOTAL REVENUS</span><span class="finance-amount income" id="revenus-total-display">&#8369;0.00</span></div>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div class="adm-card-title">&#128202; Évolution des revenus (barres mensuelles)</div>
+          <div id="monthly-chart" style="display:flex;gap:6px;align-items:flex-end;height:90px;padding:4px 0;"></div>
+          <div id="monthly-labels" style="display:flex;gap:6px;margin-top:3px;"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: DÉPENSES -->
+      <div class="adm-page" id="adm-depenses">
+        <div class="adm-page-title">&#129534; Dépenses &amp; Charges</div>
+        <div class="adm-page-sub">Loyers, transport, fournitures, salaires et autres charges</div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#10133; Nouvelle dépense</div>
+            <div class="adm-form-row"><div class="fg"><label>Description</label><input class="adm-input" id="dep-desc" placeholder="Ex: Loyer bureau octobre"></div></div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Montant (&#8369;)</label><input class="adm-input" type="number" id="dep-montant" placeholder="0.00" min="0"></div>
+              <div class="fg"><label>Date</label><input class="adm-input" type="date" id="dep-date"></div>
             </div>
-            <div class="au-field"><label>Remarque (optionnel)</label><input type="text" placeholder="Ex : Disponible à Yaoundé" id="upNote"></div>
-            <button class="btn-update" onclick="doUpdate()">Mettre à jour + Notifier →</button>
+            <div class="adm-form-row"><div class="fg"><label>Catégorie</label>
+              <select class="adm-input" id="dep-cat">
+                <option value="loyer">&#127970; Loyer / Bureau</option>
+                <option value="transport">&#128665; Transport / Lalamove</option>
+                <option value="fournitures">&#128230; Fournitures / Emballages</option>
+                <option value="communication">&#128241; Communication / Internet</option>
+                <option value="salaire">&#128119; Salaires</option>
+                <option value="douane">&#128707; Frais douane / Port</option>
+                <option value="marketing">&#128226; Marketing / Pub</option>
+                <option value="autre">&#128188; Autre</option>
+              </select>
+            </div></div>
+            <div class="adm-form-row"><div class="fg"><label>Récurrence</label>
+              <select class="adm-input" id="dep-recurrence">
+                <option value="unique">Ponctuelle</option>
+                <option value="mensuel">Mensuelle</option>
+                <option value="hebdo">Hebdomadaire</option>
+              </select>
+            </div></div>
+            <button class="adm-btn-primary" onclick="addDepense()">Enregistrer</button>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128203; Dépenses enregistrées</div>
+            <div id="depenses-list" style="max-height:270px;overflow-y:auto;font-size:.83rem;"></div>
+            <div class="finance-row" style="margin-top:10px;"><span class="finance-label">TOTAL DÉPENSES</span><span class="finance-amount expense" id="depenses-total-display">&#8369;0.00</span></div>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div class="adm-card-title">&#128202; Dépenses par catégorie</div>
+          <div id="dep-by-cat"></div>
+        </div>
+      </div>
+
+      <!-- PAGE: CLIENTS -->
+      <div class="adm-page" id="adm-clients">
+        <div class="adm-page-title">&#128101; Base clients</div>
+        <div class="adm-page-sub">Expéditeurs actifs, fidélité et historique</div>
+        <div class="kpi-grid">
+          <div class="kpi sky"><div class="kpi-val" id="cli-total">0</div><div class="kpi-lbl">Clients uniques</div></div>
+          <div class="kpi green"><div class="kpi-val" id="cli-actifs">0</div><div class="kpi-lbl">Actifs (&#8805;2 envois)</div></div>
+          <div class="kpi gold"><div class="kpi-val" id="cli-top" style="font-size:1rem;">—</div><div class="kpi-lbl">Top client</div></div>
+          <div class="kpi"><div class="kpi-val" id="cli-moy">0</div><div class="kpi-lbl">Moy. envois/client</div></div>
+        </div>
+        <div class="adm-card">
+          <div class="adm-card-title">&#128203; Liste des expéditeurs</div>
+          <div class="admin-table-wrap" style="padding:0;box-shadow:none;">
+            <table class="adm-tbl">
+              <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th></tr></thead>
+              <tbody id="clients-tbody"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
+            </table>
           </div>
         </div>
       </div>
-      <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>N° Tracking</th><th>Expéditeur</th><th>Destinataire</th><th>Destination</th><th>Poids</th><th>Statut</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr><td>GCC-2026-0041</td><td>Marie Tabi</td><td>Paul Nkeng</td><td>🇨🇲 Yaoundé</td><td>12 kg</td><td><span class="badge b-arrived">Arrivé</span></td><td><button class="notif-btn" onclick="showToast('📩 SMS envoyé','Paul Nkeng notifié : colis disponible à Yaoundé.')">Notifier SMS</button></td></tr>
-            <tr><td>GCC-2026-0040</td><td>Jean Fotso</td><td>Aline Biya</td><td>🇨🇮 Abidjan</td><td>8 kg</td><td><span class="badge b-transit">En transit</span></td><td><button class="notif-btn" onclick="showToast('📩 Email envoyé','Jean Fotso informé : colis en transit.')">Notifier Email</button></td></tr>
-            <tr><td>GCC-2026-0039</td><td>Samuel Mbia</td><td>Rose Epée</td><td>🇨🇬 Brazzaville</td><td>20 kg</td><td><span class="badge b-delivered">Livré</span></td><td><button class="notif-btn" onclick="showToast('✅ Confirmé','Livraison confirmée pour GCC-2026-0039.')">Confirmer</button></td></tr>
-            <tr><td>GCC-2026-0038</td><td>Clara Ndeh</td><td>Eric Bakang</td><td>🇬🇦 Libreville</td><td>5 kg</td><td><span class="badge b-pending">En attente</span></td><td><button class="notif-btn" onclick="showToast('📩 Rappel envoyé','Rappel de paiement envoyé à Clara Ndeh.')">Rappel paiement</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- CLIENTS TAB -->
-    <div id="tab-clients" class="adm-content" style="display:none;">
-      <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Colis envoyés</th><th>Code parrain</th><th>Inscription</th></tr></thead>
-          <tbody>
-            <tr><td>Marie Tabi</td><td>+63 917 123 4567</td><td>marie@email.com</td><td>7</td><td>GCC-REF-0001</td><td>Jan 2026</td></tr>
-            <tr><td>Jean Fotso</td><td>+63 918 234 5678</td><td>jean@email.com</td><td>4</td><td>GCC-REF-0002</td><td>Feb 2026</td></tr>
-            <tr><td>Samuel Mbia</td><td>+63 919 345 6789</td><td>samuel@email.com</td><td>12</td><td>GCC-REF-0003</td><td>Mar 2026</td></tr>
-            <tr><td>Clara Ndeh</td><td>+63 920 456 7890</td><td>clara@email.com</td><td>2</td><td>GCC-REF-0004</td><td>Avr 2026</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- PARRAINAGE TAB -->
-    <div id="tab-parrainage" class="adm-content" style="display:none;">
-      <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>Parrain</th><th>Code</th><th>Filleuls</th><th>CA généré</th><th>Taux</th><th>Commission</th><th>Statut</th></tr></thead>
-          <tbody>
-            <tr><td>Marie Tabi</td><td>GCC-REF-0001</td><td>5</td><td>₱ 60 000</td><td>10%</td><td>₱ 6 000</td><td><span class="badge b-pending">À payer</span></td></tr>
-            <tr><td>Jean Fotso</td><td>GCC-REF-0002</td><td>2</td><td>₱ 24 000</td><td>5%</td><td>₱ 1 200</td><td><span class="badge b-pending">À payer</span></td></tr>
-            <tr><td>Samuel Mbia</td><td>GCC-REF-0003</td><td>8</td><td>₱ 96 000</td><td>10%</td><td>₱ 9 600</td><td><span class="badge b-arrived">Payé</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- DEPARTS TAB -->
-    <div id="tab-departs" class="adm-content" style="display:none;">
-      <!-- FLYER UPLOAD SECTION -->
-      <div class="admin-update-form" style="margin-bottom:20px;">
-        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">🖼 Publier un flyer de départ</div>
-        <div id="flyerAdminArea">
-          <!-- No flyer state -->
-          <div id="flyerUploadArea" style="display:flex;flex-direction:column;gap:14px;">
-            <div style="border:2px dashed #c8d3e0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:#f7f9fb;" onclick="document.getElementById('flyerFileInput').click()">
-              <div style="font-size:2rem;margin-bottom:8px;">📂</div>
-              <div style="font-weight:600;color:var(--navy);margin-bottom:4px;">Cliquez pour sélectionner un flyer</div>
-              <div style="font-size:.82rem;color:var(--slate);">PNG, JPG, WEBP — max 5 Mo</div>
+      <!-- PAGE: PARRAINAGE -->
+      <div class="adm-page" id="adm-parrainage">
+        <div class="adm-page-title">&#129309; Programme Parrainage</div>
+        <div class="adm-page-sub">Gestion des parrains, filleuls et commissions</div>
+        <div class="kpi-grid">
+          <div class="kpi sky"><div class="kpi-val" id="par-total">0</div><div class="kpi-lbl">Parrains actifs</div></div>
+          <div class="kpi green"><div class="kpi-val" id="par-filleuls">0</div><div class="kpi-lbl">Filleuls totaux</div></div>
+          <div class="kpi gold"><div class="kpi-val" id="par-commissions">&#8369;0</div><div class="kpi-lbl">Commissions dues</div></div>
+        </div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#10133; Nouveau parrain</div>
+            <div class="adm-form-row"><div class="fg"><label>Nom du parrain</label><input class="adm-input" id="par-nom" placeholder="Ex: William Tabi"></div></div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Téléphone</label><input class="adm-input" id="par-tel" placeholder="+63 9xx xxx xxxx"></div>
+              <div class="fg"><label>Code parrain</label><input class="adm-input" id="par-code" placeholder="GCC-REF-001"></div>
             </div>
-            <input type="file" id="flyerFileInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;" onchange="previewFlyer(this)">
-            <!-- Preview area (hidden until file chosen) -->
-            <div id="flyerPreviewArea" style="display:none;flex-direction:column;gap:12px;align-items:center;">
-              <img id="flyerPreviewImg" src="" alt="Aperçu" style="max-width:340px;max-height:260px;border-radius:8px;border:1px solid #dde3ec;object-fit:contain;">
-              <div style="display:flex;gap:10px;">
-                <button class="btn-update" onclick="publishFlyer()" style="background:var(--gold);">✅ Publier ce flyer</button>
-                <button class="btn-update" onclick="cancelFlyer()" style="background:#e74c3c;">✖ Annuler</button>
-              </div>
+            <div class="adm-form-row"><div class="fg"><label>Commission / filleul (&#8369;)</label><input class="adm-input" type="number" id="par-commission" placeholder="200" value="200"></div></div>
+            <button class="adm-btn-primary" onclick="addParrain()">Enregistrer</button>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128203; Parrains enregistrés</div>
+            <div id="parrains-list" style="max-height:260px;overflow-y:auto;"></div>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div class="adm-card-title">&#10133; Ajouter un filleul à un parrain</div>
+          <div class="adm-form-row">
+            <div class="fg"><label>Parrain (code)</label><input class="adm-input" id="filleul-parrain-code" placeholder="GCC-REF-001"></div>
+            <div class="fg"><label>Nom du filleul</label><input class="adm-input" id="filleul-nom" placeholder="Nom du nouveau client"></div>
+            <div class="fg"><label>Commission payée ?</label>
+              <select class="adm-input" id="filleul-paye"><option value="non">Non payée</option><option value="oui">Payée</option></select>
             </div>
           </div>
-          <!-- Active flyer state -->
-          <div id="flyerActiveArea" style="display:none;flex-direction:column;gap:14px;align-items:center;">
-            <div style="font-size:.85rem;color:#27ae60;font-weight:600;background:#eafaf1;border:1px solid #a9dfbf;border-radius:6px;padding:6px 14px;">✅ Flyer actif — visible sur la page d'accueil</div>
-            <img id="flyerActiveImg" src="" alt="Flyer actif" style="max-width:360px;max-height:280px;border-radius:8px;border:1px solid #dde3ec;object-fit:contain;">
-            <div style="display:flex;gap:10px;">
-              <button class="btn-update" onclick="document.getElementById('flyerFileInput').click();" style="background:var(--navy);">🔄 Remplacer le flyer</button>
-              <button class="btn-update" onclick="removeFlyer()" style="background:#e74c3c;">🗑 Supprimer le flyer</button>
+          <button class="adm-btn-secondary" onclick="addFilleul()">Ajouter filleul</button>
+        </div>
+      </div>
+
+      <!-- PAGE: ANNONCES -->
+      <div class="adm-page" id="adm-annonces">
+        <div class="adm-page-title">&#128226; Annonces &amp; Départs</div>
+        <div class="adm-page-sub">Planification des départs cargo et communications</div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#10133; Planifier un départ</div>
+            <div class="adm-form-row"><div class="fg"><label>Destination</label>
+              <select class="adm-input" id="ann-dest">
+                <option>&#127464;&#127474; Yaoundé — Cameroun</option>
+                <option>&#127464;&#127474; Douala — Cameroun</option>
+                <option>&#127464;&#127468; Brazzaville — Congo</option>
+                <option>&#127464;&#127465; Kinshasa — RDC</option>
+                <option>&#127468;&#127462; Libreville — Gabon</option>
+                <option>&#127463;&#127471; Cotonou — Bénin</option>
+              </select>
+            </div></div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Date de départ</label><input class="adm-input" type="date" id="ann-date"></div>
+              <div class="fg"><label>Limite dépôt</label><input class="adm-input" type="time" id="ann-heure" value="16:00"></div>
             </div>
+            <div class="adm-form-row"><div class="fg"><label>Note</label><input class="adm-input" id="ann-note" placeholder="Ex: Places limitées — dépôt avant vendredi 16h"></div></div>
+            <button class="adm-btn-primary" onclick="addAnnonce()">Publier</button>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128197; Départs planifiés</div>
+            <div id="annonces-list" style="font-size:.84rem;max-height:320px;overflow-y:auto;"></div>
           </div>
         </div>
       </div>
-      <!-- DEPARTURE FORM SECTION -->
-      <div class="admin-update-form" style="margin-bottom:20px;">
-        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Publier une annonce de départ</div>
-        <div class="au-row" style="grid-template-columns:1fr 1fr 1fr auto;">
-          <div class="au-field"><label>Route</label><select><option>Manila → Yaoundé/Douala</option><option>Manila → Abidjan</option><option>Manila → Brazzaville</option><option>Manila → Libreville</option></select></div>
-          <div class="au-field"><label>Date de départ</label><input type="date"></div>
-          <div class="au-field"><label>Date d'arrivée estimée</label><input type="date"></div>
-          <button class="btn-update" onclick="showToast('✈ Annonce publiée','Le départ a été publié sur le site et notifié aux abonnés.')">Publier →</button>
+
+      <!-- PAGE: PARAMÈTRES -->
+      <div class="adm-page" id="adm-parametres">
+        <div class="adm-page-title">&#9881; Paramètres</div>
+        <div class="adm-page-sub">Tarifs, compte administrateur et données</div>
+        <div class="adm-grid-2">
+          <div class="adm-card">
+            <div class="adm-card-title">&#128178; Tarifs (&#8369;/kg)</div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Prix / kg avion</label><input class="adm-input" type="number" id="tarif-air" value="350"></div>
+              <div class="fg"><label>Prix / kg bateau</label><input class="adm-input" type="number" id="tarif-sea" value="180"></div>
+            </div>
+            <div class="adm-form-row">
+              <div class="fg"><label>Frais Lalamove fix (&#8369;)</label><input class="adm-input" type="number" id="tarif-lalamove" value="150"></div>
+              <div class="fg"><label>Assurance % valeur</label><input class="adm-input" type="number" id="tarif-assurance" value="2"></div>
+            </div>
+            <button class="adm-btn-primary" onclick="saveTarifs()">Sauvegarder</button>
+          </div>
+          <div class="adm-card">
+            <div class="adm-card-title">&#128274; Mot de passe admin</div>
+            <div class="adm-form-row"><div class="fg"><label>Nouveau mot de passe</label><input class="adm-input" type="password" id="new-pass" placeholder="Nouveau mot de passe"></div></div>
+            <div class="adm-form-row"><div class="fg"><label>Confirmer</label><input class="adm-input" type="password" id="new-pass2" placeholder="Confirmer"></div></div>
+            <button class="adm-btn-secondary" onclick="changePass()">Mettre à jour</button>
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f3f7;">
+              <p style="font-size:.8rem;color:var(--slate);margin-bottom:10px;">&#9888; Cette action est irréversible.</p>
+              <button class="adm-btn-danger" onclick="if(confirm('EFFACER TOUTES LES DONNÉES ? Cette action est irréversible.')){['gcc_submissions','gcc_revenus','gcc_depenses','gcc_parrains','gcc_annonces'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});location.reload();}">&#128465; Réinitialiser toutes les données</button>
+            </div>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div class="adm-card-title">&#128202; Export données</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="adm-btn-secondary" onclick="exportCSV('demandes')">&#128229; Exporter demandes CSV</button>
+            <button class="adm-btn-secondary" onclick="exportCSV('finance')">&#128229; Exporter finance CSV</button>
+          </div>
         </div>
       </div>
-      <div class="admin-table-wrap">
-        <p style="padding:16px;color:var(--slate);font-size:.9rem;">Aucun départ programmé actuellement. Utilisez le formulaire ci-dessus pour ajouter une annonce.</p>
-      </div>
-    </div>
+
+    </main>
   </div>
 </div>
 
@@ -1426,6 +2092,12 @@ function showToast(title,msg){
 }
 
 
+function showTab(name,btn){
+  document.querySelectorAll('.adm-content').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+name).style.display='block';
+  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
 function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
   // Build a mailto link — opens the user's email client pre-filled
   var subject = encodeURIComponent('[GCC CARGO] Mise à jour de votre colis — ' + ref);
@@ -1450,124 +2122,6 @@ function doUpdate(){
   if(!t){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
   const s=document.getElementById('upStatus').value;
   showToast(tr('updated'), tr('updatedMsg1')+t+tr('updatedMsg2')+s+tr('updatedMsg3'));
-}
-
-/* ── FLYER MANAGEMENT ── */
-var _flyerKey = 'gcc_departure_flyer';
-var _flyerPending = null; // base64 data URL pending publish
-
-function initFlyerDisplay() {
-  var data = localStorage.getItem(_flyerKey);
-  var placeholder = document.getElementById('dbPlaceholder');
-  var flyerWrap   = document.getElementById('dbFlyerWrap');
-  var flyerImg    = document.getElementById('dbFlyerImg');
-  var metaLabel   = document.getElementById('dbMetaLabel');
-  if (data) {
-    if (placeholder) placeholder.style.display = 'none';
-    if (flyerWrap)   flyerWrap.style.display = 'block';
-    if (flyerImg)    flyerImg.src = data;
-    if (metaLabel) {
-      var lang = document.documentElement.lang || 'fr';
-      metaLabel.textContent = lang === 'en' ? '✅ Active announcement' : '✅ Annonce active';
-    }
-  } else {
-    if (placeholder) placeholder.style.display = 'block';
-    if (flyerWrap)   flyerWrap.style.display = 'none';
-    if (metaLabel) {
-      var lang2 = document.documentElement.lang || 'fr';
-      metaLabel.setAttribute('data-fr','Aucune annonce active');
-      metaLabel.setAttribute('data-en','No active announcement');
-      metaLabel.textContent = lang2 === 'en' ? 'No active announcement' : 'Aucune annonce active';
-    }
-  }
-}
-
-function initAdminFlyerPanel() {
-  var data = localStorage.getItem(_flyerKey);
-  var uploadArea = document.getElementById('flyerUploadArea');
-  var activeArea = document.getElementById('flyerActiveArea');
-  var activeImg  = document.getElementById('flyerActiveImg');
-  if (data) {
-    if (uploadArea) uploadArea.style.display = 'none';
-    if (activeArea) { activeArea.style.display = 'flex'; }
-    if (activeImg)  activeImg.src = data;
-  } else {
-    if (uploadArea) uploadArea.style.display = 'flex';
-    if (activeArea) activeArea.style.display = 'none';
-    resetFlyerInput();
-  }
-}
-
-function previewFlyer(input) {
-  if (!input.files || !input.files[0]) return;
-  var file = input.files[0];
-  if (file.size > 5 * 1024 * 1024) {
-    showToast('⚠️ Fichier trop grand', 'Le flyer ne doit pas dépasser 5 Mo.');
-    return;
-  }
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    _flyerPending = e.target.result;
-    var previewArea = document.getElementById('flyerPreviewArea');
-    var previewImg  = document.getElementById('flyerPreviewImg');
-    if (previewImg)  previewImg.src = _flyerPending;
-    if (previewArea) previewArea.style.display = 'flex';
-  };
-  reader.readAsDataURL(file);
-}
-
-function publishFlyer() {
-  if (!_flyerPending) return;
-  try {
-    localStorage.setItem(_flyerKey, _flyerPending);
-  } catch(e) {
-    showToast('❌ Erreur', 'Impossible de sauvegarder le flyer (stockage plein ?).');
-    return;
-  }
-  initFlyerDisplay();
-  initAdminFlyerPanel();
-  showToast('🖼 Flyer publié', 'Le flyer est maintenant visible sur la page d\'accueil.');
-  _flyerPending = null;
-}
-
-function cancelFlyer() {
-  _flyerPending = null;
-  resetFlyerInput();
-  var previewArea = document.getElementById('flyerPreviewArea');
-  if (previewArea) previewArea.style.display = 'none';
-}
-
-function removeFlyer() {
-  if (!confirm('Supprimer le flyer actif ? Il ne sera plus affiché sur le site.')) return;
-  localStorage.removeItem(_flyerKey);
-  _flyerPending = null;
-  initFlyerDisplay();
-  initAdminFlyerPanel();
-  showToast('🗑 Flyer supprimé', 'Le flyer a été retiré de la page d\'accueil.');
-}
-
-function resetFlyerInput() {
-  var inp = document.getElementById('flyerFileInput');
-  if (inp) inp.value = '';
-  var previewImg = document.getElementById('flyerPreviewImg');
-  if (previewImg) previewImg.src = '';
-  var previewArea = document.getElementById('flyerPreviewArea');
-  if (previewArea) previewArea.style.display = 'none';
-}
-
-// Run on page load
-(function() {
-  initFlyerDisplay();
-})();
-
-// Re-init admin panel when Départs tab is opened
-var _origShowTab = typeof showTab === 'function' ? showTab : null;
-function showTab(name,btn){
-  document.querySelectorAll('.adm-content').forEach(t=>t.style.display='none');
-  document.getElementById('tab-'+name).style.display='block';
-  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if (name === 'departs') initAdminFlyerPanel();
 }
 </script>
 </body>
