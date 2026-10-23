@@ -606,6 +606,72 @@ function doAdminLogin() {
     infoEl.innerHTML = html;
   }
 
+  // ─── SUPABASE CONFIG ─────────────────────────────────────────────────────
+  var SUPA_URL = 'https://voxgdylvevwfpomamhjo.supabase.co';
+  var SUPA_KEY = 'sb_publishable_HT5VpsnIWjBEK2lrbpomUg_1G7CtCZG';
+
+  function supaFetch(path, opts) {
+    return fetch(SUPA_URL + '/rest/v1/' + path, Object.assign({
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      }
+    }, opts));
+  }
+
+  function supaInsert(entry) {
+    var row = {
+      ref: entry.ref, date: entry.date,
+      expediteur: entry.expediteur, tel_exp: entry.tel_exp, email_exp: entry.email_exp,
+      recepteur: entry.recepteur, tel_rec: entry.tel_rec,
+      destination: entry.destination,
+      mode: entry.mode, mode_depot: entry.modeDepot,
+      mode_envoi: entry.modeEnvoi,
+      paiement: entry.paiement, mode_paiement: entry.modePaiement,
+      adresse: entry.adresse, adresse_lalamove: entry.adresse_lalamove,
+      adresse_client: entry.adresseClient,
+      date_coll: entry.dateColl, creneau: entry.creneau,
+      statut: entry.statut
+    };
+    return supaFetch('submissions', { method: 'POST', body: JSON.stringify(row) });
+  }
+
+  function supaGetAll(cb) {
+    supaFetch('submissions?order=created_at.desc&limit=200')
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        if (!Array.isArray(rows)) { cb([]); return; }
+        var mapped = rows.map(function(r){
+          return {
+            id: r.id,
+            ref: r.ref, date: r.date,
+            expediteur: r.expediteur, tel_exp: r.tel_exp, email_exp: r.email_exp,
+            recepteur: r.recepteur, tel_rec: r.tel_rec,
+            destinataire: r.recepteur, tel_dest: r.tel_rec,
+            destination: r.destination,
+            mode: r.mode, modeDepot: r.mode_depot,
+            modeEnvoi: r.mode_envoi,
+            paiement: r.paiement, modePaiement: r.mode_paiement,
+            adresse: r.adresse, adresse_lalamove: r.adresse_lalamove,
+            adresseClient: r.adresse_client,
+            dateColl: r.date_coll, creneau: r.creneau,
+            statut: r.statut || 'En attente'
+          };
+        });
+        cb(mapped);
+      })
+      .catch(function(){ cb([]); });
+  }
+
+  function supaUpdateStatut(id, statut) {
+    return supaFetch('submissions?id=eq.' + id, {
+      method: 'PATCH',
+      body: JSON.stringify({ statut: statut })
+    });
+  }
+
   // ─── FORM SUBMIT: collect & store ────────────────────────────────────────
   var _submissions = [];
   try {
@@ -643,6 +709,14 @@ function doAdminLogin() {
       creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
       statut:      'En attente',
     };
+    // Sauvegarder dans Supabase (backend partagé)
+    supaInsert(entry)
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        if (Array.isArray(rows) && rows[0]) entry.id = rows[0].id;
+      })
+      .catch(function(){});
+    // Aussi en local comme fallback
     _submissions.unshift(entry);
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
     showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
@@ -699,6 +773,10 @@ function doAdminLogin() {
     var cur = _submissions[i].statut;
     _submissions[i].statut = order[(order.indexOf(cur)+1) % order.length];
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+    // Mettre à jour dans Supabase si l'entrée a un id
+    if (_submissions[i].id) {
+      supaUpdateStatut(_submissions[i].id, _submissions[i].statut).catch(function(){});
+    }
     refreshAdminTable();
     showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
   }
@@ -837,8 +915,23 @@ function doAdminLogin() {
 
   /* ═══ COLIS FILTER ═══ */
   function filterColis() {
-    /* toujours recharger depuis localStorage pour être à jour */
-    try { var _sf=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sf)) _submissions=_sf; } catch(e){}
+    var tbody = document.getElementById('admin-submissions-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">⏳ Chargement...</td></tr>';
+    // Charger depuis Supabase (données partagées entre tous les appareils)
+    supaGetAll(function(rows) {
+      if (rows.length > 0) {
+        _submissions = rows;
+        try { localStorage.setItem('gcc_submissions', JSON.stringify(rows.slice(0,200))); } catch(e){}
+      } else {
+        // Fallback localStorage si Supabase vide ou erreur
+        try { var _sf=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sf)&&_sf.length>0) _submissions=_sf; } catch(e){}
+      }
+      _renderColis();
+    });
+  }
+
+  function _renderColis() {
     var q = (document.getElementById('search-colis')||{value:''}).value.toLowerCase();
     var st = (document.getElementById('filter-statut')||{value:''}).value;
     var tbody = document.getElementById('admin-submissions-tbody');
