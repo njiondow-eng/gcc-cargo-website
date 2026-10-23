@@ -163,7 +163,15 @@ nav{
 }
 .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--orange);}
 .fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.35);}
-.fg select option{background:#163356;}
+/* Options des selects sur fond navy (hero) */
+.hero .fg select option{background:#163356;color:#fff;}
+/* Options des selects sur fond clair — lisibles (priorité haute) */
+#modePaiement option,#modePaiement optgroup,
+#modeDepot option,#modeDepot optgroup,
+#selectDestination option,#selectDestination optgroup,
+#selectModeEnvoi option,#ann-dest option,#ann-dest optgroup{
+  background:#fff !important;color:#0B1F3A !important;
+}
 .upload-zone{
   border:2px dashed rgba(255,255,255,.25);border-radius:8px;
   padding:22px;text-align:center;cursor:pointer;
