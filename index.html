@@ -81,7 +81,7 @@ nav{
 /* Hero right — departure board placeholder */
 .hero-right{display:flex;flex-direction:column;gap:16px;align-items:center;}
 .departure-board{
-  width:100%;max-width:380px;
+  width:100%;max-width:520px;
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
   border-radius:14px;overflow:hidden;
 }
@@ -786,7 +786,7 @@ function doAdminLogin() {
           <p data-fr="Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé." data-en="Upcoming departure dates<br>will be announced here.<br><br>Sign up to be notified when a departure is scheduled.">Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé.</p>
         </div>
         <div id="dbFlyerWrap" style="display:none;text-align:center;padding:8px 0;">
-          <img id="dbFlyerImg" src="" alt="Flyer" style="max-width:100%;max-height:320px;border-radius:8px;object-fit:contain;">
+          <img id="dbFlyerImg" src="" alt="Flyer" style="max-width:100%;max-height:520px;border-radius:8px;object-fit:contain;">
         </div>
       </div>
       <div class="db-meta" id="dbMeta">
@@ -1700,6 +1700,25 @@ function showTab(name,btn){
   btn.classList.add('active');
   if (name === 'departs') initAdminFlyerPanel();
 }
+
+// Triple-click on nav logo to open admin login
+(function(){
+  var _clickCount = 0;
+  var _clickTimer = null;
+  var logo = document.querySelector('.nav-logo');
+  if (logo) {
+    logo.addEventListener('click', function(){
+      _clickCount++;
+      clearTimeout(_clickTimer);
+      _clickTimer = setTimeout(function(){ _clickCount = 0; }, 700);
+      if (_clickCount >= 3) {
+        _clickCount = 0;
+        clearTimeout(_clickTimer);
+        openAdminLogin();
+      }
+    });
+  }
+})();
 </script>
 </body>
 </html>
