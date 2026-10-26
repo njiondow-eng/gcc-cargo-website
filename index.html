@@ -303,6 +303,9 @@ footer{background:var(--navy);color:var(--ice);padding:48px 8vw 24px;border-top:
 .admin-tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--white);border-radius:8px;padding:4px;width:fit-content;box-shadow:0 2px 8px rgba(11,31,58,.08);}
 .adm-tab{background:none;border:none;padding:9px 20px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.88rem;color:var(--slate);transition:background .2s,color .2s;}
 .adm-tab.active{background:var(--orange);color:var(--white);}
+.adm-filter-btn{background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);color:#555;font-size:.76rem;font-weight:600;padding:5px 13px;border-radius:20px;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .2s;}
+.adm-filter-btn.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+.adm-filter-btn:hover:not(.active){background:rgba(0,0,0,.12);}
 .admin-table-wrap{background:var(--white);border-radius:10px;padding:20px;overflow-x:auto;box-shadow:0 2px 12px rgba(11,31,58,.06);}
 table{width:100%;border-collapse:collapse;font-size:.87rem;}
 th{text-align:left;padding:10px 14px;font-weight:700;color:var(--slate);border-bottom:2px solid var(--light);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
@@ -629,6 +632,12 @@ function doAdminLogin() {
             showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
             form.reset();
             handleModeDepot('');
+            var sBtn = document.getElementById('submitBtn');
+            if (sBtn) sBtn.disabled = true;
+            var idN = document.getElementById('id-name');
+            if (idN) idN.style.display = 'none';
+            var colN = document.getElementById('colis-names');
+            if (colN) colN.style.display = 'none';
             refreshAdminTable();
           });
         });
@@ -639,16 +648,29 @@ function doAdminLogin() {
   function refreshAdminTable() {
     var tbody = document.getElementById('admin-submissions-tbody');
     if (!tbody) return;
-    var kpiDem = document.getElementById('kpi-demandes');
-    var kpiAtt = document.getElementById('kpi-attente');
-    if (kpiDem) kpiDem.textContent = _submissions.length;
-    if (kpiAtt) kpiAtt.textContent = _submissions.filter(function(s){return s.statut==='En attente';}).length;
-    if (_submissions.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>';
+    // KPIs
+    var kpiDem   = document.getElementById('kpi-demandes');
+    var kpiAtt   = document.getElementById('kpi-attente');
+    var kpiTrans = document.getElementById('kpi-transit');
+    var kpiArr   = document.getElementById('kpi-arrive');
+    var kpiLivr  = document.getElementById('kpi-livre');
+    if (kpiDem)   kpiDem.textContent   = _submissions.length;
+    if (kpiAtt)   kpiAtt.textContent   = _submissions.filter(function(s){return s.statut==='En attente';}).length;
+    if (kpiTrans) kpiTrans.textContent = _submissions.filter(function(s){return s.statut==='En transit';}).length;
+    if (kpiArr)   kpiArr.textContent   = _submissions.filter(function(s){return s.statut==='Arrivé';}).length;
+    if (kpiLivr)  kpiLivr.textContent  = _submissions.filter(function(s){return s.statut==='Livré';}).length;
+    // Filter with original indices preserved
+    var indexed = _submissions.map(function(s, i){ return {s:s, i:i}; });
+    if (_admFilter && _admFilter !== 'all') {
+      indexed = indexed.filter(function(item){ return item.s.statut === _admFilter; });
+    }
+    if (indexed.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">' + (_admFilter === 'all' ? 'Aucune soumission reçue' : 'Aucune demande avec ce statut') + '</td></tr>';
       return;
     }
     var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
-    tbody.innerHTML = _submissions.map(function(s, i) {
+    tbody.innerHTML = indexed.map(function(item) {
+      var s = item.s; var i = item.i;
       var cls = statClasses[s.statut] || 'b-pending';
       var nbFichiers = (s.fichiers && s.fichiers.length) ? s.fichiers.length : 0;
       var fichBtn = nbFichiers > 0
@@ -670,7 +692,6 @@ function doAdminLogin() {
         '</td>' +
         '</tr>';
     }).join('');
-    // Attach click handlers via event delegation
     tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
       btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
     });
@@ -684,6 +705,13 @@ function doAdminLogin() {
     tbody.querySelectorAll('.adm-fichiers-btn').forEach(function(btn) {
       btn.addEventListener('click', function() { showFichiersModal(parseInt(this.getAttribute('data-i'))); });
     });
+  }
+  var _admFilter = 'all';
+  function _gccSetFilter(f, btn) {
+    _admFilter = f;
+    document.querySelectorAll('.adm-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    refreshAdminTable();
   }
   function cycleStatut(i) {
     var order = ['En attente','En transit','Arrivé','Livré'];
@@ -1257,7 +1285,7 @@ function doAdminLogin() {
         </div>
       </div>
       <!-- KPIs demandes -->
-      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px;">
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr));margin-bottom:14px;">
         <div class="kpi" style="border-top-color:var(--sky);">
           <div class="kpi-val" id="kpi-demandes">0</div>
           <div class="kpi-lbl">Total demandes</div>
@@ -1266,6 +1294,26 @@ function doAdminLogin() {
           <div class="kpi-val" id="kpi-attente">0</div>
           <div class="kpi-lbl">En attente</div>
         </div>
+        <div class="kpi" style="border-top-color:#2980b9;">
+          <div class="kpi-val" id="kpi-transit">0</div>
+          <div class="kpi-lbl">En transit</div>
+        </div>
+        <div class="kpi" style="border-top-color:#8e44ad;">
+          <div class="kpi-val" id="kpi-arrive">0</div>
+          <div class="kpi-lbl">Arrivé</div>
+        </div>
+        <div class="kpi" style="border-top-color:#27ae60;">
+          <div class="kpi-val" id="kpi-livre">0</div>
+          <div class="kpi-lbl">Livré</div>
+        </div>
+      </div>
+      <!-- Filtres par statut -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="adm-filter-btn active" onclick="_gccSetFilter('all',this)">📋 Toutes</button>
+        <button class="adm-filter-btn" onclick="_gccSetFilter('En attente',this)">⏳ En attente</button>
+        <button class="adm-filter-btn" onclick="_gccSetFilter('En transit',this)">✈ En transit</button>
+        <button class="adm-filter-btn" onclick="_gccSetFilter('Arrivé',this)">📦 Arrivé</button>
+        <button class="adm-filter-btn" onclick="_gccSetFilter('Livré',this)">✅ Livré</button>
       </div>
       <div class="admin-table-wrap" style="overflow-x:auto;">
         <table style="min-width:900px;">
@@ -1460,25 +1508,49 @@ function toggleSubmit(){
 }
 
 // Ship submit
-function handleShipSubmit(e){
-  e.preventDefault();
-  const cb=document.getElementById('consentCheck');
-  if(!cb.checked){showToast(tr('required'), tr('requiredMsg'));return;}
-  showToast(tr('submitted'), tr('submittedMsg'));
-  e.target.reset();
-  document.getElementById('submitBtn').disabled=true;
-  document.getElementById('id-name').style.display='none';
-  document.getElementById('colis-names').style.display='none';
-}
-
 // Track
 function doTrack(){
-  const v=document.getElementById('trackInput').value.trim();
+  var v = document.getElementById('trackInput').value.trim().toUpperCase();
   if(!v){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
-  document.getElementById('trackNum').textContent=v;
-  document.getElementById('trackResult').style.display='block';
-  document.getElementById('trackResult').scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>showToast(tr('notif'), tr('colisMsg')),800);
+  // Look up in real submissions
+  var sub = null;
+  if (typeof _submissions !== 'undefined' && _submissions) {
+    for (var j = 0; j < _submissions.length; j++) {
+      if (_submissions[j].ref && _submissions[j].ref.toUpperCase() === v) { sub = _submissions[j]; break; }
+    }
+  }
+  var result = document.getElementById('trackResult');
+  if (sub) {
+    var statuses = ['En attente','En transit','Arrivé','Livré'];
+    var sidx = statuses.indexOf(sub.statut);
+    var stepDefs = [
+      {fr:'Colis enregistré', desc:'Reçu et enregistré par GCC CARGO — Manila, Philippines'},
+      {fr:'En transit', desc:'Vol en cours vers la destination finale'},
+      {fr:'Arrivé à destination', desc:'Colis disponible — destinataire notifié'},
+      {fr:'Livré', desc:'Colis remis au destinataire'}
+    ];
+    var stepsHtml = stepDefs.map(function(lbl, k){
+      var done = k < sidx; var active = k === sidx;
+      var dot = done ? '✓' : (active ? '▶' : '○');
+      var cls = done ? 'ts-done' : (active ? 'ts-active' : 'ts-pending');
+      var h4style = active ? 'color:var(--orange);' : (done ? '' : 'color:var(--slate);');
+      return '<div class="track-step"><div class="ts-dot ' + cls + '">' + dot + '</div><div class="ts-text"><h4 style="' + h4style + '">' + lbl.fr + '</h4><p>' + lbl.desc + '</p></div></div>';
+    }).join('');
+    var infoLine = sub.date + (sub.expediteur ? ' — ' + sub.expediteur : '') + (sub.destination ? ' → ' + sub.destination : '');
+    result.innerHTML =
+      '<div style="font-weight:700;color:var(--navy);margin-bottom:4px;font-size:1rem;">📦 Colis ' + sub.ref + '</div>' +
+      '<div style="font-size:.82rem;color:#666;margin-bottom:16px;">' + infoLine + '</div>' +
+      stepsHtml;
+  } else {
+    result.innerHTML =
+      '<div style="text-align:center;padding:24px 0;">' +
+      '<div style="font-size:2.2rem;margin-bottom:10px;">❌</div>' +
+      '<div style="font-weight:700;color:#c0392b;font-size:1rem;margin-bottom:6px;">Référence introuvable</div>' +
+      '<div style="font-size:.88rem;color:#888;">Aucun colis trouvé pour <strong>' + v + '</strong>.<br>Vérifiez le numéro reçu par email.</div>' +
+      '</div>';
+  }
+  result.style.display = 'block';
+  result.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 // Toast
