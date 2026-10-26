@@ -40,16 +40,11 @@ nav{
 .nav-links a{color:var(--ice);font-weight:600;font-size:.85rem;letter-spacing:.03em;transition:color .2s;padding:4px 0;border-bottom:2px solid transparent;}
 .nav-links a:hover{color:var(--orange);border-bottom-color:var(--orange);}
 .nav-actions{display:flex;gap:10px;align-items:center;}
-.btn-admin{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--ice);font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
-#nav-logo-trigger{cursor:pointer;user-select:none;}
+.btn-admin{display:none !important;background:transparent;border:1px solid rgba(255,255,255,.35);color:var(--ice);font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
 .btn-admin:hover{background:rgba(255,255,255,.1);}
 .btn-nav-cta{background:var(--orange);color:var(--white);font-weight:700;padding:10px 20px;border-radius:4px;font-size:.88rem;white-space:nowrap;transition:opacity .2s;}
 .btn-nav-cta:hover{opacity:.88;}
 .hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.6rem;cursor:pointer;padding:4px;}
-.lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,.12);border-radius:6px;padding:3px;}
-.lang-btn{background:transparent;border:none;color:rgba(255,255,255,.65);font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .18s;letter-spacing:.04em;}
-.lang-btn:hover{color:var(--white);}
-.lang-btn.active{background:var(--orange);color:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.25);}
 
 /* ═══ HERO ═══ */
 .hero{
@@ -164,15 +159,7 @@ nav{
 }
 .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--orange);}
 .fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.35);}
-/* Options des selects sur fond navy (hero) */
-.hero .fg select option{background:#163356;color:#fff;}
-/* Options des selects sur fond clair — lisibles (priorité haute) */
-#modePaiement option,#modePaiement optgroup,
-#modeDepot option,#modeDepot optgroup,
-#selectDestination option,#selectDestination optgroup,
-#selectModeEnvoi option,#selectTypeContenu option,#ann-dest option,#ann-dest optgroup{
-  background:#fff !important;color:#0B1F3A !important;
-}
+.fg select option{background:#163356;}
 .upload-zone{
   border:2px dashed rgba(255,255,255,.25);border-radius:8px;
   padding:22px;text-align:center;cursor:pointer;
@@ -301,95 +288,80 @@ footer{background:var(--navy);color:var(--ice);padding:48px 8vw 24px;border-top:
 .btn-login:hover{background:var(--sky);}
 
 /* ═══ ADMIN DASHBOARD ═══ */
-.admin-panel{display:none;position:fixed;inset:0;background:#f0f4f8;z-index:400;overflow-y:auto;}
-.admin-topbar{background:var(--navy);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:10;}
-.admin-topbar .at-brand{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.15rem;color:var(--white);letter-spacing:.04em;}
+.admin-panel{display:none;position:fixed;inset:0;background:var(--light);z-index:400;overflow-y:auto;}
+.admin-topbar{background:var(--navy);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);position:sticky;top:0;z-index:10;}
+.admin-topbar .at-brand{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.1rem;color:var(--white);}
 .admin-topbar .at-brand span{color:var(--orange);}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--ice);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
-.btn-logout:hover{background:rgba(255,255,255,.12);}
-.admin-tabs-bar{background:var(--white);border-bottom:2px solid #e8edf3;padding:0 14px;display:flex;gap:0;overflow-x:auto;}
-.adm-tab{display:flex;align-items:center;gap:6px;padding:13px 16px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;color:var(--slate);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .18s;}
-.adm-tab:hover{color:var(--navy);border-bottom-color:#d0e4f7;}
-.adm-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
-.admin-main{padding:22px 28px;overflow:hidden;min-width:0;}
-.adm-page{display:none;}
-.adm-page.active{display:block;}
-.adm-page-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.55rem;color:var(--navy);margin-bottom:4px;}
-.adm-page-sub{font-size:.84rem;color:var(--slate);margin-bottom:22px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:13px;margin-bottom:26px;}
-.kpi{background:var(--white);border-radius:12px;padding:16px 18px;border-top:4px solid var(--orange);box-shadow:0 2px 10px rgba(11,31,58,.07);}
-.kpi.sky{border-top-color:var(--sky);}.kpi.green{border-top-color:#27ae60;}.kpi.red{border-top-color:#e74c3c;}.kpi.gold{border-top-color:#f39c12;}
-.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:900;color:var(--navy);}
-.kpi-lbl{font-size:.76rem;color:var(--slate);font-weight:600;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
-.kpi-trend{font-size:.74rem;font-weight:700;margin-top:5px;}
-.kpi-trend.up{color:#27ae60;}.kpi-trend.down{color:#e74c3c;}.kpi-trend.neutral{color:var(--slate);}
-.adm-card{background:var(--white);border-radius:12px;padding:20px 22px;box-shadow:0 2px 10px rgba(11,31,58,.07);margin-bottom:18px;}
-.adm-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.02rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.adm-card-title .tag{font-size:.7rem;background:var(--orange);color:white;padding:2px 8px;border-radius:20px;font-family:'Barlow',sans-serif;font-weight:700;}
-.adm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.adm-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
-.admin-table-wrap{background:var(--white);border-radius:12px;padding:16px;overflow-x:auto;box-shadow:0 2px 10px rgba(11,31,58,.07);}
-table.adm-tbl{width:100%;border-collapse:collapse;font-size:.83rem;}
-table.adm-tbl th{text-align:left;padding:9px 11px;background:#f5f7fa;color:var(--navy);font-weight:700;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #e8edf3;}
-table.adm-tbl td{padding:9px 11px;border-bottom:1px solid #f0f3f7;vertical-align:top;}
-table.adm-tbl tr:hover td{background:#fafbfd;}
-table.adm-tbl tr:last-child td{border-bottom:none;}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.71rem;font-weight:700;}
-.b-pending{background:#fff3e0;color:#e65100;}.b-transit{background:#e3f2fd;color:#1565c0;}.b-arrived{background:#f3e5f5;color:#6a1b9a;}.b-delivered{background:#e8f5e9;color:#2e7d32;}
-.notif-btn{background:var(--orange);color:white;border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.73rem;margin-bottom:3px;display:inline-block;}
-.notif-btn:hover{filter:brightness(1.1);}
-.finance-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f3f7;}
-.finance-row:last-child{border-bottom:none;}
-.finance-label{font-size:.86rem;color:var(--navy);font-weight:600;}
-.finance-amount{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;}
-.finance-amount.income{color:#27ae60;}.finance-amount.expense{color:#e74c3c;}.finance-amount.balance{color:var(--sky);}
-.adm-form-row{display:flex;gap:11px;margin-bottom:11px;flex-wrap:wrap;align-items:flex-end;}
-.adm-form-row label{font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;}
-.adm-form-row .fg{flex:1;min-width:130px;}
-.adm-input{width:100%;padding:8px 11px;border:1.5px solid #dce3ec;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.86rem;color:var(--navy);background:#fafbfd;box-sizing:border-box;}
-.adm-input:focus{outline:none;border-color:var(--sky);}
-/* Inputs formulaire client sur fond clair (Lalamove, paiement) */
-#sectionLalamove .fg input,#sectionLalamove .fg select,#sectionLalamove .fg textarea,
-#sectionPresentiel .fg input,#sectionEcommerce .fg input{
-  background:#fff;border:1.5px solid #c8d6e8;color:var(--navy);
-}
-#sectionLalamove .fg input::placeholder,#sectionLalamove .fg textarea::placeholder{color:#94a3b8;}
-#sectionLalamove .fg label,#sectionPresentiel .fg label{color:var(--navy);}
-/* Inputs admin panel sur fond clair — couvre TOUS les onglets */
-.adm-page .fg input,.adm-page .fg select,.adm-page .fg textarea,
-.adm-page .adm-input,
-.adm-page input[type=text],.adm-page input[type=number],
-.adm-page input[type=date],.adm-page input[type=time],
-.adm-page input[type=password],.adm-page input[type=email],
-.adm-page select,.adm-page textarea{
-  background:#f4f7fb !important;border:1.5px solid #c8d3e0 !important;color:var(--navy) !important;
-  border-radius:7px !important;padding:8px 11px !important;
-  font-family:'Barlow',sans-serif !important;font-size:.86rem !important;
-  box-sizing:border-box !important;width:100% !important;
-}
-.adm-page .fg label,.adm-page label{color:var(--navy) !important;}
-.adm-page .fg input::placeholder,.adm-page .adm-input::placeholder,
-.adm-page input::placeholder,.adm-page textarea::placeholder{color:#94a3b8 !important;}
-.adm-page input:focus,.adm-page select:focus,.adm-page textarea:focus,
-.adm-page .adm-input:focus{outline:none !important;border-color:var(--sky) !important;}
-/* QR code paiement */
-.pay-qr{max-width:130px;max-height:130px;border-radius:8px;border:2px solid #e0e6ef;display:block;margin:8px auto 0;}
-.adm-btn-primary{background:var(--orange);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
-.adm-btn-secondary{background:var(--sky);color:white;border:none;padding:9px 18px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;}
-.adm-btn-danger{background:#e74c3c;color:white;border:none;padding:7px 14px;border-radius:7px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
-.parrain-card{background:linear-gradient(135deg,#f8faff,#eef4fb);border:1.5px solid #d0e4f7;border-radius:10px;padding:14px;margin-bottom:10px;}
-.parrain-name{font-weight:800;color:var(--navy);font-size:.93rem;}
-.parrain-stats{display:flex;gap:18px;margin-top:7px;}
-.parrain-stat{font-size:.78rem;color:var(--slate);}
-.parrain-stat strong{color:var(--sky);font-family:'Barlow Condensed',sans-serif;font-size:.98rem;}
-.prog-bar{height:7px;background:#e8edf3;border-radius:4px;overflow:hidden;margin-top:5px;}
-.prog-fill{height:100%;border-radius:4px;background:var(--orange);transition:width .4s;}
-.ann-card{background:#f8faff;border:1.5px solid #d0e4f7;border-radius:9px;padding:13px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.ann-info{flex:1;}
-.ann-dest{font-weight:800;color:var(--navy);font-size:.9rem;}
-.ann-date{font-size:.78rem;color:var(--slate);margin-top:3px;}
-@media(max-width:768px){.admin-main{padding:14px;}.adm-grid-2,.adm-grid-3{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.adm-tab{padding:11px 10px;font-size:.75rem;gap:4px;}}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--ice);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;}
+.admin-body{padding:32px;}
+.admin-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:20px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:36px;}
+.kpi{background:var(--white);border-radius:10px;padding:20px 22px;border-top:4px solid var(--orange);box-shadow:0 2px 12px rgba(11,31,58,.06);}
+.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:var(--navy);}
+.kpi-lbl{font-size:.8rem;color:var(--slate);font-weight:600;margin-top:2px;}
+.kpi-trend{font-size:.78rem;color:var(--green);font-weight:700;margin-top:6px;}
+.admin-tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--white);border-radius:8px;padding:4px;width:fit-content;box-shadow:0 2px 8px rgba(11,31,58,.08);}
+.adm-tab{background:none;border:none;padding:9px 20px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:.88rem;color:var(--slate);transition:background .2s,color .2s;}
+.adm-tab.active{background:var(--orange);color:var(--white);}
+.admin-table-wrap{background:var(--white);border-radius:10px;padding:20px;overflow-x:auto;box-shadow:0 2px 12px rgba(11,31,58,.06);}
+table{width:100%;border-collapse:collapse;font-size:.87rem;}
+th{text-align:left;padding:10px 14px;font-weight:700;color:var(--slate);border-bottom:2px solid var(--light);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;}
+td{padding:12px 14px;border-bottom:1px solid var(--light);color:var(--navy);}
+tr:last-child td{border:none;}
+.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:700;}
+.b-transit{background:#e3f2fd;color:var(--sky);}
+.b-arrived{background:#e8f5e9;color:var(--green);}
+.b-pending{background:#fff8e1;color:#e65100;}
+.b-delivered{background:#f3e5f5;color:#7b1fa2;}
+.notif-btn{background:var(--orange);color:var(--white);border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:'Barlow',sans-serif;}
+.admin-update-form{background:var(--white);border-radius:10px;padding:24px;box-shadow:0 2px 12px rgba(11,31,58,.06);}
+.au-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+.au-field{display:flex;flex-direction:column;gap:5px;}
+.au-field label{font-size:.8rem;font-weight:600;color:var(--slate);}
+.au-field input,.au-field select{background:var(--light);border:1px solid #d0dbe6;color:var(--navy);padding:10px 13px;border-radius:6px;font-size:.88rem;font-family:'Barlow',sans-serif;}
+.btn-update{background:var(--navy);color:var(--white);font-weight:700;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.88rem;align-self:flex-end;}
 
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--navy);color:var(--white);
+  padding:16px 22px;border-radius:10px;
+  border-left:4px solid var(--orange);
+  box-shadow:0 8px 32px rgba(11,31,58,.3);
+  z-index:600;max-width:320px;
+  transform:translateY(120%);transition:transform .35s ease;
+  font-size:.9rem;line-height:1.5;
+}
+.toast.show{transform:translateY(0);}
+.toast strong{display:block;margin-bottom:4px;color:var(--orange);}
+
+/* ═══ MOBILE ═══ */
+@media(max-width:860px){
+  .nav-links{display:none;}
+  .btn-admin{display:none;}
+  .hamburger{display:block;}
+  .hero{grid-template-columns:1fr;min-height:unset;padding:40px 5vw 60px;}
+  .hero-right{display:none;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .referral{grid-template-columns:1fr;}
+  .contact{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .track-form{flex-direction:column;}
+  .au-row{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:480px){
+  .footer-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:1fr;}
+}
+
+.lang-switcher{display:flex;align-items:center;gap:4px;margin-right:8px;}
+.lang-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.3);
+  color:#fff;padding:5px 11px;border-radius:5px;cursor:pointer;font-size:.8rem;
+  font-weight:700;transition:.2s;font-family:'Barlow',sans-serif;}
+.lang-btn.active{background:var(--orange);border-color:var(--orange);}
+.lang-btn:hover{background:var(--orange);border-color:var(--orange);}
 </style>
 <script>
 // ══════════════════════════════════════════════════
@@ -484,20 +456,18 @@ try {
 
 function openAdminLogin() {
   var now = Date.now();
+  if (now < _lockUntil) {
+    var mins = Math.ceil((_lockUntil - now) / 60000);
+    if (typeof showToast === 'function') showToast(tr('locked'), tr('retryIn') + mins + tr('retryMin'));
+    return;
+  }
   var m = document.getElementById('adminModal');
   if (m) {
     m.classList.add('open');
-    var err = document.getElementById('login-err');
-    if (now < _lockUntil) {
-      var mins = Math.ceil((_lockUntil - now) / 60000);
-      if (err) { err.textContent = '🔒 Trop de tentatives — réessayez dans ' + mins + ' min.'; err.style.display = 'block'; }
-    } else {
-      if (err) err.style.display = 'none';
-      setTimeout(function() {
-        var u = document.getElementById('adminUser');
-        if (u) u.focus();
-      }, 120);
-    }
+    setTimeout(function() {
+      var u = document.getElementById('adminUser');
+      if (u) u.focus();
+    }, 120);
   }
 }
 
@@ -520,21 +490,14 @@ function doAdminLogin() {
     _loginAttempts = 0;
     try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
     closeAdminLogin();
-    try { localStorage.setItem('gcc_admin_session', '1'); } catch(e) {}
     var panel = document.getElementById('adminPanel');
     if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
-    if (typeof startAdmClock === 'function') startAdmClock();
-    if (typeof refreshDashboard === 'function') refreshDashboard();
-    if (typeof refreshFinance === 'function') { refreshFinance(); refreshDepenses(); }
-    if (typeof refreshParrainage === 'function') refreshParrainage();
-    if (typeof refreshAnnonces === 'function') refreshAnnonces();
-    if (typeof loadTarifs === 'function') loadTarifs();
     if (typeof showToast === 'function') showToast(tr('connected'), tr('welcomeAdmin'));
   } else {
     _loginAttempts++;
     try { sessionStorage.setItem('gcc_attempts', String(_loginAttempts)); } catch(e) {}
     if (_loginAttempts >= 5) {
-      _lockUntil = Date.now() + 5 * 60 * 1000;
+      _lockUntil = Date.now() + 15 * 60 * 1000;
       try { sessionStorage.setItem('gcc_lock', String(_lockUntil)); } catch(e) {}
       _loginAttempts = 0;
       try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
@@ -545,12 +508,9 @@ function doAdminLogin() {
     }
     var err = document.getElementById('login-err');
     if (err) {
-      if (_loginAttempts === 0 && _lockUntil > Date.now()) {
-        var minsLeft = Math.ceil((_lockUntil - Date.now()) / 60000);
-        err.textContent = '🔒 Trop de tentatives — réessayez dans ' + minsLeft + ' min.';
-      } else {
-        err.textContent = '❌ Identifiants incorrects. ' + (5 - _loginAttempts) + ' tentative(s) restante(s).';
-      }
+      err.textContent = _loginAttempts >= 5
+        ? 'Compte bloqué 15 min.'
+        : 'Identifiants incorrects. ' + (5 - _loginAttempts) + ' tentative(s) restante(s).';
       err.style.display = 'block';
     }
   }
@@ -580,97 +540,17 @@ function doAdminLogin() {
     }
   }
 
-  /* ── Config paiement dynamique (éditable en admin) ── */
-  var _PAY_DEFAULTS = {
-    transfer: {label:'Bank Transfer',    ico:'🏦', note:'Banque : BPI · BDO · Metrobank — Titulaire : GCC CARGO HANDLING INC', num:'', nom:'GCC CARGO HANDLING INC', qr:''},
-    gcash:    {label:'GCash / Maya',     ico:'📱', note:'Envoyez la capture d\'écran de la transaction.',                         num:'+63 968 313 5356',   nom:'', qr:''},
-    momo:     {label:'MoMo Money',       ico:'💚', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
-    om:       {label:'Orange Money (OM)',ico:'🧡', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
-    crypto:   {label:'Crypto (USDT/BTC)', ico:'₿',  note:'Envoyez la capture d\'écran de la transaction blockchain.',              num:'',                   nom:'', qr:''},
+  var PAIEMENT_INFO = {
+    transfer: '🏦 <strong>Bank Transfer</strong><br>Banque : BPI · BDO · Metrobank<br>Titulaire : GCC CARGO HANDLING INC<br>Envoyez la capture d\'écran de votre virement.',
+    gcash:    '📱 <strong>GCash / Maya</strong><br>Numéro : <strong>+63 968 313 5356</strong><br>Nom : WILLIAM NJIONDO<br>Envoyez la capture d\'écran de la transaction.',
+    momo:     '💚 <strong>MoMo Money</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
+    om:       '🧡 <strong>Orange Money (OM)</strong><br>Numéro : <strong>+237 6 53 62 22 70</strong><br>Envoyez la capture d\'écran du dépôt.',
   };
-  var _payConfig = {};
-  try { _payConfig = JSON.parse(localStorage.getItem('gcc_pay_config') || '{}'); } catch(e){}
-  function getPayCfg(key) {
-    return Object.assign({}, _PAY_DEFAULTS[key]||{}, _payConfig[key]||{});
-  }
 
   function handleModePaiement(val) {
     var infoEl = document.getElementById('infoPaiement');
     if (!infoEl) return;
-    var c = getPayCfg(val);
-    if (!c.label) { infoEl.innerHTML = ''; return; }
-    var html = '<div style="font-weight:800;font-size:.9rem;margin-bottom:6px;">' + c.ico + ' ' + c.label + '</div>';
-    if (c.num)  html += '<div>Numéro : <strong>' + c.num + '</strong></div>';
-    if (c.nom)  html += '<div>Nom : <strong>' + c.nom + '</strong></div>';
-    if (c.note) html += '<div style="margin-top:4px;font-size:.8rem;color:var(--slate);">' + c.note + '</div>';
-    if (c.qr)   html += '<img src="' + c.qr + '" class="pay-qr" alt="QR ' + c.label + '">';
-    infoEl.innerHTML = html;
-  }
-
-  // ─── SUPABASE CONFIG ─────────────────────────────────────────────────────
-  var SUPA_URL = 'https://voxgdylvevwfpomamhjo.supabase.co';
-  var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZveGdkeWx2ZXZ3ZnBvbWFtaGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NDkzMjcsImV4cCI6MjEwODMyNTMyN30.yXR3WFsSUBnQ9O6XpXAYdKspRf29Mq33EZBlebWnU8U';
-
-  function supaFetch(path, opts) {
-    return fetch(SUPA_URL + '/rest/v1/' + path, Object.assign({
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': 'Bearer ' + SUPA_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      }
-    }, opts));
-  }
-
-  function supaInsert(entry) {
-    var row = {
-      ref: entry.ref, date: entry.date,
-      expediteur: entry.expediteur, tel_exp: entry.tel_exp, email_exp: entry.email_exp,
-      recepteur: entry.recepteur, tel_rec: entry.tel_rec,
-      destination: entry.destination,
-      mode: entry.mode, mode_depot: entry.modeDepot,
-      mode_envoi: entry.modeEnvoi,
-      paiement: entry.paiement, mode_paiement: entry.modePaiement,
-      adresse: entry.adresse, adresse_lalamove: entry.adresse_lalamove,
-      adresse_client: entry.adresseClient,
-      date_coll: entry.dateColl, creneau: entry.creneau,
-      statut: entry.statut
-    };
-    return supaFetch('submissions', { method: 'POST', body: JSON.stringify(row) });
-  }
-
-  function supaGetAll(cb) {
-    supaFetch('submissions?order=created_at.desc&limit=200')
-      .then(function(r){ return r.json(); })
-      .then(function(rows){
-        if (!Array.isArray(rows)) { cb([]); return; }
-        var mapped = rows.map(function(r){
-          return {
-            id: r.id,
-            ref: r.ref, date: r.date,
-            expediteur: r.expediteur, tel_exp: r.tel_exp, email_exp: r.email_exp,
-            recepteur: r.recepteur, tel_rec: r.tel_rec,
-            destinataire: r.recepteur, tel_dest: r.tel_rec,
-            destination: r.destination,
-            mode: r.mode, modeDepot: r.mode_depot,
-            modeEnvoi: r.mode_envoi,
-            paiement: r.paiement, modePaiement: r.mode_paiement,
-            adresse: r.adresse, adresse_lalamove: r.adresse_lalamove,
-            adresseClient: r.adresse_client,
-            dateColl: r.date_coll, creneau: r.creneau,
-            statut: r.statut || 'En attente'
-          };
-        });
-        cb(mapped);
-      })
-      .catch(function(){ cb([]); });
-  }
-
-  function supaUpdateStatut(id, statut) {
-    return supaFetch('submissions?id=eq.' + id, {
-      method: 'PATCH',
-      body: JSON.stringify({ statut: statut })
-    });
+    infoEl.innerHTML = PAIEMENT_INFO[val] || '';
   }
 
   // ─── FORM SUBMIT: collect & store ────────────────────────────────────────
@@ -680,115 +560,80 @@ function doAdminLogin() {
     if (Array.isArray(_stored)) _submissions = _stored;
   } catch(ex){}
 
+  // Read up to maxFiles files from a file input, max sizeLimit bytes each, returns array of {name,type,data}
+  function readFilesAsBase64(inputId, maxFiles, sizeLimitBytes, callback) {
+    var inp = document.getElementById(inputId);
+    var results = [];
+    if (!inp || !inp.files || inp.files.length === 0) { callback(results); return; }
+    var files = Array.prototype.slice.call(inp.files, 0, maxFiles);
+    var pending = files.length;
+    files.forEach(function(file) {
+      if (file.size > sizeLimitBytes) { pending--; if (pending === 0) callback(results); return; }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        results.push({ name: file.name, type: file.type, data: e.target.result });
+        pending--;
+        if (pending === 0) callback(results);
+      };
+      reader.onerror = function() { pending--; if (pending === 0) callback(results); };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function handleShipSubmit(e) {
     e.preventDefault();
-    // ── Validation champs obligatoires (par id, indépendant de la langue) ──
-    var _nomExp   = (document.getElementById('nomExp')||{value:''}).value.trim();
-    var _telExp   = (document.getElementById('telExp')||{value:''}).value.trim();
-    var _emailExp = (document.getElementById('emailExp')||{value:''}).value.trim();
-    var _nomRec   = (document.getElementById('nomRec')||{value:''}).value.trim();
-    var _telRec   = (document.getElementById('telRec')||{value:''}).value.trim();
-    var _destEl   = document.getElementById('selectDestination');
-    var _dest     = _destEl ? _destEl.value.trim() : '';
-    var _chk      = document.getElementById('consentCheck');
-    var _errs = [];
-    if (!_nomExp)   _errs.push('Nom expéditeur');
-    if (!_telExp)   _errs.push('Tél expéditeur');
-    if (!_nomRec)   _errs.push('Nom destinataire');
-    if (!_telRec)   _errs.push('Tél destinataire');
-    if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
-    if (_errs.length) { showToast('⚠️ Champs manquants', _errs.join(' • ')); return; }
     var now = new Date();
     var ref = 'GCC-' + now.getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
     var depotSel = document.getElementById('modeDepot');
     var paymentSel = document.getElementById('modePaiement');
-    var destSel = document.getElementById('selectDestination');
+    var destSel = document.querySelectorAll('#envoyer select')[0];
     var entry = {
       ref:         ref,
       date:        now.toLocaleDateString('fr-FR'),
-      expediteur:  _nomExp,
-      tel_exp:     _telExp,
-      email_exp:   _emailExp,
-      recepteur:   _nomRec,
-      tel_rec:     _telRec,
+      expediteur:  (document.querySelector('input[placeholder="Ex : William Tabi"]') || {value:''}).value,
+      tel_exp:     (document.querySelector('input[placeholder="+63 968 313 5356"]') || {value:''}).value,
+      email_exp:   (document.querySelector('input[type="email"]') || {value:''}).value,
+      recepteur:   (document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
+      tel_rec:     (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
       destination: destSel ? destSel.value : '',
-      mode:        depotSel ? depotSel.value : '',
       modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
       modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
-      paiement:    (document.getElementById('modePaiement') || {value:''}).value,
       modePaiement:paymentSel ? paymentSel.options[paymentSel.selectedIndex].text : '',
-      destinataire:_nomRec,
-      tel_dest:    _telRec,
       adresse:     (document.getElementById('adresseLalamove') || {value:''}).value,
-      adresse_lalamove:(document.getElementById('adresseLalamove') || {value:''}).value,
       adresseClient:(document.getElementById('adresseClient') || {value:''}).value,
       dateColl:    (document.getElementById('dateLalamove') || {value:''}).value,
       creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
       statut:      'En attente',
+      fichiers:    []
     };
-    // ── Upload des pièces jointes vers Supabase Storage ──
-    function uploadFile(inputId, prefix) {
-      var inp = document.getElementById(inputId);
-      if (!inp || !inp.files || inp.files.length === 0) return Promise.resolve([]);
-      var promises = Array.from(inp.files).map(function(file, idx) {
-        var ext = file.name.split('.').pop();
-        var path = ref + '/' + prefix + '_' + idx + '.' + ext;
-        return fetch(SUPA_URL + '/storage/v1/object/gcc-files/' + path, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPA_KEY,
-            'Authorization': 'Bearer ' + SUPA_KEY,
-            'Content-Type': file.type || 'application/octet-stream'
-          },
-          body: file
-        })
-        .then(function(r){ return r.ok ? (SUPA_URL + '/storage/v1/object/public/gcc-files/' + path) : null; })
-        .catch(function(){ return null; });
+    var form = e.target;
+    // Read ID file (max 1.5 MB)
+    readFilesAsBase64('idFile', 1, 1.5*1024*1024, function(idFiles) {
+      entry.fichiers = entry.fichiers.concat(idFiles.map(function(f){ return Object.assign({}, f, {label:'Pièce d\'identité'}); }));
+      // Read colis photos (max 5 files, 1 MB each)
+      readFilesAsBase64('colisFiles', 5, 1*1024*1024, function(colisFiles) {
+        entry.fichiers = entry.fichiers.concat(colisFiles.map(function(f){ return Object.assign({}, f, {label:'Photo colis'}); }));
+        // Read capture files
+        readFilesAsBase64('captureFile', 1, 1.5*1024*1024, function(capFiles) {
+          entry.fichiers = entry.fichiers.concat(capFiles.map(function(f){ return Object.assign({}, f, {label:'Capture'}); }));
+          readFilesAsBase64('captureEcommerce', 1, 1.5*1024*1024, function(capEFiles) {
+            entry.fichiers = entry.fichiers.concat(capEFiles.map(function(f){ return Object.assign({}, f, {label:'Capture e-commerce'}); }));
+            // Save everything
+            _submissions.unshift(entry);
+            try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){
+              // Storage full — save without files
+              entry.fichiers = [];
+              _submissions[0] = entry;
+              try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex2){}
+            }
+            showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
+            form.reset();
+            handleModeDepot('');
+            refreshAdminTable();
+          });
+        });
       });
-      return Promise.all(promises).then(function(urls){ return urls.filter(Boolean); });
-    }
-
-    // Upload tous les fichiers puis insérer
-    Promise.all([
-      uploadFile('idFile', 'id'),
-      uploadFile('colisFiles', 'colis'),
-      uploadFile('captureFile', 'paiement')
-    ]).then(function(results) {
-      var idUrls      = results[0];
-      var colisUrls   = results[1];
-      var captureUrls = results[2];
-      if (idUrls.length)      entry.piece_identite   = idUrls.join('\n');
-      if (colisUrls.length)   entry.photos_colis      = colisUrls.join('\n');
-      if (captureUrls.length) entry.capture_paiement  = captureUrls.join('\n');
-
-      // Sauvegarder dans Supabase (backend partagé)
-      supaInsert(entry)
-        .then(function(r){
-          if (!r.ok) {
-            r.text().then(function(t){ showToast('⚠️ Supabase erreur', t.substring(0,120)); });
-            return [];
-          }
-          return r.json();
-        })
-        .then(function(rows){
-          if (Array.isArray(rows) && rows[0]) { entry.id = rows[0].id; }
-        })
-        .catch(function(err){ showToast('⚠️ Réseau', String(err).substring(0,120)); });
-
-      // Aussi en local comme fallback
-      _submissions.unshift(entry);
-      try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
-      refreshAdminTable();
-
-      // ── Modale de confirmation ──
-      var modal = document.getElementById('confirmModal');
-      var refEl = document.getElementById('confirmRef');
-      if (refEl) refEl.textContent = 'Référence : ' + ref;
-      if (modal) modal.style.display = 'flex';
     });
-
-    e.target.reset();
-    handleModeDepot('');
   }
 
   function refreshAdminTable() {
@@ -799,12 +644,16 @@ function doAdminLogin() {
     if (kpiDem) kpiDem.textContent = _submissions.length;
     if (kpiAtt) kpiAtt.textContent = _submissions.filter(function(s){return s.statut==='En attente';}).length;
     if (_submissions.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>';
       return;
     }
     var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
     tbody.innerHTML = _submissions.map(function(s, i) {
       var cls = statClasses[s.statut] || 'b-pending';
+      var nbFichiers = (s.fichiers && s.fichiers.length) ? s.fichiers.length : 0;
+      var fichBtn = nbFichiers > 0
+        ? '<button class="notif-btn adm-fichiers-btn" data-i="' + i + '" style="font-size:.72rem;background:#7d3c98;display:block;width:100%;margin-bottom:4px;">📎 ' + nbFichiers + ' fichier' + (nbFichiers>1?'s':'') + '</button>'
+        : '<span style="font-size:.72rem;color:#bbb;display:block;margin-bottom:4px;">—</span>';
       return '<tr>' +
         '<td><strong style="font-family:monospace;">' + s.ref + '</strong><br><small style="color:#999;">' + s.date + '</small></td>' +
         '<td>' + (s.expediteur||'—') + '<br><small style="color:#888;">' + (s.tel_exp||'') + '</small><br><small style="color:#aaa;">' + (s.email_exp||'') + '</small></td>' +
@@ -813,15 +662,9 @@ function doAdminLogin() {
         '<td style="font-size:.8rem;">' + (s.modeDepot||'—') + '</td>' +
         '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
         '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('sentiel') ? '🏢 En bureau' : '—')) + '</td>' +
-        '<td style="font-size:.75rem;line-height:1.8;">' + (function(){
-          var links = [];
-          if (s.piece_identite) s.piece_identite.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">🪪 Pièce ID '+(i+1)+'</a>'); });
-          if (s.photos_colis) s.photos_colis.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">📦 Photo '+(i+1)+'</a>'); });
-          if (s.capture_paiement) s.capture_paiement.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">💳 Paiement '+(i+1)+'</a>'); });
-          return links.length ? links.join('') : '<span style="color:#aaa;">—</span>';
-        })() + '</td>' +
         '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>' +
         '<td style="white-space:nowrap;">' +
+        fichBtn +
         '<button class="notif-btn adm-statut-btn" data-i="' + i + '" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;">🔄 Statut</button>' +
         '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;">📧 Email</button>' +
         '</td>' +
@@ -838,695 +681,26 @@ function doAdminLogin() {
         if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
       });
     });
-    // Also update dashboard KPIs
-    if (typeof refreshDashboard === 'function') refreshDashboard();
+    tbody.querySelectorAll('.adm-fichiers-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { showFichiersModal(parseInt(this.getAttribute('data-i'))); });
+    });
   }
   function cycleStatut(i) {
     var order = ['En attente','En transit','Arrivé','Livré'];
     var cur = _submissions[i].statut;
     _submissions[i].statut = order[(order.indexOf(cur)+1) % order.length];
     try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
-    // Mettre à jour dans Supabase si l'entrée a un id
-    if (_submissions[i].id) {
-      supaUpdateStatut(_submissions[i].id, _submissions[i].statut).catch(function(){});
-    }
     refreshAdminTable();
     showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
   }
 
-  // ─── TRIPLE-CLIC LOGO → ADMIN ─────────────────────────────────────────
-  var _logoClicks = 0, _logoTimer = null;
-  function _logoClick() {
-    _logoClicks++;
-    if (_logoTimer) clearTimeout(_logoTimer);
-    _logoTimer = setTimeout(function(){ _logoClicks = 0; }, 600);
-    if (_logoClicks >= 3) {
-      _logoClicks = 0;
-      openAdminLogin();
-    }
-  }
-
   // Apply language + init on DOM ready
-  
-  /* ═══ ADMIN NAVIGATION — onglets horizontaux ═══ */
-  function showAdmTab(page, el) {
-    document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.remove('active');});
-    if (el) el.classList.add('active');
-    document.querySelectorAll('.adm-page').forEach(function(p){p.classList.remove('active');});
-    var pg = document.getElementById('adm-' + page);
-    if (pg) pg.classList.add('active');
-    if (page === 'dash') refreshDashboard();
-    if (page === 'colis') { try { var _s2=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_s2)) _submissions=_s2; } catch(e){} filterColis(); }
-    if (page === 'finance') refreshFinance();
-    if (page === 'depenses') refreshDepenses();
-    if (page === 'clients') refreshClients();
-    if (page === 'parrainage') refreshParrainage();
-    if (page === 'departs') refreshAnnonces();
-    if (page === 'parametres') { loadTarifs(); loadPayConfig(); }
-  }
-  function admNav(page, el) { showAdmTab(page, el); }
-
-  /* ═══ CLOCK ═══ */
-  function startAdmClock() {
-    function tick() {
-      var el = document.getElementById('adm-clock');
-      if (!el) return;
-      var now = new Date();
-      el.textContent = now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    }
-    tick();
-    setInterval(tick, 1000);
-  }
-
-  /* ═══ DASHBOARD ═══ */
-  function refreshDashboard() {
-    var now = new Date();
-    var dd = document.getElementById('adm-date-display');
-    if (dd) dd.textContent = now.toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-    /* recharger les soumissions depuis localStorage (cas multi-onglets) */
-    try { var _sr=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sr)) _submissions=_sr; } catch(e){}
-
-    var _revenues = [];
-    var _depenses_data = [];
-    try { _revenues = JSON.parse(localStorage.getItem('gcc_revenus') || '[]'); } catch(e) {}
-    try { _depenses_data = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
-
-    var totalRev = _revenues.reduce(function(s,r){return s + (parseFloat(r.montant)||0);}, 0);
-    var totalDep = _depenses_data.reduce(function(s,d){return s + (parseFloat(d.montant)||0);}, 0);
-    var marge = totalRev - totalDep;
-    var livres = _submissions.filter(function(s){return s.statut === 'Livré';}).length;
-
-    var setKpi = function(id, val) { var el = document.getElementById(id); if(el) el.textContent = val; };
-    setKpi('kpi-demandes', _submissions.length);
-    setKpi('kpi-attente', _submissions.filter(function(s){return s.statut==='En attente';}).length);
-    setKpi('kpi-livres', livres);
-    setKpi('kpi-revenue', '₱' + totalRev.toLocaleString('fr-FR', {minimumFractionDigits:0}));
-    setKpi('kpi-depenses-total', '₱' + totalDep.toLocaleString('fr-FR', {minimumFractionDigits:0}));
-    setKpi('kpi-marge', '₱' + marge.toLocaleString('fr-FR', {minimumFractionDigits:0}));
-
-    // Recent activity
-    var recentEl = document.getElementById('dash-recent-list');
-    if (recentEl) {
-      if (_submissions.length === 0) {
-        recentEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:16px;">Aucune activité</p>';
-      } else {
-        var recent = _submissions.slice(-5).reverse();
-        recentEl.innerHTML = recent.map(function(s) {
-          var cls = {En_attente:'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'}[s.statut.replace(' ','_')] || 'b-pending';
-          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f3f7;">'
-            + '<span><strong style="color:var(--navy);">' + (s.expediteur||'—') + '</strong><br><span style="font-size:.76rem;color:var(--slate);">' + (s.ref||'') + ' → ' + (s.destination||'').split('—')[1]||'' + '</span></span>'
-            + '<span class="badge ' + cls + '">' + s.statut + '</span>'
-            + '</div>';
-        }).join('');
-      }
-    }
-
-    // Statut chart
-    var statEl = document.getElementById('dash-statut-chart');
-    if (statEl) {
-      var stats = {'En attente':0,'En transit':0,'Arrivé':0,'Livré':0};
-      _submissions.forEach(function(s){ if(stats[s.statut]!==undefined) stats[s.statut]++; });
-      var total = _submissions.length || 1;
-      var colors = {'En attente':'#e65100','En transit':'#1565c0','Arrivé':'#6a1b9a','Livré':'#2e7d32'};
-      statEl.innerHTML = Object.keys(stats).map(function(k) {
-        var pct = Math.round(stats[k]/total*100);
-        return '<div style="margin-bottom:10px;">'
-          + '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">'
-          + '<span style="font-weight:600;color:var(--navy);">' + k + '</span>'
-          + '<span style="color:var(--slate);">' + stats[k] + ' (' + pct + '%)</span></div>'
-          + '<div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%;background:' + colors[k] + ';"></div></div>'
-          + '</div>';
-      }).join('');
-    }
-
-    // Top destinations
-    var destEl = document.getElementById('dash-destinations');
-    if (destEl) {
-      var destMap = {};
-      _submissions.forEach(function(s){ var d = (s.destination||'Inconnue').split('—')[0].trim(); destMap[d]=(destMap[d]||0)+1; });
-      var sorted = Object.keys(destMap).sort(function(a,b){return destMap[b]-destMap[a];}).slice(0,5);
-      if (sorted.length === 0) { destEl.innerHTML = '<p style="color:#aaa;text-align:center;">Aucune donnée</p>'; }
-      else {
-        var maxD = destMap[sorted[0]] || 1;
-        destEl.innerHTML = sorted.map(function(d) {
-          var pct = Math.round(destMap[d]/maxD*100);
-          return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px;"><span style="font-weight:600;color:var(--navy);">' + d + '</span><span style="color:var(--slate);">' + destMap[d] + '</span></div>'
-            + '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:var(--sky);"></div></div></div>';
-        }).join('');
-      }
-    }
-
-    // Modes dépôt
-    var modesEl = document.getElementById('dash-modes');
-    if (modesEl) {
-      var modesMap = {};
-      _submissions.forEach(function(s){ var m = s.mode||'Inconnu'; modesMap[m]=(modesMap[m]||0)+1; });
-      var mKeys = Object.keys(modesMap).sort(function(a,b){return modesMap[b]-modesMap[a];});
-      var mColors = {presentiel:'var(--orange)',lalamove:'#27ae60',ecommerce:'var(--sky)'};
-      if (mKeys.length === 0) { modesEl.innerHTML = '<p style="color:#aaa;text-align:center;">Aucune donnée</p>'; }
-      else {
-        var mTotal = _submissions.length || 1;
-        modesEl.innerHTML = mKeys.map(function(m) {
-          var pct = Math.round(modesMap[m]/mTotal*100);
-          var col = mColors[m] || 'var(--slate)';
-          var lbl = {presentiel:'En présentiel',lalamove:'Lalamove',ecommerce:'Shopee/Lazada'}[m] || m;
-          return '<div style="margin-bottom:9px;"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:3px;"><span style="font-weight:600;color:var(--navy);">' + lbl + '</span><span style="color:var(--slate);">' + modesMap[m] + ' (' + pct + '%)</span></div>'
-            + '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
-        }).join('');
-      }
-    }
-  }
-
-  /* ═══ COLIS FILTER ═══ */
-  function filterColis() {
-    var tbody = document.getElementById('admin-submissions-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">⏳ Chargement...</td></tr>';
-    // Charger depuis Supabase (données partagées entre tous les appareils)
-    supaGetAll(function(rows) {
-      if (rows.length > 0) {
-        _submissions = rows;
-        try { localStorage.setItem('gcc_submissions', JSON.stringify(rows.slice(0,200))); } catch(e){}
-      } else {
-        // Fallback localStorage si Supabase vide ou erreur
-        try { var _sf=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sf)&&_sf.length>0) _submissions=_sf; } catch(e){}
-      }
-      _renderColis();
-    });
-  }
-
-  function _renderColis() {
-    var q = (document.getElementById('search-colis')||{value:''}).value.toLowerCase();
-    var st = (document.getElementById('filter-statut')||{value:''}).value;
-    var tbody = document.getElementById('admin-submissions-tbody');
-    if (!tbody) return;
-    var filtered = _submissions.filter(function(s,i) {
-      var matchQ = !q || (s.ref||'').toLowerCase().includes(q) || (s.expediteur||'').toLowerCase().includes(q) || (s.destination||'').toLowerCase().includes(q);
-      var matchS = !st || s.statut === st;
-      return matchQ && matchS;
-    });
-    if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucun résultat</td></tr>';
-      return;
-    }
-    var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
-    tbody.innerHTML = filtered.map(function(s) {
-      var i = _submissions.indexOf(s);
-      var cls = statClasses[s.statut] || 'b-pending';
-      return '<tr><td><strong style="color:var(--sky);font-size:.8rem;">' + (s.ref||'—') + '</strong></td>'
-        + '<td>' + (s.expediteur||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_exp||'') + '</span></td>'
-        + '<td>' + (s.destinataire||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_dest||'') + '</span></td>'
-        + '<td style="font-size:.8rem;">' + (s.destination||'—').split('—')[0] + '</td>'
-        + '<td style="font-size:.8rem;">' + ({presentiel:'Présentiel',lalamove:'Lalamove',ecommerce:'Shopee/Lazada'}[s.mode]||s.mode||'—') + '</td>'
-        + '<td style="font-size:.8rem;">' + ({transfer:'Virement',cash:'Cash',westernunion:'Western Union',moneygram:'MoneyGram',remitly:'Remitly',wave:'Wave'}[s.paiement]||s.paiement||'—') + '</td>'
-        + '<td style="font-size:.78rem;max-width:120px;word-break:break-word;">' + (s.adresseClient||s.adresse_lalamove||'—') + '</td>'
-        + '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>'
-        + '<td><button class="notif-btn adm-statut-btn" data-i="' + i + '" style="background:var(--navy);">🔄</button><br>'
-        + '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="background:var(--sky);">📧</button></td></tr>';
-    }).join('');
-    tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
-    });
-    tbody.querySelectorAll('.adm-email-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idx = parseInt(this.getAttribute('data-i'));
-        var s = _submissions[idx];
-        if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
-      });
-    });
-  }
-
-  /* ═══ FINANCE - REVENUS ═══ */
-  var _revenues = [];
-  try { _revenues = JSON.parse(localStorage.getItem('gcc_revenus') || '[]'); } catch(e) {}
-
-  function addRevenu() {
-    var desc = (document.getElementById('rev-desc')||{}).value || '';
-    var montant = parseFloat((document.getElementById('rev-montant')||{}).value || '0');
-    var date = (document.getElementById('rev-date')||{}).value || new Date().toISOString().split('T')[0];
-    var cat = (document.getElementById('rev-cat')||{}).value || 'autre';
-    if (!desc || !montant) { showToast('⚠️','Remplissez description et montant'); return; }
-    _revenues.push({desc:desc, montant:montant, date:date, cat:cat, id:Date.now()});
-    try { localStorage.setItem('gcc_revenus', JSON.stringify(_revenues)); } catch(e) {}
-    ['rev-desc','rev-montant'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast('✅','Revenu enregistré : ₱' + montant.toFixed(2));
-    refreshFinance();
-    refreshDashboard();
-  }
-
-  function deleteRevenu(id) {
-    _revenues = _revenues.filter(function(r){return r.id !== id;});
-    try { localStorage.setItem('gcc_revenus', JSON.stringify(_revenues)); } catch(e) {}
-    refreshFinance();
-    refreshDashboard();
-  }
-
-  function refreshFinance() {
-    var list = document.getElementById('revenus-list');
-    var totalEl = document.getElementById('revenus-total-display');
-    var total = _revenues.reduce(function(s,r){return s+(parseFloat(r.montant)||0);},0);
-    var catIcons = {envoi:'📦',lalamove:'🛵',assurance:'🛡',emballage:'📦',autre:'💼'};
-    if (list) {
-      if (_revenues.length === 0) { list.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucun revenu</p>'; }
-      else {
-        list.innerHTML = _revenues.slice().reverse().map(function(r) {
-          return '<div class="finance-row">'
-            + '<span class="finance-label">' + (catIcons[r.cat]||'💼') + ' ' + r.desc + '<br><span style="font-size:.73rem;color:var(--slate);">' + r.date + '</span></span>'
-            + '<span style="display:flex;align-items:center;gap:8px;">'
-            + '<span class="finance-amount income">₱' + parseFloat(r.montant).toFixed(2) + '</span>'
-            + '<button onclick="deleteRevenu(' + r.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.85rem;">✕</button>'
-            + '</span></div>';
-        }).join('');
-      }
-    }
-    if (totalEl) totalEl.textContent = '₱' + total.toFixed(2);
-
-    // KPI updates
-    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-    var _depenses_data = [];
-    try { _depenses_data = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
-    var totalDep = _depenses_data.reduce(function(s,d){return s+(parseFloat(d.montant)||0);},0);
-    var marge = total - totalDep;
-    setEl('fin-revenus-total','₱'+total.toLocaleString('fr-FR',{minimumFractionDigits:0}));
-    setEl('fin-dep-total','₱'+totalDep.toLocaleString('fr-FR',{minimumFractionDigits:0}));
-    setEl('fin-marge-total','₱'+marge.toLocaleString('fr-FR',{minimumFractionDigits:0}));
-    setEl('fin-nb-rev',_revenues.length);
-
-    // Monthly bar chart
-    var chartEl = document.getElementById('monthly-chart');
-    var labelsEl = document.getElementById('monthly-labels');
-    if (chartEl) {
-      var months = {};
-      var now = new Date();
-      for (var m = 11; m >= 0; m--) {
-        var d = new Date(now.getFullYear(), now.getMonth()-m, 1);
-        var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-        months[key] = 0;
-      }
-      _revenues.forEach(function(r){ var k=(r.date||'').slice(0,7); if(months[k]!==undefined) months[k]+=(parseFloat(r.montant)||0); });
-      var vals = Object.values(months);
-      var maxV = Math.max.apply(null, vals) || 1;
-      chartEl.innerHTML = vals.map(function(v) {
-        var h = Math.max(4, Math.round(v/maxV*80));
-        return '<div style="flex:1;background:var(--sky);border-radius:3px 3px 0 0;height:'+h+'px;opacity:.8;position:relative;cursor:default;" title="₱'+v.toFixed(0)+'"></div>';
-      }).join('');
-      if (labelsEl) {
-        var keys = Object.keys(months);
-        labelsEl.innerHTML = keys.map(function(k){
-          return '<div style="flex:1;font-size:.63rem;color:var(--slate);text-align:center;">'+k.slice(5)+'</div>';
-        }).join('');
-      }
-    }
-  }
-
-  /* ═══ FINANCE - DÉPENSES ═══ */
-  var _depenses = [];
-  try { _depenses = JSON.parse(localStorage.getItem('gcc_depenses') || '[]'); } catch(e) {}
-
-  function addDepense() {
-    var desc = (document.getElementById('dep-desc')||{}).value || '';
-    var montant = parseFloat((document.getElementById('dep-montant')||{}).value || '0');
-    var date = (document.getElementById('dep-date')||{}).value || new Date().toISOString().split('T')[0];
-    var cat = (document.getElementById('dep-cat')||{}).value || 'autre';
-    var recurrence = (document.getElementById('dep-recurrence')||{}).value || 'unique';
-    if (!desc || !montant) { showToast('⚠️','Remplissez description et montant'); return; }
-    _depenses.push({desc:desc, montant:montant, date:date, cat:cat, recurrence:recurrence, id:Date.now()});
-    try { localStorage.setItem('gcc_depenses', JSON.stringify(_depenses)); } catch(e) {}
-    ['dep-desc','dep-montant'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast('✅','Dépense enregistrée : ₱' + montant.toFixed(2));
-    refreshDepenses();
-    refreshDashboard();
-  }
-
-  function deleteDepense(id) {
-    _depenses = _depenses.filter(function(d){return d.id !== id;});
-    try { localStorage.setItem('gcc_depenses', JSON.stringify(_depenses)); } catch(e) {}
-    refreshDepenses();
-    refreshDashboard();
-  }
-
-  function refreshDepenses() {
-    var list = document.getElementById('depenses-list');
-    var totalEl = document.getElementById('depenses-total-display');
-    var total = _depenses.reduce(function(s,d){return s+(parseFloat(d.montant)||0);},0);
-    var catIcons = {loyer:'🏢',transport:'🚛',fournitures:'📦',communication:'📱',salaire:'👷',douane:'🛃',marketing:'📣',autre:'💼'};
-    if (list) {
-      if (_depenses.length === 0) { list.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucune dépense</p>'; }
-      else {
-        list.innerHTML = _depenses.slice().reverse().map(function(d) {
-          var recBadge = d.recurrence !== 'unique' ? ' <span style="font-size:.68rem;background:#e3f2fd;color:#1565c0;padding:1px 6px;border-radius:10px;">' + d.recurrence + '</span>' : '';
-          return '<div class="finance-row">'
-            + '<span class="finance-label">' + (catIcons[d.cat]||'💼') + ' ' + d.desc + recBadge + '<br><span style="font-size:.73rem;color:var(--slate);">' + d.date + '</span></span>'
-            + '<span style="display:flex;align-items:center;gap:8px;">'
-            + '<span class="finance-amount expense">₱' + parseFloat(d.montant).toFixed(2) + '</span>'
-            + '<button onclick="deleteDepense(' + d.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.85rem;">✕</button>'
-            + '</span></div>';
-        }).join('');
-      }
-    }
-    if (totalEl) totalEl.textContent = '₱' + total.toFixed(2);
-
-    // By category
-    var catEl = document.getElementById('dep-by-cat');
-    if (catEl) {
-      var catMap = {};
-      _depenses.forEach(function(d){ catMap[d.cat]=(catMap[d.cat]||0)+(parseFloat(d.montant)||0); });
-      var cats = Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a];});
-      var catIcons2 = {loyer:'🏢',transport:'🚛',fournitures:'📦',communication:'📱',salaire:'👷',douane:'🛃',marketing:'📣',autre:'💼'};
-      var catNames = {loyer:'Loyer/Bureau',transport:'Transport',fournitures:'Fournitures',communication:'Communication',salaire:'Salaires',douane:'Douane/Port',marketing:'Marketing',autre:'Autre'};
-      if (cats.length === 0) { catEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucune dépense</p>'; }
-      else {
-        var maxC = catMap[cats[0]] || 1;
-        catEl.innerHTML = cats.map(function(c) {
-          var pct = Math.round(catMap[c]/total*100);
-          return '<div style="margin-bottom:10px;display:flex;align-items:center;gap:12px;">'
-            + '<span style="width:130px;font-size:.82rem;font-weight:600;color:var(--navy);">' + (catIcons2[c]||'') + ' ' + (catNames[c]||c) + '</span>'
-            + '<div style="flex:1;"><div class="prog-bar"><div class="prog-fill" style="width:'+Math.round(catMap[c]/maxC*100)+'%;background:#e74c3c;"></div></div></div>'
-            + '<span style="font-size:.8rem;color:var(--slate);min-width:80px;text-align:right;">₱' + catMap[c].toFixed(0) + ' (' + pct + '%)</span>'
-            + '</div>';
-        }).join('');
-      }
-    }
-  }
-
-  /* ═══ CLIENTS ═══ */
-  function refreshClients() {
-    try { var _sc=JSON.parse(localStorage.getItem('gcc_submissions')||'[]'); if(Array.isArray(_sc)) _submissions=_sc; } catch(e){}
-    var clientMap = {};
-    _submissions.forEach(function(s) {
-      var nom = s.expediteur || 'Inconnu';
-      if (!clientMap[nom]) clientMap[nom] = {nom:nom, tel:s.tel_exp||'', email:s.email_exp||'', envois:[], dests:[]};
-      clientMap[nom].envois.push(s.ref||'');
-      var dest = (s.destination||'').split('—')[0].trim();
-      if (dest && !clientMap[nom].dests.includes(dest)) clientMap[nom].dests.push(dest);
-    });
-    var clients = Object.values(clientMap);
-    var tbody = document.getElementById('clients-tbody');
-    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-    setEl('cli-total', clients.length);
-    setEl('cli-actifs', clients.filter(function(c){return c.envois.length>=2;}).length);
-    var topC = clients.sort(function(a,b){return b.envois.length-a.envois.length;})[0];
-    setEl('cli-top', topC ? topC.nom + ' (' + topC.envois.length + ')' : '—');
-    setEl('cli-moy', clients.length ? (Math.round(_submissions.length/clients.length*10)/10).toString() : '0');
-    if (!tbody) return;
-    if (clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>'; return; }
-    var sorted = clients.slice().sort(function(a,b){return b.envois.length-a.envois.length;});
-    tbody.innerHTML = sorted.map(function(c) {
-      var last = _submissions.filter(function(s){return s.expediteur===c.nom;}).slice(-1)[0];
-      return '<tr><td><strong style="color:var(--navy);">' + c.nom + '</strong>'
-        + (c.envois.length >= 2 ? ' <span style="font-size:.68rem;background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:10px;">Fidèle</span>' : '')
-        + '</td><td style="font-size:.83rem;">' + (c.tel||'—') + '</td>'
-        + '<td style="font-size:.83rem;">' + (c.email||'—') + '</td>'
-        + '<td><strong style="color:var(--sky);">' + c.envois.length + '</strong></td>'
-        + '<td style="font-size:.8rem;">' + (last ? (last.ref||'—') : '—') + '</td>'
-        + '<td style="font-size:.78rem;">' + c.dests.slice(0,3).join(', ') + '</td></tr>';
-    }).join('');
-  }
-
-  /* ═══ PARRAINAGE ═══ */
-  var _parrains = [];
-  try { _parrains = JSON.parse(localStorage.getItem('gcc_parrains') || '[]'); } catch(e) {}
-
-  function addParrain() {
-    var nom = (document.getElementById('par-nom')||{}).value || '';
-    var tel = (document.getElementById('par-tel')||{}).value || '';
-    var code = (document.getElementById('par-code')||{}).value || '';
-    var commission = parseFloat((document.getElementById('par-commission')||{}).value || '200');
-    if (!nom || !code) { showToast('⚠️','Nom et code parrain requis'); return; }
-    if (_parrains.find(function(p){return p.code===code;})) { showToast('⚠️','Code parrain déjà utilisé'); return; }
-    _parrains.push({nom:nom, tel:tel, code:code, commission:commission, filleuls:[], id:Date.now()});
-    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
-    ['par-nom','par-tel','par-code'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast('✅','Parrain ' + nom + ' enregistré !');
-    refreshParrainage();
-  }
-
-  function addFilleul() {
-    var code = (document.getElementById('filleul-parrain-code')||{}).value || '';
-    var nom = (document.getElementById('filleul-nom')||{}).value || '';
-    var paye = (document.getElementById('filleul-paye')||{}).value || 'non';
-    if (!code || !nom) { showToast('⚠️','Code parrain et nom filleul requis'); return; }
-    var parrain = _parrains.find(function(p){return p.code===code;});
-    if (!parrain) { showToast('❌','Parrain introuvable avec ce code'); return; }
-    parrain.filleuls.push({nom:nom, date:new Date().toISOString().split('T')[0], paye:paye, id:Date.now()});
-    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
-    ['filleul-parrain-code','filleul-nom'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast('✅','Filleul ajouté à ' + parrain.nom);
-    refreshParrainage();
-  }
-
-  function deleteParrain(id) {
-    if (!confirm('Supprimer ce parrain ?')) return;
-    _parrains = _parrains.filter(function(p){return p.id !== id;});
-    try { localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); } catch(e) {}
-    refreshParrainage();
-  }
-
-  function refreshParrainage() {
-    var totalFilleuls = _parrains.reduce(function(s,p){return s+p.filleuls.length;},0);
-    var commDues = _parrains.reduce(function(s,p){
-      return s + p.filleuls.filter(function(f){return f.paye==='non';}).length * (p.commission||0);
-    },0);
-    var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
-    setEl('par-total', _parrains.length);
-    setEl('par-filleuls', totalFilleuls);
-    setEl('par-commissions', '₱' + commDues.toFixed(0));
-    var listEl = document.getElementById('parrains-list');
-    if (!listEl) return;
-    if (_parrains.length === 0) { listEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:12px;">Aucun parrain enregistré</p>'; return; }
-    listEl.innerHTML = _parrains.map(function(p) {
-      var nonPaids = p.filleuls.filter(function(f){return f.paye==='non';}).length;
-      return '<div class="parrain-card">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        + '<div><div class="parrain-name">' + p.nom + '</div>'
-        + '<div style="font-size:.75rem;color:var(--slate);">Code: <strong style="color:var(--sky);">' + p.code + '</strong> &middot; ' + (p.tel||'') + '</div></div>'
-        + '<button onclick="deleteParrain(' + p.id + ')" style="background:none;border:none;cursor:pointer;color:#e74c3c;">✕</button></div>'
-        + '<div class="parrain-stats">'
-        + '<span class="parrain-stat"><strong>' + p.filleuls.length + '</strong> filleul(s)</span>'
-        + '<span class="parrain-stat"><strong style="color:#e74c3c;">₱' + (nonPaids*(p.commission||0)).toFixed(0) + '</strong> dues</span>'
-        + '<span class="parrain-stat"><strong>₱' + (p.commission||0) + '</strong>/filleul</span>'
-        + '</div>'
-        + (p.filleuls.length > 0 ? '<div style="margin-top:8px;font-size:.76rem;color:var(--slate);">'
-          + p.filleuls.map(function(f){return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 7px;border-radius:10px;background:'+(f.paye==='oui'?'#e8f5e9':'#fff3e0')+';color:'+(f.paye==='oui'?'#2e7d32':'#e65100')+';font-weight:600;">' + f.nom + (f.paye==='oui'?' ✓':'') + '</span>';}).join('')
-          + '</div>' : '')
-        + '</div>';
-    }).join('');
-  }
-
-  /* ═══ ANNONCES ═══ */
-  var _annonces = [];
-  try { _annonces = JSON.parse(localStorage.getItem('gcc_annonces') || '[]'); } catch(e) {}
-
-  // Stockage base64 pour la photo/doc d'annonce
-  var _annDocData = null; // {name, dataUrl}
-  function annDocPreview(input) {
-    var file = input.files[0];
-    var prev = document.getElementById('ann-doc-preview');
-    if (!file) { _annDocData = null; if(prev) prev.style.display='none'; return; }
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      _annDocData = {name: file.name, dataUrl: e.target.result, type: file.type};
-      if (prev) {
-        prev.style.display = 'flex';
-        var img = document.getElementById('ann-doc-img');
-        var fname = document.getElementById('ann-doc-fname');
-        if (fname) fname.textContent = file.name;
-        if (img) {
-          if (file.type.startsWith('image/')) { img.src = e.target.result; img.style.display='block'; }
-          else { img.src=''; img.style.display='none'; }
-        }
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function addAnnonce() {
-    var dest = (document.getElementById('ann-dest')||{}).value || '';
-    var date = (document.getElementById('ann-date')||{}).value || '';
-    var heure = (document.getElementById('ann-heure')||{}).value || '16:00';
-    var note = (document.getElementById('ann-note')||{}).value || '';
-    var mode = (document.getElementById('ann-mode')||{}).value || 'avion';
-    if (!dest || !date) { showToast('⚠️','Destination et date requises'); return; }
-    _annonces.unshift({dest:dest, date:date, heure:heure, note:note, mode:mode, doc:_annDocData, id:Date.now()});
-    try { localStorage.setItem('gcc_annonces', JSON.stringify(_annonces)); } catch(e) {}
-    ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    var fi = document.getElementById('ann-doc-file');
-    if(fi) fi.value='';
-    _annDocData = null;
-    var prev = document.getElementById('ann-doc-preview');
-    if(prev) prev.style.display='none';
-    showToast('✅','Annonce publiée pour ' + dest);
-    refreshAnnonces();
-  }
-
-  function deleteAnnonce(id) {
-    _annonces = _annonces.filter(function(a){return a.id !== id;});
-    try { localStorage.setItem('gcc_annonces', JSON.stringify(_annonces)); } catch(e) {}
-    refreshAnnonces();
-  }
-
-  function refreshAnnonces() {
-    var listEl = document.getElementById('annonces-list');
-    if (!listEl) return;
-    if (_annonces.length === 0) { listEl.innerHTML = '<div style="text-align:center;padding:32px 16px;color:#b0bec5;"><div style="font-size:2rem;margin-bottom:8px;">📭</div><div style="font-size:.85rem;">Aucune annonce publiée</div></div>'; return; }
-    listEl.innerHTML = _annonces.map(function(a) {
-      var d = new Date(a.date + 'T12:00:00');
-      var isPast = d < new Date();
-      var modeIco = a.mode === 'bateau' ? '🚢' : '✈️';
-      var docHtml = '';
-      if (a.doc && a.doc.dataUrl) {
-        if (a.doc.type && a.doc.type.startsWith('image/')) {
-          docHtml = '<div style="margin-top:8px;"><img src="' + a.doc.dataUrl + '" style="max-width:100%;max-height:120px;border-radius:6px;border:1px solid #e0e6ef;object-fit:cover;"></div>';
-        } else {
-          docHtml = '<div style="margin-top:8px;"><a href="' + a.doc.dataUrl + '" download="' + (a.doc.name||'document') + '" style="font-size:.78rem;color:var(--sky);display:flex;align-items:center;gap:5px;text-decoration:none;">📄 ' + (a.doc.name||'document') + '</a></div>';
-        }
-      }
-      return '<div style="background:#fff;border:1.5px solid ' + (isPast?'#f5c6c6':'#dce3ec') + ';border-radius:10px;padding:14px 16px;margin-bottom:10px;' + (isPast?'opacity:.6;':'') + '">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        + '<div style="flex:1;">'
-        + '<div style="font-weight:800;color:var(--navy);font-size:.92rem;">' + modeIco + ' ' + a.dest + (isPast?' <span style="font-size:.68rem;background:#fde8e8;color:#c0392b;padding:2px 7px;border-radius:10px;">PASSÉ</span>':'') + '</div>'
-        + '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;">🗓 ' + d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' · ⏰ Limite: ' + a.heure + '</div>'
-        + (a.note ? '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;font-style:italic;">📝 ' + a.note + '</div>' : '')
-        + docHtml
-        + '</div>'
-        + '<button onclick="deleteAnnonce(' + a.id + ')" style="background:#fde8e8;border:none;cursor:pointer;color:#e74c3c;font-size:.8rem;padding:4px 9px;border-radius:5px;font-weight:700;margin-left:10px;flex-shrink:0;">✕</button>'
-        + '</div></div>';
-    }).join('');
-  }
-
-  /* ═══ PARAMÈTRES / TARIFS ═══ */
-  function loadTarifs() {
-    var tarifs = {};
-    try { tarifs = JSON.parse(localStorage.getItem('gcc_tarifs') || '{}'); } catch(e) {}
-    var fields = {air:350,sea:180,lalamove:150,assurance:2};
-    Object.keys(fields).forEach(function(k) {
-      var el = document.getElementById('tarif-' + k);
-      if (el) el.value = tarifs[k] !== undefined ? tarifs[k] : fields[k];
-    });
-  }
-
-  function saveTarifs() {
-    var tarifs = {};
-    ['air','sea','lalamove','assurance'].forEach(function(k) {
-      var el = document.getElementById('tarif-' + k);
-      if (el) tarifs[k] = parseFloat(el.value) || 0;
-    });
-    try { localStorage.setItem('gcc_tarifs', JSON.stringify(tarifs)); } catch(e) {}
-    showToast('✅','Tarifs sauvegardés');
-  }
-
-  /* ── Gestion config paiement admin ── */
-  function switchPayTab(key, btn) {
-    ['transfer','gcash','momo','om','crypto'].forEach(function(k) {
-      var p = document.getElementById('ppanel-'+k);
-      var b = document.getElementById('ptab-'+k);
-      if (p) p.style.display = (k===key) ? 'block' : 'none';
-      if (b) { b.style.background = (k===key) ? 'var(--navy)' : '#e8edf3'; b.style.color = (k===key) ? '#fff' : 'var(--navy)'; }
-    });
-  }
-
-  function loadPayConfig() {
-    var keys = ['transfer','gcash','momo','om','crypto'];
-    keys.forEach(function(k) {
-      var c = getPayCfg(k);
-      var elNum = document.getElementById('pay-num-'+k);
-      var elNom = document.getElementById('pay-nom-'+k);
-      var elNote= document.getElementById('pay-note-'+k);
-      var prev  = document.getElementById('pay-qr-prev-'+k);
-      if (elNum)  elNum.value  = c.num  || '';
-      if (elNom)  elNom.value  = c.nom  || '';
-      if (elNote) elNote.value = c.note || '';
-      if (prev && c.qr) { prev.src = c.qr; prev.style.display = 'block'; }
-      else if (prev)    { prev.style.display = 'none'; }
-    });
-  }
-
-  function payQrPreview(key, input) {
-    var file = input.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      if (!_payConfig[key]) _payConfig[key] = {};
-      _payConfig[key].qr = e.target.result;
-      var prev = document.getElementById('pay-qr-prev-'+key);
-      if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function savePayConfig() {
-    var keys = ['transfer','gcash','momo','om','crypto'];
-    keys.forEach(function(k) {
-      if (!_payConfig[k]) _payConfig[k] = {};
-      var elNum  = document.getElementById('pay-num-'+k);
-      var elNom  = document.getElementById('pay-nom-'+k);
-      var elNote = document.getElementById('pay-note-'+k);
-      if (elNum)  _payConfig[k].num  = elNum.value.trim();
-      if (elNom)  _payConfig[k].nom  = elNom.value.trim();
-      if (elNote) _payConfig[k].note = elNote.value.trim();
-    });
-    try { localStorage.setItem('gcc_pay_config', JSON.stringify(_payConfig)); } catch(e) {}
-    showToast('✅','Infos paiement sauvegardées');
-  }
-
-  function changePass() {
-    var p1 = (document.getElementById('new-pass')||{}).value || '';
-    var p2 = (document.getElementById('new-pass2')||{}).value || '';
-    if (!p1 || p1.length < 6) { showToast('⚠️','Mot de passe trop court (min. 6 caractères)'); return; }
-    if (p1 !== p2) { showToast('❌','Les mots de passe ne correspondent pas'); return; }
-    try { localStorage.setItem('gcc_admin_pass', p1); } catch(e) {}
-    showToast('✅','Mot de passe mis à jour');
-    document.getElementById('new-pass').value = '';
-    document.getElementById('new-pass2').value = '';
-  }
-
-  /* ═══ EXPORT CSV ═══ */
-  function exportCSV(type) {
-    var rows, headers, filename;
-    if (type === 'demandes') {
-      headers = ['Référence','Expéditeur','Tél Exp','Destinataire','Tél Dest','Destination','Mode','Paiement','Statut'];
-      rows = _submissions.map(function(s){return [s.ref,s.expediteur,s.tel_exp,s.destinataire,s.tel_dest,s.destination,s.mode,s.paiement,s.statut];});
-      filename = 'gcc_demandes.csv';
-    } else {
-      var revRows = _revenues.map(function(r){return ['Revenu',r.date,r.cat,r.desc,r.montant];});
-      var depRows = _depenses.map(function(d){return ['Dépense',d.date,d.cat,d.desc,d.montant];});
-      headers = ['Type','Date','Catégorie','Description','Montant'];
-      rows = revRows.concat(depRows);
-      filename = 'gcc_finance.csv';
-    }
-    var csv = [headers.join(',')].concat(rows.map(function(r){return r.map(function(c){return '"'+(c||'').toString().replace(/"/g,'""')+'"';}).join(',');})).join('\n');
-    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
-    showToast('📥','Export CSV téléchargé : ' + filename);
-  }
-
-function doLogout() {
-    try { localStorage.removeItem('gcc_admin_session'); } catch(e) {}
-    var panel = document.getElementById('adminPanel');
-    if (panel) { panel.style.display = 'none'; document.body.style.overflow = ''; }
-  }
-
   document.addEventListener('DOMContentLoaded', function() {
     setLang(LANG);
     handleModePaiement('transfer');
     refreshAdminTable();
-    // Restore admin session if still active
-    try {
-      if (localStorage.getItem('gcc_admin_session') === '1') {
-        var panel = document.getElementById('adminPanel');
-        if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
-        // Boot dashboard
-        if (typeof startAdmClock === 'function') startAdmClock();
-        if (typeof refreshDashboard === 'function') refreshDashboard();
-        if (typeof refreshFinance === 'function') { refreshFinance(); refreshDepenses(); }
-        if (typeof refreshParrainage === 'function') refreshParrainage();
-        if (typeof refreshAnnonces === 'function') refreshAnnonces();
-        if (typeof loadTarifs === 'function') loadTarifs();
-      }
-    } catch(e) {}
+    // Re-apply flyer display AFTER setLang() so it isn't overwritten
+    if (typeof initFlyerDisplay === 'function') initFlyerDisplay();
   });
 </script>
 </head>
@@ -1534,7 +708,7 @@ function doLogout() {
 
 <!-- ░░ NAV ░░ -->
 <nav id="main-nav">
-  <div class="nav-logo" id="nav-logo-trigger" onclick="_logoClick()">
+  <div class="nav-logo">
     <img src="data:image/webp;base64,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" alt="GCC Cargo">
     <div class="nav-logo-text">
       <div class="gcc">GCC CARGO</div>
@@ -1550,7 +724,7 @@ function doLogout() {
     <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
   </ul>
   <div class="nav-actions"><div class="lang-switcher"><button class="lang-btn active" onclick="setLang('fr')">FR</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
-    <button class="btn-admin" onclick="openAdminLogin()" style="display:none;">🔐 Admin</button>
+    <button class="btn-admin" onclick="openAdminLogin()">🔐 Admin</button>
     <a href="#envoyer" class="btn-nav-cta" data-fr="Envoyer un colis" data-en="Ship a package">Envoyer un colis</a>
     <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
   </div>
@@ -1594,7 +768,6 @@ function doLogout() {
       <span class="rpill">🇹🇬 Togo</span>
       <span class="rpill">🇧🇫 Burkina</span>
       <span class="rpill">🇬🇭 Ghana</span>
-      <span class="rpill">🇹🇩 Tchad</span>
     </div>
   </div>
   <div class="hero-right">
@@ -1607,14 +780,17 @@ function doLogout() {
           <div class="dh2" data-fr="Annonces & Arrivées" data-en="Announcements & Arrivals">Annonces & Arrivées</div>
         </div>
       </div>
-      <div class="db-body">
-        <div class="db-placeholder">
+      <div class="db-body" id="dbBody">
+        <div class="db-placeholder" id="dbPlaceholder">
           <div class="db-icon">📋</div>
           <p data-fr="Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé." data-en="Upcoming departure dates<br>will be announced here.<br><br>Sign up to be notified when a departure is scheduled.">Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé.</p>
         </div>
+        <div id="dbFlyerWrap" style="display:none;text-align:center;padding:8px 0;">
+          <img id="dbFlyerImg" src="" alt="Flyer" style="max-width:100%;max-height:320px;border-radius:8px;object-fit:contain;">
+        </div>
       </div>
-      <div class="db-meta">
-        <span data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
+      <div class="db-meta" id="dbMeta">
+        <span id="dbMetaLabel" data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
         <button class="db-notify-btn" data-fr="Me notifier" data-en="Notify me" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
       </div>
     </div>
@@ -1633,7 +809,7 @@ function doLogout() {
 <section class="destinations" id="destinations">
   <div class="section-eyebrow" data-fr="ZONES DE LIVRAISON" data-en="DELIVERY ZONES">ZONES DE LIVRAISON</div>
   <h2 class="section-title" data-fr="Où nous livrons" data-en="Where we deliver">Où nous livrons</h2>
-  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves 12 countries in Central and West Africa from the Philippines via Manila's airports and ports.">GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
+  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 8 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves countries in Central and West Africa from the Philippines via Manila's airports and ports.">GCC CARGO HANDLING INC dessert 8 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
   <div class="dest-grid">
     <div class="dest-card"><div class="dest-flag">🇨🇲</div><h3>Cameroun</h3><p>Yaoundé & Douala</p></div>
     <div class="dest-card"><div class="dest-flag">🇨🇬</div><h3>Congo Brazzaville</h3><p>Brazzaville</p></div>
@@ -1646,7 +822,6 @@ function doLogout() {
     <div class="dest-card"><div class="dest-flag">🇹🇬</div><h3>Togo</h3><p>Lomé</p></div>
     <div class="dest-card"><div class="dest-flag">🇧🇫</div><h3>Burkina Faso</h3><p>Ouagadougou</p></div>
     <div class="dest-card"><div class="dest-flag">🇬🇭</div><h3>Ghana</h3><p>Accra</p></div>
-    <div class="dest-card"><div class="dest-flag">🇹🇩</div><h3>Tchad</h3><p>N'Djamena</p></div>
   </div>
 </section>
 
@@ -1674,56 +849,36 @@ function doLogout() {
   <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input id="emailExp" type="email" placeholder="votre@email.com"></div>
+      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input type="tel" placeholder="+63 968 313 5356" required></div>
+      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" placeholder="votre@email.com"></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
-        <select id="selectDestination">
-          <optgroup label="🇵🇭 Philippines → Afrique">
-            <option>🇵🇭 Manille → 🇨🇲 Yaoundé</option>
-            <option>🇵🇭 Manille → 🇨🇲 Douala</option>
-            <option>🇵🇭 Manille → 🇨🇬 Brazzaville</option>
-            <option>🇵🇭 Manille → 🇨🇩 Kinshasa</option>
-            <option>🇵🇭 Manille → 🇬🇦 Libreville</option>
-            <option>🇵🇭 Manille → 🇬🇶 Malabo</option>
-            <option>🇵🇭 Manille → 🇧🇯 Cotonou</option>
-            <option>🇵🇭 Manille → 🇨🇮 Abidjan</option>
-            <option>🇵🇭 Manille → 🇨🇫 Bangui</option>
-            <option>🇵🇭 Manille → 🇹🇬 Lomé</option>
-            <option>🇵🇭 Manille → 🇧🇫 Ouagadougou</option>
-            <option>🇵🇭 Manille → 🇬🇭 Accra</option>
-            <option>🇵🇭 Manille → 🇸🇳 Dakar</option>
-            <option>🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)</option>
-          </optgroup>
-          <optgroup label="🌍 Afrique → Philippines">
-            <option>🇨🇲 Yaoundé → 🇵🇭 Manille</option>
-            <option>🇨🇲 Douala → 🇵🇭 Manille</option>
-            <option>🇨🇬 Brazzaville → 🇵🇭 Manille</option>
-            <option>🇨🇩 Kinshasa → 🇵🇭 Manille</option>
-            <option>🇬🇦 Libreville → 🇵🇭 Manille</option>
-            <option>🇬🇶 Malabo → 🇵🇭 Manille</option>
-            <option>🇧🇯 Cotonou → 🇵🇭 Manille</option>
-            <option>🇨🇮 Abidjan → 🇵🇭 Manille</option>
-            <option>🇨🇫 Bangui → 🇵🇭 Manille</option>
-            <option>🇹🇬 Lomé → 🇵🇭 Manille</option>
-            <option>🇧🇫 Ouagadougou → 🇵🇭 Manille</option>
-            <option>🇬🇭 Accra → 🇵🇭 Manille</option>
-            <option>🇸🇳 Dakar → 🇵🇭 Manille</option>
-            <option>🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille</option>
-          </optgroup>
+        <select>
+          <option>🇨🇲 Yaoundé — Cameroun</option>
+          <option>🇨🇲 Douala — Cameroun</option>
+          <option>🇨🇬 Brazzaville — Congo</option>
+          <option>🇨🇩 Kinshasa — RDC</option>
+          <option>🇬🇦 Libreville — Gabon</option>
+          <option>🇬🇶 Malabo — Guinée Équatoriale</option>
+          <option>🇧🇯 Cotonou — Bénin</option>
+          <option>🇨🇮 Abidjan — Côte d'Ivoire</option>
+          <option>🇨🇫 Bangui — RCA</option>
+          <option>🇹🇬 Lomé — Togo</option>
+          <option>🇧🇫 Ouagadougou — Burkina Faso</option>
+          <option>🇬🇭 Accra — Ghana</option>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
+      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
         <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
-          <option value="" data-fr="— Choisir le mode de dépôt —" data-en="— Choose drop-off mode —">— Choisir le mode de dépôt —</option>
-          <option value="presentiel" data-fr="🏢 En présentiel — je dépose moi-même aux bureaux GCC" data-en="🏢 In person — I drop off at GCC offices">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
-          <option value="lalamove" data-fr="🛵 Lalamove — collecte à mon domicile / adresse" data-en="🛵 Lalamove — pickup from my home / address">🛵 Lalamove — collecte à mon domicile / adresse</option>
-          <option value="ecommerce" data-fr="🛍️ Shopee / Lazada (livraison aux locaux GCC)" data-en="🛍️ Shopee / Lazada (delivered to GCC premises)">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
+          <option value="">— Choisir le mode de dépôt —</option>
+          <option value="presentiel">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
+          <option value="lalamove">🛵 Lalamove — collecte à mon domicile / adresse</option>
+          <option value="ecommerce">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
         </select>
       </div>
 
@@ -1739,48 +894,47 @@ function doLogout() {
       <!-- ═══ SECTION LALAMOVE (masquée par défaut) ═══ -->
       <div class="fg full" id="sectionLalamove" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid var(--orange);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;" data-fr="🛵 INFORMATIONS LALAMOVE" data-en="🛵 LALAMOVE INFORMATION">🛵 INFORMATIONS LALAMOVE</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;">🛵 INFORMATIONS LALAMOVE</div>
           <div class="form-grid" style="gap:14px;">
             <div class="fg full">
-              <label data-fr="Adresse de collecte (Philippines)" data-en="Pickup address (Philippines)">Adresse de collecte (Philippines)</label>
-              <input type="text" id="adresseLalamove" data-fr="Ex : 123 Naga Rd, Parañaque, Metro Manila" data-en="E.g.: 123 Naga Rd, Parañaque, Metro Manila" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
+              <label>Adresse de collecte (Philippines)</label>
+              <input type="text" id="adresseLalamove" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label data-fr="Date souhaitée de collecte" data-en="Preferred pickup date">Date souhaitée de collecte</label>
+              <label>Date souhaitée de collecte</label>
               <input type="date" id="dateLalamove" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label data-fr="Créneau horaire préféré" data-en="Preferred time slot">Créneau horaire préféré</label>
+              <label>Créneau horaire préféré</label>
               <select id="creneauLalamove" style="font-size:.9rem;">
-                <option data-fr="Matin (8h – 12h)" data-en="Morning (8 AM – 12 PM)">Matin (8h – 12h)</option>
-                <option data-fr="Après-midi (12h – 17h)" data-en="Afternoon (12 PM – 5 PM)">Après-midi (12h – 17h)</option>
-                <option data-fr="Soir (17h – 20h)" data-en="Evening (5 PM – 8 PM)">Soir (17h – 20h)</option>
+                <option>Matin (8h – 12h)</option>
+                <option>Après-midi (12h – 17h)</option>
+                <option>Soir (17h – 20h)</option>
               </select>
             </div>
           </div>
 
           <!-- PAIEMENT -->
           <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(232,119,34,.25);">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;" data-fr="💳 MODE DE PAIEMENT" data-en="💳 PAYMENT METHOD">💳 MODE DE PAIEMENT</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;">💳 MODE DE PAIEMENT</div>
             <div class="form-grid" style="gap:14px;">
               <div class="fg full">
-                <label data-fr="Méthode de paiement" data-en="Payment method">Méthode de paiement</label>
+                <label>Méthode de paiement</label>
                 <select id="modePaiement" onchange="handleModePaiement(this.value)" style="font-size:.9rem;">
                   <option value="transfer">🏦 Bank Transfer (BPI, BDO, Metrobank…)</option>
                   <option value="gcash">📱 GCash / Maya</option>
                   <option value="momo">💚 MoMo Money</option>
                   <option value="om">🧡 Orange Money (OM)</option>
-                  <option value="crypto">₿ Crypto (USDT / BTC / ETH)</option>
                 </select>
               </div>
               <!-- Infos bancaires dynamiques -->
               <div class="fg full" id="infoPaiement" style="background:#f0f6ff;border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--navy);line-height:1.7;"></div>
               <!-- Upload capture de paiement -->
               <div class="fg full" id="sectionCapturePaiement">
-                <label data-fr="📸 Capture d'écran du paiement / dépôt" data-en="📸 Payment / deposit screenshot">📸 Capture d'écran du paiement / dépôt</label>
+                <label>📸 Capture d'écran du paiement / dépôt</label>
                 <div class="upload-zone" onclick="document.getElementById('captureFile').click()" style="padding:16px;">
                   <div class="uz-icon" style="font-size:1.6rem;">📸</div>
-                  <p data-fr="Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Upload your transfer or deposit screenshot<br><small>JPG, PNG or PDF — max 5 MB</small>">Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
+                  <p>Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
                   <div class="uz-name" id="capture-name"></div>
                   <input id="captureFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'capture-name')">
                 </div>
@@ -1793,16 +947,16 @@ function doLogout() {
       <!-- ═══ INFO PRESENTIEL ═══ -->
       <div class="fg full" id="sectionPresentiel" style="display:none;">
         <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--sky);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;" data-fr="🏢 DÉPÔT EN PRÉSENTIEL" data-en="🏢 DROP-OFF IN PERSON">🏢 DÉPÔT EN PRÉSENTIEL</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;" data-fr="Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement." data-en="Bring your parcel directly to our office. Our team checks, weighs and issues your invoice on the spot. You pay and receive your receipt immediately.">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;">🏢 DÉPÔT EN PRÉSENTIEL</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;">
             Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 <span data-fr="Horaires : Lun–Sam, 9h00 – 18h00" data-en="Hours: Mon–Sat, 9:00 AM – 6:00 PM">Horaires : Lun–Sam, 9h00 – 18h00</span><br>
+            🕗 Horaires : Lun–Sam, 9h00 – 18h00<br>
             📞 +63 968 313 5356 / +63 915 385 7604
           </div>
-          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash/Maya · Bank Transfer">
+          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;">
             💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer
           </p>
         </div>
@@ -1810,17 +964,17 @@ function doLogout() {
       <!-- ═══ INFO SHOPEE/LAZADA ═══ -->
       <div class="fg full" id="sectionEcommerce" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff5f0,#ffeee6);border:1.5px solid #e74c3c;border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;" data-fr="🛍️ COMMANDE SHOPEE / LAZADA" data-en="🛍️ SHOPEE / LAZADA ORDER">🛍️ COMMANDE SHOPEE / LAZADA</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;" data-fr="Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition." data-en="Your online order will be delivered <strong>directly to our premises</strong> by the platform courier (Shopee, Lazada, etc.). GCC CARGO receives, checks, weighs and prepares it for shipment.">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;">🛍️ COMMANDE SHOPEE / LAZADA</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;">
             Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 <span data-fr="Livraisons acceptées : Lun–Sam, 9h00 – 17h00" data-en="Deliveries accepted: Mon–Sat, 9:00 AM – 5:00 PM">Livraisons acceptées : Lun–Sam, 9h00 – 17h00</span><br>
+            🕗 Livraisons acceptées : Lun–Sam, 9h00 – 17h00<br>
             📞 +63 968 313 5356
           </div>
           <!-- Avertissement responsabilité -->
-          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;" data-fr="⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires." data-en="⚠️ <strong>CLIENT RESPONSIBILITY:</strong> By choosing this mode, you acknowledge that you are <strong>solely and entirely responsible</strong> for the contents of the ordered parcel, its legal and customs compliance. GCC CARGO HANDLING INC cannot be held responsible for the content, condition or legality of the parcel delivered by the platform. Any illegal or non-compliant content exposes the client to legal proceedings.">
+          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;">
             ⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires.
           </div>
           <!-- Upload capture paiement -->
@@ -1837,7 +991,7 @@ function doLogout() {
       </div>
 
       <div class="fg"><label data-fr="Type de contenu" data-en="Content type">Type de contenu</label>
-        <select id="selectTypeContenu">
+        <select>
           <option>Marchandises générales</option>
           <option>Électronique</option>
           <option>Médicaments</option>
@@ -2068,527 +1222,198 @@ function doLogout() {
   <div class="admin-topbar">
     <div class="at-brand">GCC CARGO <span>ADMIN</span></div>
     <div style="display:flex;gap:10px;align-items:center;">
-      <span id="adm-clock" style="font-size:.78rem;color:rgba(214,237,251,.5);font-family:'Barlow Condensed',sans-serif;"></span>
-      <span style="font-size:.8rem;color:rgba(214,237,251,.6);">Admin GCC</span>
-      <button class="btn-logout" onclick="doLogout()">&#9211; Déconnexion</button>
+      <span style="font-size:.82rem;color:rgba(214,237,251,.6);">Connecté en tant que : <strong style="color:var(--ice);">Admin GCC</strong></span>
+      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
     </div>
   </div>
-  <!-- Onglets horizontaux -->
-  <div class="admin-tabs-bar">
-    <div class="adm-tab active" onclick="showAdmTab('dash',this)">&#128202; Dashboard</div>
-    <div class="adm-tab" onclick="showAdmTab('colis',this)">&#128230; Demandes</div>
-    <div class="adm-tab" onclick="showAdmTab('finance',this)">&#128176; Finance</div>
-    <div class="adm-tab" onclick="showAdmTab('depenses',this)">&#129534; Dépenses</div>
-    <div class="adm-tab" onclick="showAdmTab('departs',this)">&#128226; Départs</div>
-    <div class="adm-tab" onclick="showAdmTab('clients',this)">&#128101; Clients</div>
-    <div class="adm-tab" onclick="showAdmTab('parrainage',this)">&#129309; Parrainage</div>
-    <div class="adm-tab" onclick="showAdmTab('parametres',this)">&#9881; Paramètres</div>
+  <div class="admin-body">
+    <!-- KPIs -->
+    <div class="admin-section-title">Vue d'ensemble</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-val">47</div><div class="kpi-lbl">Colis ce mois</div><div class="kpi-trend">↑ +12% vs mois précédent</div></div>
+      <div class="kpi"><div class="kpi-val">₱ 186K</div><div class="kpi-lbl">Revenus (mois)</div><div class="kpi-trend">↑ +8% vs mois précédent</div></div>
+      <div class="kpi"><div class="kpi-val">14</div><div class="kpi-lbl">En transit</div><div class="kpi-trend">→ Stable</div></div>
+      <div class="kpi"><div class="kpi-val">8</div><div class="kpi-lbl">Arrivés — à notifier</div><div class="kpi-trend" style="color:#e65100;">⚠ Action requise</div></div>
+      <div class="kpi"><div class="kpi-val">23</div><div class="kpi-lbl">Parrains actifs</div><div class="kpi-trend">↑ +4 ce mois</div></div>
+      <div class="kpi"><div class="kpi-val">₱ 14.2K</div><div class="kpi-lbl">Commissions à payer</div><div class="kpi-trend" style="color:#e65100;">⚠ À traiter</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="adm-tab active" onclick="showTab('demandes',this)">📬 Demandes clients</button>
+      <button class="adm-tab" onclick="showTab('colis',this)">📦 Colis en cours</button>
+      <button class="adm-tab" onclick="showTab('clients',this)">👥 Clients</button>
+      <button class="adm-tab" onclick="showTab('parrainage',this)">💰 Parrainage</button>
+      <button class="adm-tab" onclick="showTab('departs',this)">✈ Départs</button>
+    </div>
+
+    <!-- ═══ DEMANDES CLIENTS TAB ═══ -->
+    <div id="tab-demandes" class="adm-content" style="display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:0;">Demandes reçues via le formulaire</div>
+        <div style="display:flex;gap:8px;">
+          <button class="notif-btn" style="background:#27ae60;" onclick="exportDemandes()">⬇ Exporter CSV</button>
+          <button class="notif-btn" style="background:var(--navy);" onclick="if(confirm('Effacer toutes les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();}">🗑 Vider</button>
+        </div>
+      </div>
+      <!-- KPIs demandes -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:20px;">
+        <div class="kpi" style="border-top-color:var(--sky);">
+          <div class="kpi-val" id="kpi-demandes">0</div>
+          <div class="kpi-lbl">Total demandes</div>
+        </div>
+        <div class="kpi" style="border-top-color:#e65100;">
+          <div class="kpi-val" id="kpi-attente">0</div>
+          <div class="kpi-lbl">En attente</div>
+        </div>
+      </div>
+      <div class="admin-table-wrap" style="overflow-x:auto;">
+        <table style="min-width:900px;">
+          <thead>
+            <tr>
+              <th>Réf / Date</th>
+              <th>Expéditeur</th>
+              <th>Récepteur</th>
+              <th>Destination</th>
+              <th>Mode dépôt</th>
+              <th>Paiement</th>
+              <th>Adresse / Créneau</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-submissions-tbody">
+            <tr><td colspan="9" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COLIS TAB -->
+    <div id="tab-colis" class="adm-content" style="display:none;">
+      <div style="margin-bottom:16px;">
+        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:12px;">Mettre à jour un colis</div>
+        <div class="admin-update-form">
+          <div class="au-row">
+            <div class="au-field"><label>N° de tracking</label><input type="text" placeholder="GCC-2026-00XXX" id="upTrack"></div>
+            <div class="au-field"><label>Nouveau statut</label>
+              <select id="upStatus">
+                <option>Enregistré</option>
+                <option>En transit</option>
+                <option>Arrivé à destination</option>
+                <option>Livré</option>
+                <option>Problème douanier</option>
+              </select>
+            </div>
+            <div class="au-field"><label>Remarque (optionnel)</label><input type="text" placeholder="Ex : Disponible à Yaoundé" id="upNote"></div>
+            <button class="btn-update" onclick="doUpdate()">Mettre à jour + Notifier →</button>
+          </div>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table>
+          <thead><tr><th>N° Tracking</th><th>Expéditeur</th><th>Destinataire</th><th>Destination</th><th>Poids</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>GCC-2026-0041</td><td>Marie Tabi</td><td>Paul Nkeng</td><td>🇨🇲 Yaoundé</td><td>12 kg</td><td><span class="badge b-arrived">Arrivé</span></td><td><button class="notif-btn" onclick="showToast('📩 SMS envoyé','Paul Nkeng notifié : colis disponible à Yaoundé.')">Notifier SMS</button></td></tr>
+            <tr><td>GCC-2026-0040</td><td>Jean Fotso</td><td>Aline Biya</td><td>🇨🇮 Abidjan</td><td>8 kg</td><td><span class="badge b-transit">En transit</span></td><td><button class="notif-btn" onclick="showToast('📩 Email envoyé','Jean Fotso informé : colis en transit.')">Notifier Email</button></td></tr>
+            <tr><td>GCC-2026-0039</td><td>Samuel Mbia</td><td>Rose Epée</td><td>🇨🇬 Brazzaville</td><td>20 kg</td><td><span class="badge b-delivered">Livré</span></td><td><button class="notif-btn" onclick="showToast('✅ Confirmé','Livraison confirmée pour GCC-2026-0039.')">Confirmer</button></td></tr>
+            <tr><td>GCC-2026-0038</td><td>Clara Ndeh</td><td>Eric Bakang</td><td>🇬🇦 Libreville</td><td>5 kg</td><td><span class="badge b-pending">En attente</span></td><td><button class="notif-btn" onclick="showToast('📩 Rappel envoyé','Rappel de paiement envoyé à Clara Ndeh.')">Rappel paiement</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTS TAB -->
+    <div id="tab-clients" class="adm-content" style="display:none;">
+      <div class="admin-table-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Colis envoyés</th><th>Code parrain</th><th>Inscription</th></tr></thead>
+          <tbody>
+            <tr><td>Marie Tabi</td><td>+63 917 123 4567</td><td>marie@email.com</td><td>7</td><td>GCC-REF-0001</td><td>Jan 2026</td></tr>
+            <tr><td>Jean Fotso</td><td>+63 918 234 5678</td><td>jean@email.com</td><td>4</td><td>GCC-REF-0002</td><td>Feb 2026</td></tr>
+            <tr><td>Samuel Mbia</td><td>+63 919 345 6789</td><td>samuel@email.com</td><td>12</td><td>GCC-REF-0003</td><td>Mar 2026</td></tr>
+            <tr><td>Clara Ndeh</td><td>+63 920 456 7890</td><td>clara@email.com</td><td>2</td><td>GCC-REF-0004</td><td>Avr 2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PARRAINAGE TAB -->
+    <div id="tab-parrainage" class="adm-content" style="display:none;">
+      <div class="admin-table-wrap">
+        <table>
+          <thead><tr><th>Parrain</th><th>Code</th><th>Filleuls</th><th>CA généré</th><th>Taux</th><th>Commission</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>Marie Tabi</td><td>GCC-REF-0001</td><td>5</td><td>₱ 60 000</td><td>10%</td><td>₱ 6 000</td><td><span class="badge b-pending">À payer</span></td></tr>
+            <tr><td>Jean Fotso</td><td>GCC-REF-0002</td><td>2</td><td>₱ 24 000</td><td>5%</td><td>₱ 1 200</td><td><span class="badge b-pending">À payer</span></td></tr>
+            <tr><td>Samuel Mbia</td><td>GCC-REF-0003</td><td>8</td><td>₱ 96 000</td><td>10%</td><td>₱ 9 600</td><td><span class="badge b-arrived">Payé</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEPARTS TAB -->
+    <div id="tab-departs" class="adm-content" style="display:none;">
+      <!-- FLYER UPLOAD SECTION -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">🖼 Publier un flyer de départ</div>
+        <div id="flyerAdminArea">
+          <!-- No flyer state -->
+          <div id="flyerUploadArea" style="display:flex;flex-direction:column;gap:14px;">
+            <div style="border:2px dashed #c8d3e0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;background:#f7f9fb;" onclick="document.getElementById('flyerFileInput').click()">
+              <div style="font-size:2rem;margin-bottom:8px;">📂</div>
+              <div style="font-weight:600;color:var(--navy);margin-bottom:4px;">Cliquez pour sélectionner un flyer</div>
+              <div style="font-size:.82rem;color:var(--slate);">PNG, JPG, WEBP — max 2 Mo</div>
+            </div>
+            <input type="file" id="flyerFileInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;" onchange="previewFlyer(this)">
+            <!-- Preview area (hidden until file chosen) -->
+            <div id="flyerPreviewArea" style="display:none;flex-direction:column;gap:12px;align-items:center;">
+              <img id="flyerPreviewImg" src="" alt="Aperçu" style="max-width:340px;max-height:260px;border-radius:8px;border:1px solid #dde3ec;object-fit:contain;">
+              <div style="display:flex;gap:10px;">
+                <button class="btn-update" onclick="publishFlyer()" style="background:var(--gold);">✅ Publier ce flyer</button>
+                <button class="btn-update" onclick="cancelFlyer()" style="background:#e74c3c;">✖ Annuler</button>
+              </div>
+            </div>
+          </div>
+          <!-- Active flyer state -->
+          <div id="flyerActiveArea" style="display:none;flex-direction:column;gap:14px;align-items:center;">
+            <div style="font-size:.85rem;color:#27ae60;font-weight:600;background:#eafaf1;border:1px solid #a9dfbf;border-radius:6px;padding:6px 14px;">✅ Flyer actif — visible sur la page d'accueil</div>
+            <img id="flyerActiveImg" src="" alt="Flyer actif" style="max-width:360px;max-height:280px;border-radius:8px;border:1px solid #dde3ec;object-fit:contain;">
+            <div style="display:flex;gap:10px;">
+              <button class="btn-update" onclick="document.getElementById('flyerFileInput').click();" style="background:var(--navy);">🔄 Remplacer le flyer</button>
+              <button class="btn-update" onclick="removeFlyer()" style="background:#e74c3c;">🗑 Supprimer le flyer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DEPARTURE FORM SECTION -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Publier une annonce de départ</div>
+        <div class="au-row" style="grid-template-columns:1fr 1fr 1fr auto;">
+          <div class="au-field"><label>Route</label><select><option>Manila → Yaoundé/Douala</option><option>Manila → Abidjan</option><option>Manila → Brazzaville</option><option>Manila → Libreville</option></select></div>
+          <div class="au-field"><label>Date de départ</label><input type="date"></div>
+          <div class="au-field"><label>Date d'arrivée estimée</label><input type="date"></div>
+          <button class="btn-update" onclick="showToast('✈ Annonce publiée','Le départ a été publié sur le site et notifié aux abonnés.')">Publier →</button>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <p style="padding:16px;color:var(--slate);font-size:.9rem;">Aucun départ programmé actuellement. Utilisez le formulaire ci-dessus pour ajouter une annonce.</p>
+      </div>
+    </div>
   </div>
-  <main class="admin-main">
+</div>
 
-      <!-- PAGE: DASHBOARD -->
-      <div class="adm-page active" id="adm-dash">
-        <div class="adm-page-title">&#128202; Tableau de bord</div>
-        <div class="adm-page-sub" id="adm-date-display">Chargement...</div>
-        <div class="kpi-grid">
-          <div class="kpi sky"><div class="kpi-val" id="kpi-demandes">0</div><div class="kpi-lbl">Demandes totales</div><div class="kpi-trend neutral">Toutes périodes</div></div>
-          <div class="kpi"><div class="kpi-val" id="kpi-attente">0</div><div class="kpi-lbl">En attente</div><div class="kpi-trend neutral">À traiter</div></div>
-          <div class="kpi green"><div class="kpi-val" id="kpi-livres">0</div><div class="kpi-lbl">Livrés</div><div class="kpi-trend up">&#8593; Complétés</div></div>
-          <div class="kpi gold"><div class="kpi-val" id="kpi-revenue">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div><div class="kpi-trend up">Enregistrés</div></div>
-          <div class="kpi red"><div class="kpi-val" id="kpi-depenses-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div><div class="kpi-trend neutral">Ce mois</div></div>
-          <div class="kpi green"><div class="kpi-val" id="kpi-marge">&#8369;0</div><div class="kpi-lbl">Marge nette</div><div class="kpi-trend up" id="kpi-marge-trend">Revenus - Dépenses</div></div>
-        </div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#128230; Activité récente <span class="tag">Live</span></div>
-            <div id="dash-recent-list" style="font-size:.84rem;color:var(--slate);"></div>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128202; Répartition par statut</div>
-            <div id="dash-statut-chart"></div>
-          </div>
-        </div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#127758; Top destinations</div>
-            <div id="dash-destinations" style="font-size:.84rem;"></div>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128179; Modes de dépôt</div>
-            <div id="dash-modes" style="font-size:.84rem;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE: COLIS EN COURS -->
-      <div class="adm-page" id="adm-colis">
-        <div class="adm-page-title">&#128230; Colis en cours</div>
-        <div class="adm-page-sub">Gestion et suivi de toutes les demandes d'expédition</div>
-        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-          <input class="adm-input" id="search-colis" placeholder="&#128269; Rechercher ref, nom, destination..." oninput="filterColis()" style="max-width:270px;flex:1;">
-          <select class="adm-input" id="filter-statut" onchange="filterColis()" style="max-width:155px;">
-            <option value="">Tous les statuts</option>
-            <option>En attente</option><option>En transit</option><option>Arrivé</option><option>Livré</option>
-          </select>
-          <button class="adm-btn-danger" onclick="if(confirm('Vider TOUTES les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();showToast('&#128465;','Données effacées');}">&#128465; Vider</button>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="adm-tbl" id="admin-submissions-tbl">
-            <thead><tr>
-              <th>Réf.</th><th>Expéditeur</th><th>Destinataire</th><th>Destination</th>
-              <th>Dépôt</th><th>Paiement</th><th>Adresse</th><th>Pièces jointes</th><th>Statut</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="admin-submissions-tbody">
-              <tr><td colspan="10" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PAGE: FINANCE -->
-      <div class="adm-page" id="adm-finance">
-        <div class="adm-page-title">&#128176; Finance &amp; Revenus</div>
-        <div class="adm-page-sub">Suivi des entrées d'argent et rentabilité</div>
-        <div class="kpi-grid">
-          <div class="kpi green"><div class="kpi-val" id="fin-revenus-total">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div></div>
-          <div class="kpi red"><div class="kpi-val" id="fin-dep-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div></div>
-          <div class="kpi sky"><div class="kpi-val" id="fin-marge-total">&#8369;0</div><div class="kpi-lbl">Marge nette</div></div>
-          <div class="kpi gold"><div class="kpi-val" id="fin-nb-rev">0</div><div class="kpi-lbl">Nb entrées</div></div>
-        </div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#10133; Enregistrer un revenu</div>
-            <div class="adm-form-row"><div class="fg"><label>Description</label><input class="adm-input" id="rev-desc" placeholder="Ex: Envoi GCC-2026-12345"></div></div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Montant (&#8369;)</label><input class="adm-input" type="number" id="rev-montant" placeholder="0.00" min="0"></div>
-              <div class="fg"><label>Date</label><input class="adm-input" type="date" id="rev-date"></div>
-            </div>
-            <div class="adm-form-row"><div class="fg"><label>Catégorie</label>
-              <select class="adm-input" id="rev-cat">
-                <option value="envoi">&#128230; Frais d'envoi</option>
-                <option value="lalamove">&#128757; Collecte Lalamove</option>
-                <option value="assurance">&#128737; Assurance colis</option>
-                <option value="emballage">&#128188; Emballage</option>
-                <option value="autre">&#128188; Autre</option>
-              </select>
-            </div></div>
-            <button class="adm-btn-primary" onclick="addRevenu()">Enregistrer</button>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128203; Historique revenus</div>
-            <div id="revenus-list" style="max-height:240px;overflow-y:auto;font-size:.83rem;"></div>
-            <div class="finance-row" style="margin-top:10px;"><span class="finance-label">TOTAL REVENUS</span><span class="finance-amount income" id="revenus-total-display">&#8369;0.00</span></div>
-          </div>
-        </div>
-        <div class="adm-card">
-          <div class="adm-card-title">&#128202; Évolution des revenus (barres mensuelles)</div>
-          <div id="monthly-chart" style="display:flex;gap:6px;align-items:flex-end;height:90px;padding:4px 0;"></div>
-          <div id="monthly-labels" style="display:flex;gap:6px;margin-top:3px;"></div>
-        </div>
-      </div>
-
-      <!-- PAGE: DÉPENSES -->
-      <div class="adm-page" id="adm-depenses">
-        <div class="adm-page-title">&#129534; Dépenses &amp; Charges</div>
-        <div class="adm-page-sub">Loyers, transport, fournitures, salaires et autres charges</div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#10133; Nouvelle dépense</div>
-            <div class="adm-form-row"><div class="fg"><label>Description</label><input class="adm-input" id="dep-desc" placeholder="Ex: Loyer bureau octobre"></div></div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Montant (&#8369;)</label><input class="adm-input" type="number" id="dep-montant" placeholder="0.00" min="0"></div>
-              <div class="fg"><label>Date</label><input class="adm-input" type="date" id="dep-date"></div>
-            </div>
-            <div class="adm-form-row"><div class="fg"><label>Catégorie</label>
-              <select class="adm-input" id="dep-cat">
-                <option value="loyer">&#127970; Loyer / Bureau</option>
-                <option value="transport">&#128665; Transport / Lalamove</option>
-                <option value="fournitures">&#128230; Fournitures / Emballages</option>
-                <option value="communication">&#128241; Communication / Internet</option>
-                <option value="salaire">&#128119; Salaires</option>
-                <option value="douane">&#128707; Frais douane / Port</option>
-                <option value="marketing">&#128226; Marketing / Pub</option>
-                <option value="autre">&#128188; Autre</option>
-              </select>
-            </div></div>
-            <div class="adm-form-row"><div class="fg"><label>Récurrence</label>
-              <select class="adm-input" id="dep-recurrence">
-                <option value="unique">Ponctuelle</option>
-                <option value="mensuel">Mensuelle</option>
-                <option value="hebdo">Hebdomadaire</option>
-              </select>
-            </div></div>
-            <button class="adm-btn-primary" onclick="addDepense()">Enregistrer</button>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128203; Dépenses enregistrées</div>
-            <div id="depenses-list" style="max-height:270px;overflow-y:auto;font-size:.83rem;"></div>
-            <div class="finance-row" style="margin-top:10px;"><span class="finance-label">TOTAL DÉPENSES</span><span class="finance-amount expense" id="depenses-total-display">&#8369;0.00</span></div>
-          </div>
-        </div>
-        <div class="adm-card">
-          <div class="adm-card-title">&#128202; Dépenses par catégorie</div>
-          <div id="dep-by-cat"></div>
-        </div>
-      </div>
-
-      <!-- PAGE: CLIENTS -->
-      <div class="adm-page" id="adm-clients">
-        <div class="adm-page-title">&#128101; Base clients</div>
-        <div class="adm-page-sub">Expéditeurs actifs, fidélité et historique</div>
-        <div class="kpi-grid">
-          <div class="kpi sky"><div class="kpi-val" id="cli-total">0</div><div class="kpi-lbl">Clients uniques</div></div>
-          <div class="kpi green"><div class="kpi-val" id="cli-actifs">0</div><div class="kpi-lbl">Actifs (&#8805;2 envois)</div></div>
-          <div class="kpi gold"><div class="kpi-val" id="cli-top" style="font-size:1rem;">—</div><div class="kpi-lbl">Top client</div></div>
-          <div class="kpi"><div class="kpi-val" id="cli-moy">0</div><div class="kpi-lbl">Moy. envois/client</div></div>
-        </div>
-        <div class="adm-card">
-          <div class="adm-card-title">&#128203; Liste des expéditeurs</div>
-          <div class="admin-table-wrap" style="padding:0;box-shadow:none;">
-            <table class="adm-tbl">
-              <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th></tr></thead>
-              <tbody id="clients-tbody"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE: PARRAINAGE -->
-      <div class="adm-page" id="adm-parrainage">
-        <div class="adm-page-title">&#129309; Programme Parrainage</div>
-        <div class="adm-page-sub">Gestion des parrains, filleuls et commissions</div>
-        <div class="kpi-grid">
-          <div class="kpi sky"><div class="kpi-val" id="par-total">0</div><div class="kpi-lbl">Parrains actifs</div></div>
-          <div class="kpi green"><div class="kpi-val" id="par-filleuls">0</div><div class="kpi-lbl">Filleuls totaux</div></div>
-          <div class="kpi gold"><div class="kpi-val" id="par-commissions">&#8369;0</div><div class="kpi-lbl">Commissions dues</div></div>
-        </div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#10133; Nouveau parrain</div>
-            <div class="adm-form-row"><div class="fg"><label>Nom du parrain</label><input class="adm-input" id="par-nom" placeholder="Ex: William Tabi"></div></div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Téléphone</label><input class="adm-input" id="par-tel" placeholder="+63 9xx xxx xxxx"></div>
-              <div class="fg"><label>Code parrain</label><input class="adm-input" id="par-code" placeholder="GCC-REF-001"></div>
-            </div>
-            <div class="adm-form-row"><div class="fg"><label>Commission / filleul (&#8369;)</label><input class="adm-input" type="number" id="par-commission" placeholder="200" value="200"></div></div>
-            <button class="adm-btn-primary" onclick="addParrain()">Enregistrer</button>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128203; Parrains enregistrés</div>
-            <div id="parrains-list" style="max-height:260px;overflow-y:auto;"></div>
-          </div>
-        </div>
-        <div class="adm-card">
-          <div class="adm-card-title">&#10133; Ajouter un filleul à un parrain</div>
-          <div class="adm-form-row">
-            <div class="fg"><label>Parrain (code)</label><input class="adm-input" id="filleul-parrain-code" placeholder="GCC-REF-001"></div>
-            <div class="fg"><label>Nom du filleul</label><input class="adm-input" id="filleul-nom" placeholder="Nom du nouveau client"></div>
-            <div class="fg"><label>Commission payée ?</label>
-              <select class="adm-input" id="filleul-paye"><option value="non">Non payée</option><option value="oui">Payée</option></select>
-            </div>
-          </div>
-          <button class="adm-btn-secondary" onclick="addFilleul()">Ajouter filleul</button>
-        </div>
-      </div>
-
-      <!-- PAGE: ANNONCES -->
-      <div class="adm-page" id="adm-departs">
-        <div class="adm-page-title">&#128226; Annonces &amp; Départs</div>
-        <div class="adm-page-sub">Planification des départs cargo et communications clients</div>
-        <div class="adm-grid-2">
-
-          <!-- FORMULAIRE -->
-          <div class="adm-card">
-            <div class="adm-card-title">&#10133; Planifier un départ</div>
-
-            <!-- Destination -->
-            <div style="margin-bottom:12px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🌍 Destination</label>
-              <select class="adm-input" id="ann-dest">
-                <optgroup label="🇵🇭 Manille → Afrique">
-                  <option value="🇵🇭 Manille → 🇨🇲 Yaoundé">🇵🇭 Manille → 🇨🇲 Yaoundé</option>
-                  <option value="🇵🇭 Manille → 🇨🇲 Douala">🇵🇭 Manille → 🇨🇲 Douala</option>
-                  <option value="🇵🇭 Manille → 🇨🇬 Brazzaville">🇵🇭 Manille → 🇨🇬 Brazzaville</option>
-                  <option value="🇵🇭 Manille → 🇨🇩 Kinshasa">🇵🇭 Manille → 🇨🇩 Kinshasa</option>
-                  <option value="🇵🇭 Manille → 🇬🇦 Libreville">🇵🇭 Manille → 🇬🇦 Libreville</option>
-                  <option value="🇵🇭 Manille → 🇧🇯 Cotonou">🇵🇭 Manille → 🇧🇯 Cotonou</option>
-                  <option value="🇵🇭 Manille → 🇸🇳 Dakar">🇵🇭 Manille → 🇸🇳 Dakar</option>
-                  <option value="🇵🇭 Manille → 🇨🇮 Abidjan">🇵🇭 Manille → 🇨🇮 Abidjan</option>
-                  <option value="🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)">🇵🇭 Manille → 🇹🇩 N'Djamena (Tchad)</option>
-                </optgroup>
-                <optgroup label="🇨🇲 Afrique → Manille">
-                  <option value="🇨🇲 Yaoundé → 🇵🇭 Manille">🇨🇲 Yaoundé → 🇵🇭 Manille</option>
-                  <option value="🇨🇲 Douala → 🇵🇭 Manille">🇨🇲 Douala → 🇵🇭 Manille</option>
-                  <option value="🇨🇬 Brazzaville → 🇵🇭 Manille">🇨🇬 Brazzaville → 🇵🇭 Manille</option>
-                  <option value="🇨🇩 Kinshasa → 🇵🇭 Manille">🇨🇩 Kinshasa → 🇵🇭 Manille</option>
-                  <option value="🇬🇦 Libreville → 🇵🇭 Manille">🇬🇦 Libreville → 🇵🇭 Manille</option>
-                  <option value="🇧🇯 Cotonou → 🇵🇭 Manille">🇧🇯 Cotonou → 🇵🇭 Manille</option>
-                  <option value="🇸🇳 Dakar → 🇵🇭 Manille">🇸🇳 Dakar → 🇵🇭 Manille</option>
-                  <option value="🇨🇮 Abidjan → 🇵🇭 Manille">🇨🇮 Abidjan → 🇵🇭 Manille</option>
-                  <option value="🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille">🇹🇩 N'Djamena (Tchad) → 🇵🇭 Manille</option>
-                </optgroup>
-              </select>
-            </div>
-
-            <!-- Mode transport -->
-            <div style="margin-bottom:12px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🚀 Mode de transport</label>
-              <select class="adm-input" id="ann-mode" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
-                <option value="avion">✈️ Fret Aérien</option>
-                <option value="bateau">🚢 Fret Maritime</option>
-              </select>
-            </div>
-
-            <!-- Date + heure limite -->
-            <div style="display:flex;gap:11px;margin-bottom:12px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:130px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📅 Date de départ</label>
-                <input class="adm-input" type="date" id="ann-date" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
-              </div>
-              <div style="flex:1;min-width:120px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">⏰ Limite de dépôt</label>
-                <input class="adm-input" type="time" id="ann-heure" value="16:00" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
-              </div>
-            </div>
-
-            <!-- Note -->
-            <div style="margin-bottom:12px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📝 Message / Note</label>
-              <textarea class="adm-input" id="ann-note" rows="2" placeholder="Ex: Places limitées — tarif spécial cette semaine…" style="border:1.5px solid #c8d3e0;background:#f4f7fb;resize:vertical;"></textarea>
-            </div>
-
-            <!-- Upload document / flyer -->
-            <div style="margin-bottom:16px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">📎 Flyer / Document (optionnel)</label>
-              <label style="display:flex;align-items:center;gap:10px;border:2px dashed #c8d3e0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#f8fafd;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--sky)'" onmouseout="this.style.borderColor='#c8d3e0'">
-                <span style="font-size:1.4rem;">🖼️</span>
-                <div>
-                  <div style="font-size:.82rem;font-weight:700;color:var(--navy);">Cliquer pour ajouter une image ou PDF</div>
-                  <div style="font-size:.72rem;color:var(--slate);">JPG, PNG ou PDF — max 5 MB</div>
-                </div>
-                <input type="file" id="ann-doc-file" accept=".jpg,.jpeg,.png,.pdf" style="display:none;" onchange="annDocPreview(this)">
-              </label>
-              <!-- Prévisualisation -->
-              <div id="ann-doc-preview" style="display:none;align-items:center;gap:10px;margin-top:8px;background:#f0f6ff;border-radius:7px;padding:10px 12px;border:1px solid #d0e4f7;">
-                <img id="ann-doc-img" src="" alt="" style="max-height:56px;max-width:80px;border-radius:5px;object-fit:cover;display:none;">
-                <span style="font-size:.8rem;color:var(--navy);font-weight:600;" id="ann-doc-fname"></span>
-                <button onclick="_annDocData=null;document.getElementById('ann-doc-file').value='';document.getElementById('ann-doc-preview').style.display='none';" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#e74c3c;font-size:.9rem;">✕</button>
-              </div>
-            </div>
-
-            <button class="adm-btn-primary" onclick="addAnnonce()" style="width:100%;font-size:.9rem;padding:11px;">🚀 Publier l'annonce</button>
-          </div>
-
-          <!-- LISTE -->
-          <div class="adm-card">
-            <div class="adm-card-title">&#128197; Départs planifiés</div>
-            <div id="annonces-list" style="font-size:.84rem;max-height:440px;overflow-y:auto;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAGE: PARAMÈTRES -->
-      <div class="adm-page" id="adm-parametres">
-        <div class="adm-page-title">&#9881; Paramètres</div>
-        <div class="adm-page-sub">Tarifs, compte administrateur et données</div>
-        <div class="adm-grid-2">
-          <div class="adm-card">
-            <div class="adm-card-title">&#128178; Tarifs (&#8369;/kg)</div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Prix / kg avion</label><input class="adm-input" type="number" id="tarif-air" value="350"></div>
-              <div class="fg"><label>Prix / kg bateau</label><input class="adm-input" type="number" id="tarif-sea" value="180"></div>
-            </div>
-            <div class="adm-form-row">
-              <div class="fg"><label>Frais Lalamove fix (&#8369;)</label><input class="adm-input" type="number" id="tarif-lalamove" value="150"></div>
-              <div class="fg"><label>Assurance % valeur</label><input class="adm-input" type="number" id="tarif-assurance" value="2"></div>
-            </div>
-            <button class="adm-btn-primary" onclick="saveTarifs()">Sauvegarder</button>
-          </div>
-          <div class="adm-card">
-            <div class="adm-card-title">&#128274; Mot de passe admin</div>
-            <div class="adm-form-row"><div class="fg"><label>Nouveau mot de passe</label><input class="adm-input" type="password" id="new-pass" placeholder="Nouveau mot de passe"></div></div>
-            <div class="adm-form-row"><div class="fg"><label>Confirmer</label><input class="adm-input" type="password" id="new-pass2" placeholder="Confirmer"></div></div>
-            <button class="adm-btn-secondary" onclick="changePass()">Mettre à jour</button>
-            <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f3f7;">
-              <p style="font-size:.8rem;color:var(--slate);margin-bottom:10px;">&#9888; Cette action est irréversible.</p>
-              <button class="adm-btn-danger" onclick="if(confirm('EFFACER TOUTES LES DONNÉES ? Cette action est irréversible.')){['gcc_submissions','gcc_revenus','gcc_depenses','gcc_parrains','gcc_annonces'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});location.reload();}">&#128465; Réinitialiser toutes les données</button>
-            </div>
-          </div>
-        </div>
-        <!-- BLOC CONFIG PAIEMENT -->
-        <div class="adm-card" style="margin-top:0;">
-          <div class="adm-card-title">💳 Informations de paiement (affichées aux clients)</div>
-          <p style="font-size:.8rem;color:var(--slate);margin-bottom:16px;">Ces infos apparaissent automatiquement selon le mode de paiement choisi par le client. Ajoutez vos numéros et QR codes ici.</p>
-
-          <!-- Tabs internes paiement -->
-          <div style="display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;">
-            <button onclick="switchPayTab('transfer',this)" id="ptab-transfer" style="background:var(--navy);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🏦 Bank Transfer</button>
-            <button onclick="switchPayTab('gcash',this)" id="ptab-gcash" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">📱 GCash/Maya</button>
-            <button onclick="switchPayTab('momo',this)" id="ptab-momo" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">💚 MoMo</button>
-            <button onclick="switchPayTab('om',this)" id="ptab-om" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🧡 Orange Money</button>
-            <button onclick="switchPayTab('crypto',this)" id="ptab-crypto" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">₿ Crypto</button>
-          </div>
-
-          <!-- Panneaux par méthode -->
-          <div id="ppanel-transfer" class="ppanel">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du titulaire</label>
-                <input class="adm-input" id="pay-nom-transfer" placeholder="GCC CARGO HANDLING INC">
-              </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Banques acceptées</label>
-                <input class="adm-input" id="pay-num-transfer" placeholder="BPI · BDO · Metrobank">
-              </div>
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-transfer" placeholder="Envoyez la capture d'écran de votre virement.">
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code (optionnel)</label>
-              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
-                📤 Uploader QR <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('transfer',this)">
-              </label>
-              <img id="pay-qr-prev-transfer" src="" style="display:none;max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
-            </div>
-          </div>
-
-          <div id="ppanel-gcash" class="ppanel" style="display:none;">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro GCash / Maya</label>
-                <input class="adm-input" id="pay-num-gcash" placeholder="+63 9XX XXX XXXX">
-              </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
-                <input class="adm-input" id="pay-nom-gcash" placeholder="Nom affiché sur GCash">
-              </div>
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-gcash" placeholder="Envoyez la capture d'écran de la transaction.">
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code GCash (recommandé)</label>
-              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
-                📤 Uploader QR GCash <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('gcash',this)">
-              </label>
-              <img id="pay-qr-prev-gcash" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
-            </div>
-          </div>
-
-          <div id="ppanel-momo" class="ppanel" style="display:none;">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro MoMo</label>
-                <input class="adm-input" id="pay-num-momo" placeholder="+237 6XX XXX XXX">
-              </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
-                <input class="adm-input" id="pay-nom-momo" placeholder="Nom MoMo Money">
-              </div>
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-momo" placeholder="Envoyez la capture d'écran du dépôt.">
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code MoMo (optionnel)</label>
-              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
-                📤 Uploader QR MoMo <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('momo',this)">
-              </label>
-              <img id="pay-qr-prev-momo" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
-            </div>
-          </div>
-
-          <div id="ppanel-om" class="ppanel" style="display:none;">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro Orange Money</label>
-                <input class="adm-input" id="pay-num-om" placeholder="+237 6XX XXX XXX">
-              </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du compte</label>
-                <input class="adm-input" id="pay-nom-om" placeholder="Nom Orange Money">
-              </div>
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-om" placeholder="Envoyez la capture d'écran du dépôt.">
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code OM (optionnel)</label>
-              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
-                📤 Uploader QR Orange Money <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('om',this)">
-              </label>
-              <img id="pay-qr-prev-om" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
-            </div>
-          </div>
-
-          <div id="ppanel-crypto" class="ppanel" style="display:none;">
-            <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;color:#92400e;">
-              ⚠️ Vérifiez toujours l'adresse wallet avant de confirmer un paiement crypto. Les transactions sont irréversibles.
-            </div>
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Réseau / Token</label>
-                <input class="adm-input" id="pay-nom-crypto" placeholder="Ex: USDT (TRC-20) · BTC · ETH">
-              </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Adresse Wallet</label>
-                <input class="adm-input" id="pay-num-crypto" placeholder="0x... ou T... ou bc1...">
-              </div>
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-crypto" placeholder="Envoyez la capture d'écran de la transaction blockchain.">
-            </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code Wallet (recommandé)</label>
-              <label style="display:inline-flex;align-items:center;gap:8px;border:2px dashed #c8d3e0;border-radius:7px;padding:9px 14px;cursor:pointer;background:#f8fafd;font-size:.8rem;font-weight:600;color:var(--navy);">
-                📤 Uploader QR Wallet <input type="file" accept="image/*" style="display:none;" onchange="payQrPreview('crypto',this)">
-              </label>
-              <img id="pay-qr-prev-crypto" src="" style="max-width:110px;max-height:110px;border-radius:7px;border:1.5px solid #dce3ec;margin-top:8px;display:none;">
-            </div>
-          </div>
-
-          <button class="adm-btn-primary" onclick="savePayConfig()" style="margin-top:18px;">💾 Sauvegarder les infos paiement</button>
-        </div>
-
-        <div class="adm-card">
-          <div class="adm-card-title">&#128202; Export données</div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button class="adm-btn-secondary" onclick="exportCSV('demandes')">&#128229; Exporter demandes CSV</button>
-            <button class="adm-btn-secondary" onclick="exportCSV('finance')">&#128229; Exporter finance CSV</button>
-          </div>
-        </div>
-      </div>
-
-  </main>
+<!-- FICHIERS MODAL -->
+<div id="fichiersModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:28px;max-width:680px;width:90%;max-height:82vh;overflow-y:auto;position:relative;">
+    <button onclick="closeFichiersModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#666;">✕</button>
+    <div style="font-weight:700;font-size:1.05rem;color:var(--navy);margin-bottom:18px;">📎 Pièces jointes</div>
+    <div id="fichiersModalContent"></div>
+  </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"><strong id="toast-title"></strong><span id="toast-msg"></span></div>
-
-<!-- MODALE CONFIRMATION SOUMISSION -->
-<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(11,31,58,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;padding:36px 32px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;">
-    <div style="font-size:3.5rem;margin-bottom:12px;">✅</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;color:#0B1F3A;margin-bottom:6px;">Demande envoyée !</h2>
-    <p style="font-size:1rem;color:#E87722;font-weight:700;margin-bottom:4px;" id="confirmRef">Référence : —</p>
-    <p style="font-size:.92rem;color:#444;line-height:1.65;margin-bottom:28px;">
-      Votre demande a bien été enregistrée.<br>
-      Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le paiement.
-    </p>
-    <div style="background:#f0f6ff;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:.84rem;color:#0B1F3A;line-height:1.7;text-align:left;">
-      📞 <strong>+63 968 313 5356</strong> · +63 915 385 7604<br>
-      📧 <strong>gomerjavan45@gmail.com</strong><br>
-      📍 Trimar Building, Multinational Ave, Parañaque
-    </div>
-    <button onclick="document.getElementById('confirmModal').style.display='none'" style="background:#E87722;color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;">OK, j'ai compris →</button>
-  </div>
-</div>
 
 <script>
 const LOGO_LG  = "data:image/webp;base64,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";
@@ -2634,6 +1459,18 @@ function toggleSubmit(){
   document.getElementById('submitBtn').disabled=!cb.checked;
 }
 
+// Ship submit
+function handleShipSubmit(e){
+  e.preventDefault();
+  const cb=document.getElementById('consentCheck');
+  if(!cb.checked){showToast(tr('required'), tr('requiredMsg'));return;}
+  showToast(tr('submitted'), tr('submittedMsg'));
+  e.target.reset();
+  document.getElementById('submitBtn').disabled=true;
+  document.getElementById('id-name').style.display='none';
+  document.getElementById('colis-names').style.display='none';
+}
+
 // Track
 function doTrack(){
   const v=document.getElementById('trackInput').value.trim();
@@ -2654,12 +1491,6 @@ function showToast(title,msg){
 }
 
 
-function showTab(name,btn){
-  document.querySelectorAll('.adm-content').forEach(t=>t.style.display='none');
-  document.getElementById('tab-'+name).style.display='block';
-  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
 function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
   // Build a mailto link — opens the user's email client pre-filled
   var subject = encodeURIComponent('[GCC CARGO] Mise à jour de votre colis — ' + ref);
@@ -2684,6 +1515,190 @@ function doUpdate(){
   if(!t){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
   const s=document.getElementById('upStatus').value;
   showToast(tr('updated'), tr('updatedMsg1')+t+tr('updatedMsg2')+s+tr('updatedMsg3'));
+}
+
+/* ── EXPORT DEMANDES ── */
+function exportDemandes() {
+  if (!_submissions || _submissions.length === 0) {
+    showToast('⚠️ Aucune donnée', 'Il n\'y a aucune demande à exporter.');
+    return;
+  }
+  var headers = ['Référence','Date','Expéditeur','Tél Expéditeur','Email','Récepteur','Tél Récepteur','Destination','Mode Dépôt','Mode Envoi','Paiement','Adresse Collecte','Adresse Client','Date Collecte','Créneau','Statut','Nb Fichiers'];
+  var rows = _submissions.map(function(s) {
+    return [
+      s.ref||'', s.date||'', s.expediteur||'', s.tel_exp||'', s.email_exp||'',
+      s.recepteur||'', s.tel_rec||'', s.destination||'', s.modeDepot||'',
+      s.modeEnvoi||'', s.modePaiement||'', s.adresse||'', s.adresseClient||'',
+      s.dateColl||'', s.creneau||'', s.statut||'',
+      (s.fichiers ? s.fichiers.length : 0)
+    ];
+  });
+  var csv = [headers].concat(rows).map(function(row) {
+    return row.map(function(cell) {
+      return '"' + String(cell).replace(/"/g, '""') + '"';
+    }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'gcc-demandes-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  showToast('✅ Export réussi', _submissions.length + ' demande(s) exportée(s) en CSV.');
+}
+
+/* ── FICHIERS MODAL ── */
+function showFichiersModal(idx) {
+  var s = _submissions[idx];
+  if (!s || !s.fichiers || s.fichiers.length === 0) return;
+  var modal = document.getElementById('fichiersModal');
+  var content = document.getElementById('fichiersModalContent');
+  if (!modal || !content) return;
+  var html = '<div style="font-size:.85rem;color:#666;margin-bottom:14px;">Demande <strong>' + s.ref + '</strong> — ' + s.expediteur + '</div>';
+  s.fichiers.forEach(function(f, fi) {
+    html += '<div style="margin-bottom:20px;border:1px solid #eee;border-radius:8px;padding:14px;">';
+    html += '<div style="font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:8px;">📎 ' + (f.label||'Fichier') + ' — ' + f.name + '</div>';
+    if (f.type && f.type.indexOf('image') === 0) {
+      html += '<img src="' + f.data + '" alt="' + f.name + '" style="max-width:100%;max-height:320px;border-radius:6px;display:block;margin-bottom:8px;">';
+    } else {
+      html += '<div style="background:#f5f5f5;border-radius:6px;padding:10px;font-size:.82rem;color:#666;margin-bottom:8px;">📄 Fichier PDF — cliquez ci-dessous pour télécharger</div>';
+    }
+    html += '<a href="' + f.data + '" download="' + f.name + '" style="display:inline-block;background:var(--navy);color:#fff;font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:4px;text-decoration:none;">⬇ Télécharger</a>';
+    html += '</div>';
+  });
+  content.innerHTML = html;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeFichiersModal() {
+  var modal = document.getElementById('fichiersModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = 'hidden'; // admin panel is still open
+}
+
+/* ── FLYER MANAGEMENT ── */
+var _flyerKey = 'gcc_departure_flyer';
+var _flyerPending = null; // base64 data URL pending publish
+
+function initFlyerDisplay() {
+  var data = localStorage.getItem(_flyerKey);
+  var placeholder = document.getElementById('dbPlaceholder');
+  var flyerWrap   = document.getElementById('dbFlyerWrap');
+  var flyerImg    = document.getElementById('dbFlyerImg');
+  var metaLabel   = document.getElementById('dbMetaLabel');
+  if (data) {
+    if (placeholder) placeholder.style.display = 'none';
+    if (flyerWrap)   { flyerWrap.style.display = 'block'; flyerWrap.style.visibility = 'visible'; }
+    if (flyerImg)    { flyerImg.src = data; flyerImg.style.display = 'block'; }
+    // Update data-fr/data-en so setLang() also shows the correct text
+    if (metaLabel) {
+      metaLabel.setAttribute('data-fr','✅ Annonce active');
+      metaLabel.setAttribute('data-en','✅ Active announcement');
+      var lang = document.documentElement.lang || 'fr';
+      metaLabel.textContent = lang === 'en' ? '✅ Active announcement' : '✅ Annonce active';
+    }
+  } else {
+    if (placeholder) placeholder.style.display = '';
+    if (flyerWrap)   flyerWrap.style.display = 'none';
+    if (flyerImg)    flyerImg.src = '';
+    if (metaLabel) {
+      metaLabel.setAttribute('data-fr','Aucune annonce active');
+      metaLabel.setAttribute('data-en','No active announcement');
+      var lang2 = document.documentElement.lang || 'fr';
+      metaLabel.textContent = lang2 === 'en' ? 'No active announcement' : 'Aucune annonce active';
+    }
+  }
+}
+
+function initAdminFlyerPanel() {
+  var data = localStorage.getItem(_flyerKey);
+  var uploadArea = document.getElementById('flyerUploadArea');
+  var activeArea = document.getElementById('flyerActiveArea');
+  var activeImg  = document.getElementById('flyerActiveImg');
+  if (data) {
+    if (uploadArea) uploadArea.style.display = 'none';
+    if (activeArea) { activeArea.style.display = 'flex'; }
+    if (activeImg)  activeImg.src = data;
+  } else {
+    if (uploadArea) uploadArea.style.display = 'flex';
+    if (activeArea) activeArea.style.display = 'none';
+    resetFlyerInput();
+  }
+}
+
+function previewFlyer(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('⚠️ Fichier trop grand', 'Le flyer ne doit pas dépasser 2 Mo. Compressez l\'image et réessayez.');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _flyerPending = e.target.result;
+    var previewArea = document.getElementById('flyerPreviewArea');
+    var previewImg  = document.getElementById('flyerPreviewImg');
+    if (previewImg)  previewImg.src = _flyerPending;
+    if (previewArea) previewArea.style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function publishFlyer() {
+  if (!_flyerPending) return;
+  try {
+    localStorage.setItem(_flyerKey, _flyerPending);
+  } catch(e) {
+    showToast('❌ Erreur', 'Impossible de sauvegarder le flyer (stockage plein ?).');
+    return;
+  }
+  initFlyerDisplay();
+  initAdminFlyerPanel();
+  showToast('🖼 Flyer publié', 'Le flyer est maintenant visible sur la page d\'accueil.');
+  _flyerPending = null;
+}
+
+function cancelFlyer() {
+  _flyerPending = null;
+  resetFlyerInput();
+  var previewArea = document.getElementById('flyerPreviewArea');
+  if (previewArea) previewArea.style.display = 'none';
+}
+
+function removeFlyer() {
+  if (!confirm('Supprimer le flyer actif ? Il ne sera plus affiché sur le site.')) return;
+  localStorage.removeItem(_flyerKey);
+  _flyerPending = null;
+  initFlyerDisplay();
+  initAdminFlyerPanel();
+  showToast('🗑 Flyer supprimé', 'Le flyer a été retiré de la page d\'accueil.');
+}
+
+function resetFlyerInput() {
+  var inp = document.getElementById('flyerFileInput');
+  if (inp) inp.value = '';
+  var previewImg = document.getElementById('flyerPreviewImg');
+  if (previewImg) previewImg.src = '';
+  var previewArea = document.getElementById('flyerPreviewArea');
+  if (previewArea) previewArea.style.display = 'none';
+}
+
+// Run on page load
+(function() {
+  initFlyerDisplay();
+})();
+
+// Re-init admin panel when Départs tab is opened
+var _origShowTab = typeof showTab === 'function' ? showTab : null;
+function showTab(name,btn){
+  document.querySelectorAll('.adm-content').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+name).style.display='block';
+  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name === 'departs') initAdminFlyerPanel();
 }
 </script>
 </body>
