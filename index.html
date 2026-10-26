@@ -676,6 +676,9 @@ function doAdminLogin() {
       var fichBtn = nbFichiers > 0
         ? '<button class="notif-btn adm-fichiers-btn" data-i="' + i + '" style="font-size:.72rem;background:#7d3c98;display:block;width:100%;margin-bottom:4px;">📎 ' + nbFichiers + ' fichier' + (nbFichiers>1?'s':'') + '</button>'
         : '<span style="font-size:.72rem;color:#bbb;display:block;margin-bottom:4px;">—</span>';
+      var statutOptions = ['En attente','En transit','Arrivé','Livré'].map(function(opt){
+        return '<option value="' + opt + '"' + (opt === s.statut ? ' selected' : '') + '>' + opt + '</option>';
+      }).join('');
       return '<tr>' +
         '<td><strong style="font-family:monospace;">' + s.ref + '</strong><br><small style="color:#999;">' + s.date + '</small></td>' +
         '<td>' + (s.expediteur||'—') + '<br><small style="color:#888;">' + (s.tel_exp||'') + '</small><br><small style="color:#aaa;">' + (s.email_exp||'') + '</small></td>' +
@@ -685,21 +688,41 @@ function doAdminLogin() {
         '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
         '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('sentiel') ? '🏢 En bureau' : '—')) + '</td>' +
         '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>' +
-        '<td style="white-space:nowrap;">' +
+        '<td style="white-space:nowrap;min-width:130px;">' +
         fichBtn +
-        '<button class="notif-btn adm-statut-btn" data-i="' + i + '" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;">🔄 Statut</button>' +
-        '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;">📧 Email</button>' +
+        '<select class="adm-statut-sel" data-i="' + i + '" style="font-size:.72rem;width:100%;margin-bottom:4px;padding:4px 6px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;">' + statutOptions + '</select>' +
+        '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;margin-bottom:4px;">📧 Email</button>' +
+        '<button class="notif-btn adm-del-btn" data-i="' + i + '" style="font-size:.72rem;background:#e74c3c;display:block;width:100%;">🗑️ Supprimer</button>' +
         '</td>' +
         '</tr>';
     }).join('');
-    tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
+    tbody.querySelectorAll('.adm-statut-sel').forEach(function(sel) {
+      sel.addEventListener('change', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var newStatut = this.value;
+        _submissions[idx].statut = newStatut;
+        try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+        refreshAdminTable();
+        showToast('Statut mis à jour', _submissions[idx] ? _submissions[idx].ref + ' → ' + newStatut : newStatut);
+      });
     });
     tbody.querySelectorAll('.adm-email-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var idx = parseInt(this.getAttribute('data-i'));
         var s = _submissions[idx];
         if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
+      });
+    });
+    tbody.querySelectorAll('.adm-del-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var s = _submissions[idx];
+        if (!s) return;
+        if (!confirm('Supprimer la demande ' + s.ref + ' ?\nCette action est irréversible.')) return;
+        _submissions.splice(idx, 1);
+        try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+        refreshAdminTable();
+        showToast('Demande supprimée', s.ref + ' a été supprimée.');
       });
     });
     tbody.querySelectorAll('.adm-fichiers-btn').forEach(function(btn) {
@@ -712,14 +735,6 @@ function doAdminLogin() {
     document.querySelectorAll('.adm-filter-btn').forEach(function(b){ b.classList.remove('active'); });
     if (btn) btn.classList.add('active');
     refreshAdminTable();
-  }
-  function cycleStatut(i) {
-    var order = ['En attente','En transit','Arrivé','Livré'];
-    var cur = _submissions[i].statut;
-    _submissions[i].statut = order[(order.indexOf(cur)+1) % order.length];
-    try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
-    refreshAdminTable();
-    showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
   }
 
   // Apply language + init on DOM ready
