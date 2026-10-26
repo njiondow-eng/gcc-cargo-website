@@ -492,6 +492,7 @@ function doAdminLogin() {
   if (u === _ADMIN_USER && p === _ADMIN_PASS) {
     _loginAttempts = 0;
     try { sessionStorage.setItem('gcc_attempts', '0'); } catch(e) {}
+    try { localStorage.setItem('gcc_admin_session', '1'); } catch(e) {}
     closeAdminLogin();
     var panel = document.getElementById('adminPanel');
     if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
@@ -1787,6 +1788,24 @@ function showTab(name,btn){
   btn.classList.add('active');
   if (name === 'departs') initAdminFlyerPanel();
 }
+
+// Admin session persistence
+function doLogout() {
+  try { localStorage.removeItem('gcc_admin_session'); } catch(e) {}
+  var panel = document.getElementById('adminPanel');
+  if (panel) { panel.style.display = 'none'; document.body.style.overflow = ''; }
+  if (typeof showToast === 'function') showToast('Déconnecté', 'Session admin terminée.');
+}
+(function() {
+  try {
+    if (localStorage.getItem('gcc_admin_session') === '1') {
+      document.addEventListener('DOMContentLoaded', function() {
+        var panel = document.getElementById('adminPanel');
+        if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+      });
+    }
+  } catch(e) {}
+})();
 
 // Triple-click on nav logo to open admin login
 (function(){
