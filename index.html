@@ -1465,32 +1465,29 @@ function doAdminLogin() {
     <!-- COLIS TAB -->
     <div id="tab-colis" class="adm-content" style="display:none;">
       <div style="margin-bottom:16px;">
-        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:12px;">Mettre à jour un colis</div>
+        <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:12px;">Mettre à jour un statut</div>
         <div class="admin-update-form">
-          <div class="au-row">
-            <div class="au-field"><label>N° de tracking</label><input type="text" placeholder="GCC-2026-00XXX" id="upTrack"></div>
+          <div class="au-row" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+            <div class="au-field"><label>N° de tracking</label><input type="text" placeholder="GCC-2026-XXXXX" id="upTrack" style="font-size:.95rem;"></div>
             <div class="au-field"><label>Nouveau statut</label>
-              <select id="upStatus">
-                <option>Enregistré</option>
-                <option>En transit</option>
-                <option>Arrivé à destination</option>
-                <option>Livré</option>
-                <option>Problème douanier</option>
+              <select id="upStatus" style="font-size:.95rem;padding:12px;">
+                <option value="En attente">⏳ En attente</option>
+                <option value="En transit">✈ En transit</option>
+                <option value="Arrivé">📦 Arrivé</option>
+                <option value="Livré">✅ Livré</option>
               </select>
             </div>
-            <div class="au-field"><label>Remarque (optionnel)</label><input type="text" placeholder="Ex : Disponible à Yaoundé" id="upNote"></div>
-            <button class="btn-update" onclick="doUpdate()">Mettre à jour + Notifier →</button>
+            <div class="au-field"><label>Remarque (optionnel)</label><input type="text" placeholder="Ex : Disponible à Yaoundé" id="upNote" style="font-size:.95rem;"></div>
+            <button class="btn-update" onclick="doUpdate()">💾 Mettre à jour</button>
           </div>
         </div>
       </div>
+      <div class="admin-section-title" style="font-size:.95rem;margin-bottom:10px;">📦 Colis actifs (depuis les demandes)</div>
       <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>N° Tracking</th><th>Expéditeur</th><th>Destinataire</th><th>Destination</th><th>Poids</th><th>Statut</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr><td>GCC-2026-0041</td><td>Marie Tabi</td><td>Paul Nkeng</td><td>🇨🇲 Yaoundé</td><td>12 kg</td><td><span class="badge b-arrived">Arrivé</span></td><td><button class="notif-btn" onclick="showToast('📩 SMS envoyé','Paul Nkeng notifié : colis disponible à Yaoundé.')">Notifier SMS</button></td></tr>
-            <tr><td>GCC-2026-0040</td><td>Jean Fotso</td><td>Aline Biya</td><td>🇨🇮 Abidjan</td><td>8 kg</td><td><span class="badge b-transit">En transit</span></td><td><button class="notif-btn" onclick="showToast('📩 Email envoyé','Jean Fotso informé : colis en transit.')">Notifier Email</button></td></tr>
-            <tr><td>GCC-2026-0039</td><td>Samuel Mbia</td><td>Rose Epée</td><td>🇨🇬 Brazzaville</td><td>20 kg</td><td><span class="badge b-delivered">Livré</span></td><td><button class="notif-btn" onclick="showToast('✅ Confirmé','Livraison confirmée pour GCC-2026-0039.')">Confirmer</button></td></tr>
-            <tr><td>GCC-2026-0038</td><td>Clara Ndeh</td><td>Eric Bakang</td><td>🇬🇦 Libreville</td><td>5 kg</td><td><span class="badge b-pending">En attente</span></td><td><button class="notif-btn" onclick="showToast('📩 Rappel envoyé','Rappel de paiement envoyé à Clara Ndeh.')">Rappel paiement</button></td></tr>
+        <table style="min-width:700px;">
+          <thead><tr><th>N° Tracking</th><th>Expéditeur</th><th>Récepteur</th><th>Destination</th><th>Statut</th><th>Action rapide</th></tr></thead>
+          <tbody id="colis-tbody">
+            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun colis actif</td></tr>
           </tbody>
         </table>
       </div>
@@ -1791,10 +1788,52 @@ function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
 }
 
 function doUpdate(){
-  const t=document.getElementById('upTrack').value;
-  if(!t){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
-  const s=document.getElementById('upStatus').value;
-  showToast(tr('updated'), tr('updatedMsg1')+t+tr('updatedMsg2')+s+tr('updatedMsg3'));
+  var t = (document.getElementById('upTrack').value || '').trim().toUpperCase();
+  if(!t){showToast('⚠️ Champ requis','Entrez un numéro de tracking.');return;}
+  var newStatut = document.getElementById('upStatus').value;
+  var found = false;
+  for(var i=0;i<_submissions.length;i++){
+    var ref = (_submissions[i].ref||'').toUpperCase();
+    if(ref === t || ref.replace(/^GCC-/,'') === t || t.replace(/^GCC-/,'') === ref.replace(/^GCC-/,'')){
+      _submissions[i].statut = newStatut;
+      found = true;
+      break;
+    }
+  }
+  if(!found){showToast('❌ Introuvable','Aucune demande avec la référence « '+t+' » trouvée.');return;}
+  try{localStorage.setItem('gcc_submissions',JSON.stringify(_submissions.slice(0,200)));}catch(ex){}
+  refreshAdminTable();
+  initColisTab();
+  document.getElementById('upTrack').value = '';
+  showToast('✅ Statut mis à jour',t+' → '+newStatut);
+}
+
+function initColisTab(){
+  var tbody = document.getElementById('colis-tbody');
+  if(!tbody) return;
+  var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
+  var actifs = (_submissions||[]).filter(function(s){ return s.statut !== 'Livré'; });
+  if(!actifs.length){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun colis actif</td></tr>';
+    return;
+  }
+  tbody.innerHTML = actifs.map(function(s){
+    var cls = statClasses[s.statut] || 'b-pending';
+    var recDisplay = s.recepteur || '—';
+    if(s.recepteurs && s.recepteurs.length > 1){
+      recDisplay = s.recepteurs.map(function(r){return r.nom||'?';}).join(', ');
+    }
+    return '<tr>'+
+      '<td style="font-weight:600;color:var(--navy);">'+(s.ref||'—')+'</td>'+
+      '<td>'+(s.expediteur||'—')+'</td>'+
+      '<td>'+recDisplay+'</td>'+
+      '<td>'+(s.destination||'—')+'</td>'+
+      '<td><span class="badge '+cls+'">'+(s.statut||'En attente')+'</span></td>'+
+      '<td><button class="notif-btn" onclick="(function(){'+
+        'document.getElementById(\'upTrack\').value=\''+( s.ref||'').replace(/'/g,"\\'")+'\''+
+      '})();" style="font-size:.8rem;padding:6px 10px;">✏️ Modifier</button></td>'+
+    '</tr>';
+  }).join('');
 }
 
 /* ── EXPORT DEMANDES ── */
@@ -1980,6 +2019,7 @@ function showTab(name,btn){
   btn.classList.add('active');
   if (name === 'departs') initAdminFlyerPanel();
   if (name === 'parametres') loadParamSettings();
+  if (name === 'colis') initColisTab();
 }
 
 // ═══════════ PARAMÈTRES ═══════════
