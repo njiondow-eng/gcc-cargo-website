@@ -520,6 +520,68 @@ function doAdminLogin() {
   }
 }
 
+// ─── RÉCEPTEURS MULTIPLES ────────────────────────────────────────────────────
+  var _recCount = 0;
+
+  function recepteurCardHtml(idx, isFirst) {
+    var removeBtn = isFirst ? '' :
+      '<button type="button" onclick="removeRecepteur(' + idx + ')" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer;white-space:nowrap;" title="Supprimer ce récepteur">✕</button>';
+    return '<div class="rec-card" id="rec-' + idx + '" style="border:1px solid #dde3ec;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#f8fafc;position:relative;">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+        '<span style="font-weight:700;color:var(--navy);font-size:.88rem;">👤 Récepteur ' + (idx === 0 ? '1 (principal)' : (idx+1)) + '</span>' +
+        removeBtn +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">' +
+        '<div class="fg" style="margin:0;"><label style="font-size:.8rem;">Nom complet</label>' +
+          '<input type="text" class="rec-nom" placeholder="Ex : Marie Mbeu"' + (idx===0?' required':'') + ' style="width:100%;"></div>' +
+        '<div class="fg" style="margin:0;"><label style="font-size:.8rem;">Téléphone</label>' +
+          '<input type="tel" class="rec-tel" placeholder="+237 6XX XXX XXX"' + (idx===0?' required':'') + ' style="width:100%;"></div>' +
+        '<div class="fg" style="margin:0;grid-column:1/-1;"><label style="font-size:.8rem;">Adresse de livraison (optionnel)</label>' +
+          '<input type="text" class="rec-adresse" placeholder="Quartier, ville..." style="width:100%;"></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function addRecepteur() {
+    var list = document.getElementById('recepteursList');
+    if (!list) return;
+    // max 8 récepteurs
+    if (list.querySelectorAll('.rec-card').length >= 8) {
+      showToast('Maximum atteint', 'Vous pouvez ajouter au maximum 8 récepteurs.');
+      return;
+    }
+    var div = document.createElement('div');
+    div.innerHTML = recepteurCardHtml(_recCount, _recCount === 0);
+    list.appendChild(div.firstChild);
+    _recCount++;
+  }
+
+  function removeRecepteur(idx) {
+    var card = document.getElementById('rec-' + idx);
+    if (card) card.remove();
+  }
+
+  function collectRecepteurs() {
+    var list = document.getElementById('recepteursList');
+    if (!list) return [{nom:'', tel:'', adresse:''}];
+    var cards = list.querySelectorAll('.rec-card');
+    var result = [];
+    cards.forEach(function(card) {
+      var nom     = (card.querySelector('.rec-nom')     || {value:''}).value.trim();
+      var tel     = (card.querySelector('.rec-tel')     || {value:''}).value.trim();
+      var adresse = (card.querySelector('.rec-adresse') || {value:''}).value.trim();
+      if (nom || tel) result.push({nom: nom, tel: tel, adresse: adresse});
+    });
+    return result.length ? result : [{nom:'', tel:'', adresse:''}];
+  }
+
+  // Init : ajouter le premier récepteur au chargement du DOM
+  document.addEventListener('DOMContentLoaded', function() {
+    var list = document.getElementById('recepteursList');
+    if (list && list.children.length === 0) { addRecepteur(); }
+  });
+// ────────────────────────────────────────────────────────────────────────────
+
 // ─── CONDITIONAL FORM LOGIC ─────────────────────────────────────────────────
   function handleModeDepot(val) {
     var lalamove   = document.getElementById('sectionLalamove');
@@ -597,8 +659,9 @@ function doAdminLogin() {
       expediteur:  (document.querySelector('input[placeholder="Ex : William Tabi"]') || {value:''}).value,
       tel_exp:     (document.querySelector('input[placeholder="+63 968 313 5356"]') || {value:''}).value,
       email_exp:   (document.querySelector('input[type="email"]') || {value:''}).value,
-      recepteur:   (document.querySelector('input[placeholder="Ex : Marie Mbeu"]') || {value:''}).value,
-      tel_rec:     (document.querySelector('input[placeholder="+237 6XX XXX XXX"]') || {value:''}).value,
+      recepteur:   (function(){var r=collectRecepteurs();return r.map(function(x){return x.nom;}).join(' | ');})(),
+      tel_rec:     (function(){var r=collectRecepteurs();return r.map(function(x){return x.tel;}).join(' | ');})(),
+      recepteurs:  collectRecepteurs(),
       destination: destSel ? destSel.value : '',
       modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
       modeEnvoi:   (document.getElementById('selectModeEnvoi') || {value:''}).value,
@@ -649,17 +712,45 @@ function doAdminLogin() {
   function refreshAdminTable() {
     var tbody = document.getElementById('admin-submissions-tbody');
     if (!tbody) return;
-    // KPIs
+    // Counts
+    var nTotal   = _submissions.length;
+    var nAttente = _submissions.filter(function(s){return s.statut==='En attente';}).length;
+    var nTransit = _submissions.filter(function(s){return s.statut==='En transit';}).length;
+    var nArrive  = _submissions.filter(function(s){return s.statut==='Arrivé';}).length;
+    var nLivre   = _submissions.filter(function(s){return s.statut==='Livré';}).length;
+    // Ce mois
+    var now = new Date(); var mm = now.getMonth()+1; var yy = now.getFullYear();
+    var nMois = _submissions.filter(function(s){
+      if (!s.date) return false;
+      var parts = s.date.split('/'); // dd/mm/yyyy
+      return parts.length === 3 && parseInt(parts[1],10) === mm && parseInt(parts[2],10) === yy;
+    }).length;
+    // Vue d'ensemble KPIs
+    function _setText(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
+    function _setTrend(id, val, warn) { var el=document.getElementById(id); if(!el)return; el.textContent=val; el.style.color=warn?'#e65100':''; }
+    _setText('ov-total',   nTotal);
+    _setText('ov-attente', nAttente);
+    _setText('ov-transit', nTransit);
+    _setText('ov-arrive',  nArrive);
+    _setText('ov-livre',   nLivre);
+    _setText('ov-mois',    nMois);
+    _setTrend('ov-total-trend',   nTotal===0 ? 'Aucune demande' : nTotal + ' au total', false);
+    _setTrend('ov-attente-trend', nAttente===0 ? '✓ Aucune en attente' : '⚠ À traiter', nAttente>0);
+    _setTrend('ov-transit-trend', nTransit===0 ? '→ Aucun en cours' : nTransit + ' colis en route', false);
+    _setTrend('ov-arrive-trend',  nArrive===0 ? '✓ Tous notifiés' : '⚠ ' + nArrive + ' à notifier', nArrive>0);
+    _setTrend('ov-livre-trend',   nLivre===0 ? '—' : nLivre + ' livraison(s) confirmée(s)', false);
+    _setTrend('ov-mois-trend',    nMois===0 ? 'Aucune ce mois' : nMois + ' en ' + now.toLocaleString('fr-FR',{month:'long'}), false);
+    // Demandes section KPIs
     var kpiDem   = document.getElementById('kpi-demandes');
     var kpiAtt   = document.getElementById('kpi-attente');
     var kpiTrans = document.getElementById('kpi-transit');
     var kpiArr   = document.getElementById('kpi-arrive');
     var kpiLivr  = document.getElementById('kpi-livre');
-    if (kpiDem)   kpiDem.textContent   = _submissions.length;
-    if (kpiAtt)   kpiAtt.textContent   = _submissions.filter(function(s){return s.statut==='En attente';}).length;
-    if (kpiTrans) kpiTrans.textContent = _submissions.filter(function(s){return s.statut==='En transit';}).length;
-    if (kpiArr)   kpiArr.textContent   = _submissions.filter(function(s){return s.statut==='Arrivé';}).length;
-    if (kpiLivr)  kpiLivr.textContent  = _submissions.filter(function(s){return s.statut==='Livré';}).length;
+    if (kpiDem)   kpiDem.textContent   = nTotal;
+    if (kpiAtt)   kpiAtt.textContent   = nAttente;
+    if (kpiTrans) kpiTrans.textContent = nTransit;
+    if (kpiArr)   kpiArr.textContent   = nArrive;
+    if (kpiLivr)  kpiLivr.textContent  = nLivre;
     // Filter with original indices preserved
     var indexed = _submissions.map(function(s, i){ return {s:s, i:i}; });
     if (_admFilter && _admFilter !== 'all') {
@@ -683,7 +774,16 @@ function doAdminLogin() {
       return '<tr>' +
         '<td><strong style="font-family:monospace;">' + s.ref + '</strong><br><small style="color:#999;">' + s.date + '</small></td>' +
         '<td>' + (s.expediteur||'—') + '<br><small style="color:#888;">' + (s.tel_exp||'') + '</small><br><small style="color:#aaa;">' + (s.email_exp||'') + '</small></td>' +
-        '<td>' + (s.recepteur||'—') + '<br><small style="color:#888;">' + (s.tel_rec||'') + '</small></td>' +
+        '<td>' + (function(){
+          if (s.recepteurs && s.recepteurs.length > 1) {
+            return s.recepteurs.map(function(r,ri){
+              return '<span style="display:block;' + (ri>0?'margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0;':'') + '">' +
+                '<b>' + (r.nom||'—') + '</b><br><small style="color:#888;">' + (r.tel||'') + '</small>' +
+                (r.adresse ? '<br><small style="color:#aaa;">' + r.adresse + '</small>' : '') + '</span>';
+            }).join('');
+          }
+          return (s.recepteur||'—') + '<br><small style="color:#888;">' + (s.tel_rec||'') + '</small>';
+        })() + '</td>' +
         '<td>' + (s.destination||'—') + '</td>' +
         '<td style="font-size:.8rem;">' + (s.modeDepot||'—') + '</td>' +
         '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
@@ -913,8 +1013,16 @@ function doAdminLogin() {
           <option>🇬🇭 Accra — Ghana</option>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <!-- RÉCEPTEURS (multi) -->
+      <div class="fg full" style="grid-column:1/-1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <label data-fr="Récepteur(s)" data-en="Recipient(s)" style="margin:0;">Récepteur(s)</label>
+          <button type="button" onclick="addRecepteur()" style="background:var(--sky);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;">＋ <span data-fr="Ajouter un récepteur" data-en="Add recipient">Ajouter un récepteur</span></button>
+        </div>
+        <div id="recepteursList">
+          <!-- Le premier récepteur est injecté par JS au chargement -->
+        </div>
+      </div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
@@ -1274,12 +1382,12 @@ function doAdminLogin() {
     <!-- KPIs -->
     <div class="admin-section-title">Vue d'ensemble</div>
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-val">47</div><div class="kpi-lbl">Colis ce mois</div><div class="kpi-trend">↑ +12% vs mois précédent</div></div>
-      <div class="kpi"><div class="kpi-val">₱ 186K</div><div class="kpi-lbl">Revenus (mois)</div><div class="kpi-trend">↑ +8% vs mois précédent</div></div>
-      <div class="kpi"><div class="kpi-val">14</div><div class="kpi-lbl">En transit</div><div class="kpi-trend">→ Stable</div></div>
-      <div class="kpi"><div class="kpi-val">8</div><div class="kpi-lbl">Arrivés — à notifier</div><div class="kpi-trend" style="color:#e65100;">⚠ Action requise</div></div>
-      <div class="kpi"><div class="kpi-val">23</div><div class="kpi-lbl">Parrains actifs</div><div class="kpi-trend">↑ +4 ce mois</div></div>
-      <div class="kpi"><div class="kpi-val">₱ 14.2K</div><div class="kpi-lbl">Commissions à payer</div><div class="kpi-trend" style="color:#e65100;">⚠ À traiter</div></div>
+      <div class="kpi" style="border-top-color:var(--orange);"><div class="kpi-val" id="ov-total">0</div><div class="kpi-lbl">Total demandes</div><div class="kpi-trend" id="ov-total-trend">—</div></div>
+      <div class="kpi" style="border-top-color:#e65100;"><div class="kpi-val" id="ov-attente">0</div><div class="kpi-lbl">En attente</div><div class="kpi-trend" id="ov-attente-trend">—</div></div>
+      <div class="kpi" style="border-top-color:#2980b9;"><div class="kpi-val" id="ov-transit">0</div><div class="kpi-lbl">En transit</div><div class="kpi-trend" id="ov-transit-trend">—</div></div>
+      <div class="kpi" style="border-top-color:#8e44ad;"><div class="kpi-val" id="ov-arrive">0</div><div class="kpi-lbl">Arrivé — à notifier</div><div class="kpi-trend" id="ov-arrive-trend">—</div></div>
+      <div class="kpi" style="border-top-color:#27ae60;"><div class="kpi-val" id="ov-livre">0</div><div class="kpi-lbl">Livré</div><div class="kpi-trend" id="ov-livre-trend">—</div></div>
+      <div class="kpi" style="border-top-color:var(--sky);"><div class="kpi-val" id="ov-mois">0</div><div class="kpi-lbl">Demandes ce mois</div><div class="kpi-trend" id="ov-mois-trend">—</div></div>
     </div>
 
     <!-- Tabs -->
@@ -1289,6 +1397,7 @@ function doAdminLogin() {
       <button class="adm-tab" onclick="showTab('clients',this)">👥 Clients</button>
       <button class="adm-tab" onclick="showTab('parrainage',this)">💰 Parrainage</button>
       <button class="adm-tab" onclick="showTab('departs',this)">✈ Départs</button>
+      <button class="adm-tab" onclick="showTab('parametres',this)">⚙ Paramètres</button>
     </div>
 
     <!-- ═══ DEMANDES CLIENTS TAB ═══ -->
@@ -1464,6 +1573,89 @@ function doAdminLogin() {
         <p style="padding:16px;color:var(--slate);font-size:.9rem;">Aucun départ programmé actuellement. Utilisez le formulaire ci-dessus pour ajouter une annonce.</p>
       </div>
     </div>
+
+    <!-- ═══ PARAMÈTRES TAB ═══ -->
+    <div id="tab-parametres" class="adm-content" style="display:none;">
+      <div class="admin-section-title" style="margin-bottom:18px;">⚙ Paramètres généraux</div>
+
+      <!-- Prix par kg -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">💰 Tarification</div>
+        <div class="au-row" style="grid-template-columns:1fr 1fr auto;align-items:end;">
+          <div class="au-field">
+            <label>Prix par kg (₱)</label>
+            <input type="number" id="paramPrixKg" min="0" step="1" placeholder="ex: 850" style="font-size:1rem;">
+          </div>
+          <div class="au-field">
+            <label>Prix par kg (XAF)</label>
+            <input type="number" id="paramPrixKgXaf" min="0" step="100" placeholder="ex: 3500" style="font-size:1rem;">
+          </div>
+          <button class="btn-update" onclick="saveParams()">💾 Enregistrer</button>
+        </div>
+        <div style="font-size:.8rem;color:#888;margin-top:8px;">Ces tarifs s'affichent dans la section Tarifs du site.</div>
+      </div>
+
+      <!-- Coordonnées de paiement -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">📱 Coordonnées GCash / Maya</div>
+        <div class="au-row" style="grid-template-columns:1fr 1fr;align-items:end;">
+          <div class="au-field">
+            <label>Numéro GCash / Maya</label>
+            <input type="tel" id="paramGcashNum" placeholder="+63 9XX XXX XXXX" style="font-size:1rem;">
+          </div>
+          <div class="au-field">
+            <label>Nom du compte</label>
+            <input type="text" id="paramGcashNom" placeholder="WILLIAM NJIONDO" style="font-size:1rem;">
+          </div>
+        </div>
+        <div class="au-row" style="grid-template-columns:1fr 1fr;margin-top:10px;align-items:end;">
+          <div class="au-field">
+            <label>Numéro Bank Transfer</label>
+            <input type="text" id="paramBankNum" placeholder="BPI / BDO / Metrobank..." style="font-size:1rem;">
+          </div>
+          <div class="au-field">
+            <label>Nom titulaire du compte</label>
+            <input type="text" id="paramBankNom" placeholder="WILLIAM NJIONDO" style="font-size:1rem;">
+          </div>
+        </div>
+        <div style="margin-top:12px;text-align:right;">
+          <button class="btn-update" onclick="saveParams()">💾 Enregistrer</button>
+        </div>
+      </div>
+
+      <!-- QR Code GCash -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">📷 QR Code GCash / Maya</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+          <div>
+            <div id="paramQrPreviewWrap" style="display:none;margin-bottom:10px;">
+              <img id="paramQrPreview" src="" alt="QR Code actuel" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid #dde3ec;">
+            </div>
+            <div style="border:2px dashed #c8d3e0;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#f7f9fb;min-width:200px;" onclick="document.getElementById('paramQrFile').click()">
+              <div style="font-size:1.6rem;margin-bottom:6px;">📷</div>
+              <div style="font-weight:600;color:var(--navy);font-size:.88rem;">Cliquez pour changer le QR code</div>
+              <div style="font-size:.78rem;color:var(--slate);">PNG, JPG — max 1 Mo</div>
+            </div>
+            <input type="file" id="paramQrFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewParamQr(this)">
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:.85rem;color:#555;margin-bottom:8px;">Le QR code s'affiche dans la section paiement du formulaire d'envoi.</div>
+            <div id="paramQrStatus" style="font-size:.82rem;color:#27ae60;font-weight:600;display:none;">✅ QR code actif</div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button class="btn-update" id="paramQrSaveBtn" onclick="saveParamQr()" style="display:none;">💾 Publier ce QR</button>
+              <button class="btn-update" onclick="removeParamQr()" style="background:#e74c3c;display:none;" id="paramQrDelBtn">🗑 Supprimer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview des paramètres actifs -->
+      <div class="admin-update-form">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">📋 Paramètres actuellement enregistrés</div>
+        <div id="paramPreview" style="font-size:.88rem;color:#555;line-height:2;">Chargement...</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1787,7 +1979,119 @@ function showTab(name,btn){
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   if (name === 'departs') initAdminFlyerPanel();
+  if (name === 'parametres') loadParamSettings();
 }
+
+// ═══════════ PARAMÈTRES ═══════════
+function loadParamSettings() {
+  try {
+    var prix = localStorage.getItem('gcc_prix') || '';
+    var prixXaf = localStorage.getItem('gcc_prix_xaf') || '';
+    var gcashNum = localStorage.getItem('gcc_gcash') || '';
+    var gcashNom = localStorage.getItem('gcc_gcash_nom') || '';
+    var bankNum = localStorage.getItem('gcc_bank') || '';
+    var bankNom = localStorage.getItem('gcc_bank_nom') || '';
+    var el = function(id){ return document.getElementById(id); };
+    if(el('paramPrixKg'))    el('paramPrixKg').value    = prix;
+    if(el('paramPrixKgXaf')) el('paramPrixKgXaf').value = prixXaf;
+    if(el('paramGcashNum'))  el('paramGcashNum').value  = gcashNum;
+    if(el('paramGcashNom'))  el('paramGcashNom').value  = gcashNom;
+    if(el('paramBankNum'))   el('paramBankNum').value   = bankNum;
+    if(el('paramBankNom'))   el('paramBankNom').value   = bankNom;
+    // QR preview
+    var qr = localStorage.getItem('gcc_qr') || '';
+    if (qr) {
+      var img = document.getElementById('paramQrPreview');
+      if(img){ img.src = qr; document.getElementById('paramQrPreviewWrap').style.display='block'; }
+      var st = document.getElementById('paramQrStatus');
+      if(st) st.style.display='block';
+      var delBtn = document.getElementById('paramQrDelBtn');
+      if(delBtn) delBtn.style.display='inline-block';
+    }
+    // Summary preview
+    var lines = [
+      '<b>Prix par kg :</b> ' + (prix ? '₱ ' + prix : '—') + (prixXaf ? '  /  ' + prixXaf + ' XAF' : ''),
+      '<b>GCash / Maya :</b> ' + (gcashNum || '—') + (gcashNom ? ' (' + gcashNom + ')' : ''),
+      '<b>Bank transfer :</b> ' + (bankNum || '—') + (bankNom ? ' (' + bankNom + ')' : ''),
+      '<b>QR code :</b> ' + (qr ? '✅ Enregistré' : '❌ Aucun')
+    ];
+    var prev = document.getElementById('paramPreview');
+    if(prev) prev.innerHTML = lines.join('<br>');
+  } catch(e) {}
+}
+
+function saveParams() {
+  try {
+    var prix    = document.getElementById('paramPrixKg')    ? document.getElementById('paramPrixKg').value.trim()    : '';
+    var prixXaf = document.getElementById('paramPrixKgXaf') ? document.getElementById('paramPrixKgXaf').value.trim() : '';
+    var gNum    = document.getElementById('paramGcashNum')  ? document.getElementById('paramGcashNum').value.trim()  : '';
+    var gNom    = document.getElementById('paramGcashNom')  ? document.getElementById('paramGcashNom').value.trim()  : '';
+    var bNum    = document.getElementById('paramBankNum')   ? document.getElementById('paramBankNum').value.trim()   : '';
+    var bNom    = document.getElementById('paramBankNom')   ? document.getElementById('paramBankNom').value.trim()   : '';
+    if(prix)    localStorage.setItem('gcc_prix',      prix);    else localStorage.removeItem('gcc_prix');
+    if(prixXaf) localStorage.setItem('gcc_prix_xaf',  prixXaf); else localStorage.removeItem('gcc_prix_xaf');
+    if(gNum)    localStorage.setItem('gcc_gcash',     gNum);    else localStorage.removeItem('gcc_gcash');
+    if(gNom)    localStorage.setItem('gcc_gcash_nom', gNom);    else localStorage.removeItem('gcc_gcash_nom');
+    if(bNum)    localStorage.setItem('gcc_bank',      bNum);    else localStorage.removeItem('gcc_bank');
+    if(bNom)    localStorage.setItem('gcc_bank_nom',  bNom);    else localStorage.removeItem('gcc_bank_nom');
+    loadParamSettings();
+    showToast('Paramètres sauvegardés', 'Les informations ont été mises à jour.');
+  } catch(e) { showToast('Erreur', 'Impossible de sauvegarder.'); }
+}
+
+function previewParamQr(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (file.size > 1048576) { showToast('Fichier trop grand', 'Max 1 Mo pour le QR code.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('paramQrPreview');
+    var wrap = document.getElementById('paramQrPreviewWrap');
+    var saveBtn = document.getElementById('paramQrSaveBtn');
+    if(img)  { img.src = e.target.result; }
+    if(wrap) { wrap.style.display = 'block'; }
+    if(saveBtn) { saveBtn.style.display = 'inline-block'; }
+    img._pendingQr = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveParamQr() {
+  var img = document.getElementById('paramQrPreview');
+  if (!img || !img._pendingQr) { showToast('Aucun fichier', 'Sélectionnez d\'abord une image.'); return; }
+  try {
+    localStorage.setItem('gcc_qr', img._pendingQr);
+    var st = document.getElementById('paramQrStatus');
+    if(st) st.style.display = 'block';
+    var delBtn = document.getElementById('paramQrDelBtn');
+    if(delBtn) delBtn.style.display = 'inline-block';
+    var saveBtn = document.getElementById('paramQrSaveBtn');
+    if(saveBtn) saveBtn.style.display = 'none';
+    img._pendingQr = null;
+    loadParamSettings();
+    showToast('QR code enregistré', 'Le QR code est maintenant actif sur le site.');
+  } catch(e) { showToast('Erreur', 'Impossible de sauvegarder le QR code.'); }
+}
+
+function removeParamQr() {
+  if (!confirm('Supprimer le QR code ? Il ne sera plus affiché sur le site.')) return;
+  try {
+    localStorage.removeItem('gcc_qr');
+    var img = document.getElementById('paramQrPreview');
+    if(img) { img.src=''; img._pendingQr=null; }
+    var wrap = document.getElementById('paramQrPreviewWrap');
+    if(wrap) wrap.style.display='none';
+    var st = document.getElementById('paramQrStatus');
+    if(st) st.style.display='none';
+    var delBtn = document.getElementById('paramQrDelBtn');
+    if(delBtn) delBtn.style.display='none';
+    var saveBtn = document.getElementById('paramQrSaveBtn');
+    if(saveBtn) saveBtn.style.display='none';
+    loadParamSettings();
+    showToast('QR code supprimé', 'Le QR code a été retiré.');
+  } catch(e) {}
+}
+// ═════════════════════════════════
 
 // Admin session persistence
 function doLogout() {
