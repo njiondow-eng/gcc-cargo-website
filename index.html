@@ -671,6 +671,7 @@ function doAdminLogin() {
       dateColl:    (document.getElementById('dateLalamove') || {value:''}).value,
       creneau:     (document.getElementById('creneauLalamove') || {value:''}).value,
       statut:      'En attente',
+      codeParrain: (function(){var v=(document.getElementById('codeParrain')||{value:''}).value.trim().toUpperCase();return v;})(),
       fichiers:    []
     };
     var form = e.target;
@@ -1158,7 +1159,7 @@ function doAdminLogin() {
       <div class="fg"><label data-fr="Poids estimé (KG)" data-en="Estimated weight (KG)">Poids estimé (KG)</label><input type="number" placeholder="Ex : 10" min="1"></div>
       <div class="fg"><label data-fr="Valeur déclarée (₱)" data-en="Declared value (₱)">Valeur déclarée (₱)</label><input type="number" placeholder="Ex : 5000" min="0"></div>
       <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..."></textarea></div>
-      <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
+      <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage <span style="font-weight:400;color:#888;">(optionnel)</span></label><input id="codeParrain" type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042" style="text-transform:uppercase;"></div>
 
       <!-- UPLOADS -->
       <div class="fg full">
@@ -1510,13 +1511,50 @@ function doAdminLogin() {
 
     <!-- PARRAINAGE TAB -->
     <div id="tab-parrainage" class="adm-content" style="display:none;">
+
+      <!-- FORMULAIRE AJOUT PARRAIN -->
+      <div class="admin-update-form" style="margin-bottom:20px;">
+        <div style="font-weight:700;color:var(--navy);font-size:1rem;margin-bottom:14px;">➕ Ajouter un parrain</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
+          <div class="au-field">
+            <label>Nom complet</label>
+            <input id="pNom" type="text" placeholder="Ex : Marie Tabi" style="font-size:.92rem;">
+          </div>
+          <div class="au-field">
+            <label>Téléphone / WhatsApp</label>
+            <input id="pTel" type="tel" placeholder="+63 9XX XXX XXXX" style="font-size:.92rem;">
+          </div>
+          <div class="au-field">
+            <label>Taux de commission</label>
+            <select id="pTaux" style="font-size:.92rem;padding:12px;border:1px solid #dde3ec;border-radius:8px;background:#f8fafc;width:100%;">
+              <option value="3">3%</option>
+              <option value="5" selected>5%</option>
+              <option value="7">7%</option>
+              <option value="10">10%</option>
+            </select>
+          </div>
+          <button onclick="addParrain()" style="background:var(--orange);color:#fff;border:none;padding:13px 20px;border-radius:8px;font-weight:700;font-family:'Barlow',sans-serif;cursor:pointer;white-space:nowrap;font-size:.92rem;">💾 Créer & Générer code</button>
+        </div>
+      </div>
+
+      <!-- TABLEAU PARRAINS -->
+      <div class="admin-section-title" style="font-size:.95rem;margin-bottom:10px;">🤝 Parrains actifs</div>
       <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>Parrain</th><th>Code</th><th>Filleuls</th><th>CA généré</th><th>Taux</th><th>Commission</th><th>Statut</th></tr></thead>
-          <tbody>
-            <tr><td>Marie Tabi</td><td>GCC-REF-0001</td><td>5</td><td>₱ 60 000</td><td>10%</td><td>₱ 6 000</td><td><span class="badge b-pending">À payer</span></td></tr>
-            <tr><td>Jean Fotso</td><td>GCC-REF-0002</td><td>2</td><td>₱ 24 000</td><td>5%</td><td>₱ 1 200</td><td><span class="badge b-pending">À payer</span></td></tr>
-            <tr><td>Samuel Mbia</td><td>GCC-REF-0003</td><td>8</td><td>₱ 96 000</td><td>10%</td><td>₱ 9 600</td><td><span class="badge b-arrived">Payé</span></td></tr>
+        <table style="min-width:800px;">
+          <thead>
+            <tr>
+              <th>Parrain</th>
+              <th>Code unique</th>
+              <th>Filleuls</th>
+              <th>CA généré</th>
+              <th>Taux</th>
+              <th>Commission</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="parrainage-tbody">
+            <tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Aucun parrain enregistré</td></tr>
           </tbody>
         </table>
       </div>
@@ -1808,6 +1846,99 @@ function doUpdate(){
   showToast('✅ Statut mis à jour',t+' → '+newStatut);
 }
 
+/* ══════════════════════════════════════════
+   PARRAINAGE
+══════════════════════════════════════════ */
+var _parrains = (function(){
+  try{ return JSON.parse(localStorage.getItem('gcc_parrains')||'[]'); }catch(e){return [];}
+})();
+
+function _saveParrains(){
+  try{ localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); }catch(e){}
+}
+
+function _nextRefCode(){
+  if(!_parrains.length) return 'GCC-REF-0001';
+  var nums = _parrains.map(function(p){ return parseInt((p.code||'0').replace(/\D/g,''))||0; });
+  var next = Math.max.apply(null, nums) + 1;
+  return 'GCC-REF-' + String(next).padStart(4,'0');
+}
+
+function addParrain(){
+  var nom  = (document.getElementById('pNom')||{value:''}).value.trim();
+  var tel  = (document.getElementById('pTel')||{value:''}).value.trim();
+  var taux = parseInt((document.getElementById('pTaux')||{value:'5'}).value)||5;
+  if(!nom){ showToast('⚠️ Nom requis','Entrez le nom complet du parrain.'); return; }
+  var code = _nextRefCode();
+  _parrains.push({ code:code, nom:nom, tel:tel, taux:taux, statut:'À payer', dateCreation: new Date().toISOString().slice(0,10) });
+  _saveParrains();
+  document.getElementById('pNom').value = '';
+  document.getElementById('pTel').value = '';
+  initParrainageTab();
+  showToast('✅ Parrain ajouté', nom + ' — code : ' + code);
+}
+
+function removeParrain(code){
+  if(!confirm('Supprimer le parrain avec le code ' + code + ' ?')) return;
+  _parrains = _parrains.filter(function(p){ return p.code !== code; });
+  _saveParrains();
+  initParrainageTab();
+  showToast('🗑 Supprimé','Parrain retiré.');
+}
+
+function markParrainPaid(code){
+  for(var i=0;i<_parrains.length;i++){
+    if(_parrains[i].code===code){ _parrains[i].statut = _parrains[i].statut==='Payé' ? 'À payer' : 'Payé'; break; }
+  }
+  _saveParrains();
+  initParrainageTab();
+}
+
+function copyParrainCode(code){
+  if(navigator.clipboard){ navigator.clipboard.writeText(code).then(function(){ showToast('📋 Copié !', code + ' copié dans le presse-papiers.'); }); }
+  else{ var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast('📋 Copié !',code+' copié.'); }
+}
+
+function shareParrain(code, nom){
+  var msg = '🎁 GCC CARGO — Programme de parrainage\n\nBonjour ! Je vous invite à expédier vos colis avec GCC CARGO 🇵🇭→🌍\n\nUtilisez mon code de parrainage lors de votre demande :\n👉 ' + code + '\n\nRéservez sur : gcc-cargo-website.vercel.app\n\nMerci de la confiance !';
+  if(navigator.share){ navigator.share({title:'Code parrainage GCC CARGO', text:msg}).catch(function(){}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(msg).then(function(){ showToast('📤 Prêt à partager !','Message copié. Collez-le sur WhatsApp ou ailleurs.'); }); }
+  else{ showToast('📤 Code : '+code,'Partagez ce code : '+code); }
+}
+
+function initParrainageTab(){
+  var tbody = document.getElementById('parrainage-tbody');
+  if(!tbody) return;
+  if(!_parrains.length){
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:24px;">Aucun parrain enregistré — ajoutez-en un ci-dessus</td></tr>';
+    return;
+  }
+  var prix = parseFloat(localStorage.getItem('gcc_prix')||'0')||0;
+  tbody.innerHTML = _parrains.map(function(p){
+    // Compter filleuls depuis _submissions
+    var filleuls = (_submissions||[]).filter(function(s){ return (s.codeParrain||'').toUpperCase() === p.code.toUpperCase(); });
+    var nbFilleuls = filleuls.length;
+    var caTotal = filleuls.reduce(function(sum,s){ return sum + (parseFloat(s.poids)||0)*prix; }, 0);
+    var commission = caTotal * (p.taux/100);
+    var clsSt = p.statut==='Payé' ? 'b-arrived' : 'b-pending';
+    return '<tr>'+
+      '<td style="font-weight:600;">' + p.nom + (p.tel?'<br><small style="color:#888;font-weight:400;">'+p.tel+'</small>':'') + '</td>'+
+      '<td><code style="background:#f0f4ff;padding:3px 8px;border-radius:5px;font-size:.85rem;color:var(--navy);font-weight:700;">' + p.code + '</code></td>'+
+      '<td style="text-align:center;font-weight:700;color:var(--navy);">' + nbFilleuls + '</td>'+
+      '<td>₱ ' + caTotal.toLocaleString() + '</td>'+
+      '<td style="font-weight:600;">' + p.taux + '%</td>'+
+      '<td style="font-weight:700;color:var(--orange);">₱ ' + Math.round(commission).toLocaleString() + '</td>'+
+      '<td><span class="badge ' + clsSt + '">' + p.statut + '</span></td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button onclick="copyParrainCode(\''+p.code+'\')" title="Copier le code" style="background:#e3f2fd;color:var(--sky);border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.8rem;margin-right:3px;">📋</button>'+
+        '<button onclick="shareParrain(\''+p.code+'\',\''+p.nom.replace(/'/g,"\\'")+'\')" title="Partager" style="background:#e8f5e9;color:var(--green);border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.8rem;margin-right:3px;">📤</button>'+
+        '<button onclick="markParrainPaid(\''+p.code+'\')" title="'+(p.statut==='Payé'?'Marquer À payer':'Marquer Payé')+'" style="background:#fff3e0;color:var(--orange);border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.8rem;margin-right:3px;">'+(p.statut==='Payé'?'↩':'✅')+'</button>'+
+        '<button onclick="removeParrain(\''+p.code+'\')" title="Supprimer" style="background:#fce4ec;color:#c62828;border:none;padding:5px 9px;border-radius:5px;cursor:pointer;font-size:.8rem;">🗑</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
 function initColisTab(){
   var tbody = document.getElementById('colis-tbody');
   if(!tbody) return;
@@ -2020,6 +2151,7 @@ function showTab(name,btn){
   if (name === 'departs') initAdminFlyerPanel();
   if (name === 'parametres') loadParamSettings();
   if (name === 'colis') initColisTab();
+  if (name === 'parrainage') initParrainageTab();
 }
 
 // ═══════════ PARAMÈTRES ═══════════
