@@ -636,11 +636,16 @@ function doAdminLogin() {
     return Object.assign({'apikey':_SB_KEY,'Authorization':'Bearer '+_SB_KEY,'Content-Type':'application/json','Accept':'application/json'}, extra||{});
   }
 
-  // Strip large file base64 for DB (garde nom/type/taille seulement)
+  // Prépare l'entrée pour Supabase — images compressées conservées, PDF > 300 KB réduit à métadonnées
   function _sbPrepEntry(entry) {
     var e = JSON.parse(JSON.stringify(entry));
     if (e.fichiers && e.fichiers.length) {
-      e.fichiers = e.fichiers.map(function(f){ return {name:f.name,type:f.type,label:f.label,size:f.data?Math.round(f.data.length*.75):0}; });
+      e.fichiers = e.fichiers.map(function(f) {
+        if (f.type && f.type.indexOf('image') === 0) return f; // images compressées : OK
+        var sz = f.data ? Math.round(f.data.length * .75) : 0;
+        if (sz > 300 * 1024) return { name: f.name, type: f.type, label: f.label, size: sz }; // PDF trop grand
+        return f;
+      });
     }
     return e;
   }
@@ -666,6 +671,14 @@ function doAdminLogin() {
   function _sbDelete(ref) {
     fetch(_SB_URL+'/rest/v1/gcc_demandes?ref=eq.'+encodeURIComponent(ref), {
       method:'DELETE', headers:_sbHeaders({'Prefer':'return=minimal'})
+    }).catch(function(){});
+  }
+
+  // Mettre à jour une entrée complète dans Supabase (après édition admin)
+  function _sbUpdateEntry(ref, entry) {
+    fetch(_SB_URL+'/rest/v1/gcc_demandes?ref=eq.'+encodeURIComponent(ref), {
+      method:'PATCH', headers:_sbHeaders({'Prefer':'return=minimal'}),
+      body:JSON.stringify({ expediteur: entry.expediteur||'', destination: entry.destination||'', data: _sbPrepEntry(entry) })
     }).catch(function(){});
   }
 
@@ -753,8 +766,9 @@ function doAdminLogin() {
         var d = (typeof row.data==='string') ? JSON.parse(row.data) : (row.data||{});
         // Le statut de Supabase prime toujours sur le statut dans le champ data
         d.statut = row.statut || d.statut || 'En attente';
-        // Restaurer les fichiers binaires locaux si disponibles
-        if(localFileMap[row.ref]) d.fichiers = localFileMap[row.ref];
+        // Priorité : fichiers avec data depuis Supabase. Sinon fallback localStorage (ancien format).
+        var sbHasFiles = d.fichiers && d.fichiers.length > 0 && d.fichiers[0].data;
+        if (!sbHasFiles && localFileMap[row.ref]) d.fichiers = localFileMap[row.ref];
         return d;
       }).sort(function(a,b){ return (b.date||'')>(a.date||'')?1:-1; });
       try{ localStorage.setItem('gcc_submissions',JSON.stringify(_submissions.slice(0,200))); }catch(ex){}
@@ -770,6 +784,26 @@ function doAdminLogin() {
     });
   }
 
+  // Compresse une image via canvas (max 600px, qualité JPEG) pour stockage Supabase
+  function compressImage(dataUrl, maxW, maxH, quality, callback) {
+    try {
+      var img = new Image();
+      img.onload = function() {
+        try {
+          var w = img.width, h = img.height;
+          var scale = Math.min(1, maxW / w, maxH / h);
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.round(w * scale);
+          canvas.height = Math.round(h * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          callback(canvas.toDataURL('image/jpeg', quality));
+        } catch(e) { callback(dataUrl); }
+      };
+      img.onerror = function() { callback(dataUrl); };
+      img.src = dataUrl;
+    } catch(e) { callback(dataUrl); }
+  }
+
   // Read up to maxFiles files from a file input, max sizeLimit bytes each, returns array of {name,type,data}
   function readFilesAsBase64(inputId, maxFiles, sizeLimitBytes, callback) {
     var inp = document.getElementById(inputId);
@@ -780,10 +814,20 @@ function doAdminLogin() {
     files.forEach(function(file) {
       if (file.size > sizeLimitBytes) { pending--; if (pending === 0) callback(results); return; }
       var reader = new FileReader();
-      reader.onload = function(e) {
-        results.push({ name: file.name, type: file.type, data: e.target.result });
-        pending--;
-        if (pending === 0) callback(results);
+      reader.onload = function(ev) {
+        var raw = ev.target.result;
+        if (file.type && file.type.indexOf('image') === 0) {
+          // Compresser les images avant stockage (Supabase + localStorage)
+          compressImage(raw, 600, 600, 0.5, function(compressed) {
+            results.push({ name: file.name, type: 'image/jpeg', data: compressed });
+            pending--;
+            if (pending === 0) callback(results);
+          });
+        } else {
+          results.push({ name: file.name, type: file.type, data: raw });
+          pending--;
+          if (pending === 0) callback(results);
+        }
       };
       reader.onerror = function() { pending--; if (pending === 0) callback(results); };
       reader.readAsDataURL(file);
@@ -800,9 +844,9 @@ function doAdminLogin() {
     var entry = {
       ref:         ref,
       date:        now.toLocaleDateString('fr-FR'),
-      expediteur:  (document.querySelector('input[placeholder="Ex : William Tabi"]') || {value:''}).value,
+      expediteur:  (document.getElementById('nomExp') || {value:''}).value.trim(),
       tel_exp:     (document.querySelector('input[placeholder="+63 968 313 5356"]') || {value:''}).value,
-      email_exp:   (document.querySelector('input[type="email"]') || {value:''}).value,
+      email_exp:   (document.getElementById('emailExp') || {value:''}).value,
       recepteur:   (function(){var r=collectRecepteurs();return r.map(function(x){return x.nom;}).join(' | ');})(),
       tel_rec:     (function(){var r=collectRecepteurs();return r.map(function(x){return x.tel;}).join(' | ');})(),
       recepteurs:  collectRecepteurs(),
@@ -819,6 +863,13 @@ function doAdminLogin() {
       fichiers:    []
     };
     var form = e.target;
+    // Validation : photo colis TOUJOURS obligatoire
+    var colisInput = document.getElementById('colisFiles');
+    if (!colisInput || !colisInput.files || colisInput.files.length === 0) {
+      alert(LANG === 'en' ? 'Please add at least one package photo (required).' : 'Veuillez ajouter au moins une photo du colis (obligatoire).');
+      colisInput && colisInput.closest('.fg') && colisInput.closest('.fg').scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
     // Read ID file (max 1.5 MB)
     readFilesAsBase64('idFile', 1, 1.5*1024*1024, function(idFiles) {
       entry.fichiers = entry.fichiers.concat(idFiles.map(function(f){ return Object.assign({}, f, {label:'Pièce d\'identité'}); }));
@@ -838,9 +889,18 @@ function doAdminLogin() {
               try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex2){}
             }
             _sbSave(entry); // → Supabase (async, non-bloquant)
+            // Mémoriser le client si une pièce d'identité a été envoyée
+            if (entry.email_exp && entry.fichiers.some(function(f){ return f.label && f.label.indexOf('identit') !== -1; })) {
+              _saveClientProfile(entry.email_exp, entry.expediteur);
+            }
             showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
             form.reset();
             handleModeDepot('');
+            // Reset banner client récurrent
+            var rcBanner = document.getElementById('returningClientBanner');
+            if (rcBanner) rcBanner.style.display = 'none';
+            var idInp = document.getElementById('idFile');
+            if (idInp) idInp.required = false;
             var sBtn = document.getElementById('submitBtn');
             if (sBtn) sBtn.disabled = true;
             var idN = document.getElementById('id-name');
@@ -937,6 +997,7 @@ function doAdminLogin() {
         '<td style="white-space:nowrap;min-width:130px;">' +
         fichBtn +
         '<select class="adm-statut-sel" data-i="' + i + '" style="font-size:.72rem;width:100%;margin-bottom:4px;padding:4px 6px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;">' + statutOptions + '</select>' +
+        '<button class="notif-btn adm-edit-btn" data-i="' + i + '" style="font-size:.72rem;background:#e67e22;display:block;width:100%;margin-bottom:4px;">✏️ Éditer</button>' +
         '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;margin-bottom:4px;">📧 Email</button>' +
         '<button class="notif-btn adm-del-btn" data-i="' + i + '" style="font-size:.72rem;background:#e74c3c;display:block;width:100%;">🗑️ Supprimer</button>' +
         '</td>' +
@@ -976,6 +1037,9 @@ function doAdminLogin() {
     tbody.querySelectorAll('.adm-fichiers-btn').forEach(function(btn) {
       btn.addEventListener('click', function() { showFichiersModal(parseInt(this.getAttribute('data-i'))); });
     });
+    tbody.querySelectorAll('.adm-edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { showEditModal(parseInt(this.getAttribute('data-i'))); });
+    });
   }
   var _admFilter = 'all';
   function _gccSetFilter(f, btn) {
@@ -985,6 +1049,38 @@ function doAdminLogin() {
     refreshAdminTable();
   }
 
+  // Détection client récurrent — vérifie l'email pour proposer ID optionnel
+  function checkReturningClient(email) {
+    if (!email) return;
+    var emailLow = email.toLowerCase().trim();
+    var banner = document.getElementById('returningClientBanner');
+    var idInput = document.getElementById('idFile');
+    // Chercher dans les demandes précédentes (localStorage + _submissions)
+    var hasId = _submissions.some(function(s) {
+      return (s.email_exp||'').toLowerCase() === emailLow &&
+             s.fichiers && s.fichiers.some(function(f){ return f.label && f.label.indexOf('identit') !== -1 && f.data; });
+    });
+    // Aussi vérifier le localStorage des clients (sauvegarde légère)
+    if (!hasId) {
+      try {
+        var stored = JSON.parse(localStorage.getItem('gcc_clients') || '{}');
+        if (stored[emailLow] && stored[emailLow].hasId) hasId = true;
+      } catch(e){}
+    }
+    if (banner) banner.style.display = hasId ? 'block' : 'none';
+    if (idInput) idInput.required = !hasId;
+  }
+
+  // Sauvegarder le profil léger du client après soumission (sans données sensibles)
+  function _saveClientProfile(email, nom) {
+    if (!email) return;
+    try {
+      var stored = JSON.parse(localStorage.getItem('gcc_clients') || '{}');
+      stored[email.toLowerCase()] = { nom: nom, hasId: true };
+      localStorage.setItem('gcc_clients', JSON.stringify(stored));
+    } catch(e){}
+  }
+
   // Apply language + init on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
     setLang(LANG);
@@ -992,6 +1088,11 @@ function doAdminLogin() {
     refreshAdminTable();
     // Re-apply flyer display AFTER setLang() so it isn't overwritten
     if (typeof initFlyerDisplay === 'function') initFlyerDisplay();
+    // Détection client récurrent sur blur de l'email
+    var emailField = document.getElementById('emailExp');
+    if (emailField) {
+      emailField.addEventListener('blur', function(){ checkReturningClient(this.value); });
+    }
   });
 </script>
 </head>
@@ -1140,7 +1241,7 @@ function doAdminLogin() {
   <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
       <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input type="tel" placeholder="+63 968 313 5356" required></div>
       <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" id="emailExp" placeholder="votre@email.com" required></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
@@ -1309,8 +1410,11 @@ function doAdminLogin() {
       <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage <span style="font-weight:400;color:#888;">(optionnel)</span></label><input id="codeParrain" type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042" style="text-transform:uppercase;"></div>
 
       <!-- UPLOADS -->
-      <div class="fg full">
+      <div class="fg full" id="idUploadSection">
         <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale)</label>
+        <div id="returningClientBanner" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:12px 16px;margin-bottom:10px;font-size:.88rem;color:#2e7d32;">
+          ✅ <strong>Bienvenue !</strong> Nous avons déjà votre pièce d'identité enregistrée — vous n'avez pas besoin de la joindre à nouveau. <span style="opacity:.7;">(Elle reste acceptée si vous souhaitez la mettre à jour.)</span>
+        </div>
         <div class="upload-zone" onclick="document.getElementById('idFile').click()">
           <div class="uz-icon">🪪</div>
           <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
@@ -1850,6 +1954,48 @@ function doAdminLogin() {
   </div>
 </div>
 
+<!-- EDIT MODAL -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:28px;max-width:680px;width:94%;max-height:88vh;overflow-y:auto;position:relative;">
+    <button onclick="closeEditModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#666;">✕</button>
+    <div style="font-weight:700;font-size:1.05rem;color:var(--navy);margin-bottom:6px;">✏️ Éditer la demande</div>
+    <div id="editModalRef" style="font-size:.82rem;color:#888;margin-bottom:18px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Prénom & Nom expéditeur</label><input id="editNom" type="text" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Téléphone / WhatsApp</label><input id="editTel" type="tel" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Email</label><input id="editEmail" type="email" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Destination</label><input id="editDest" type="text" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div style="grid-column:1/-1;"><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Adresse client (Philippines)</label><input id="editAdresse" type="text" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Récepteur — Nom</label><input id="editRecNom" type="text" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Récepteur — Téléphone</label><input id="editRecTel" type="tel" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;"></div>
+      <div style="grid-column:1/-1;"><label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:4px;">Note / Commentaire interne</label><textarea id="editNote" rows="2" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:7px;font-size:.9rem;resize:vertical;"></textarea></div>
+    </div>
+    <!-- Upload fichiers supplémentaires -->
+    <div style="margin-top:18px;border-top:1px solid #eee;padding-top:16px;">
+      <div style="font-weight:700;font-size:.9rem;color:var(--navy);margin-bottom:10px;">📎 Ajouter / remplacer des fichiers</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">🪪 Pièce d'identité</label>
+          <input id="editIdFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="font-size:.8rem;width:100%;">
+        </div>
+        <div>
+          <label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">📦 Photos colis (max 5)</label>
+          <input id="editColisFiles" type="file" accept=".jpg,.jpeg,.png" multiple style="font-size:.8rem;width:100%;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">📄 Autre document</label>
+          <input id="editAutreFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="font-size:.8rem;width:100%;">
+        </div>
+      </div>
+      <div id="editFilesPreview" style="margin-top:10px;font-size:.78rem;color:#888;"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;border-top:1px solid #eee;padding-top:16px;">
+      <button onclick="closeEditModal()" style="padding:10px 20px;border-radius:7px;border:1px solid #ddd;background:#fff;color:#666;font-weight:600;cursor:pointer;">Annuler</button>
+      <button onclick="saveEditModal()" style="padding:10px 24px;border-radius:7px;border:none;background:var(--orange);color:#fff;font-weight:700;cursor:pointer;font-size:.95rem;">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- FICHIERS MODAL -->
 <div id="fichiersModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:14px;padding:28px;max-width:680px;width:90%;max-height:82vh;overflow-y:auto;position:relative;">
@@ -2176,6 +2322,96 @@ function exportDemandes() {
   showToast('✅ Export réussi', _submissions.length + ' demande(s) exportée(s) en CSV.');
 }
 
+/* ── EDIT MODAL ── */
+var _editIdx = -1;
+function showEditModal(idx) {
+  var s = _submissions[idx];
+  if (!s) return;
+  _editIdx = idx;
+  document.getElementById('editModalRef').textContent = s.ref + ' — ' + (s.date||'');
+  document.getElementById('editNom').value    = s.expediteur || '';
+  document.getElementById('editTel').value    = s.tel_exp    || '';
+  document.getElementById('editEmail').value  = s.email_exp  || '';
+  document.getElementById('editDest').value   = s.destination|| '';
+  document.getElementById('editAdresse').value= s.adresseClient||'';
+  // Premier récepteur
+  var rec0 = (s.recepteurs && s.recepteurs[0]) || {};
+  document.getElementById('editRecNom').value = rec0.nom||s.recepteur||'';
+  document.getElementById('editRecTel').value = rec0.tel||s.tel_rec||'';
+  document.getElementById('editNote').value   = s.noteAdmin||'';
+  // Aperçu fichiers existants
+  var prev = document.getElementById('editFilesPreview');
+  if (prev) {
+    var fList = s.fichiers && s.fichiers.length > 0
+      ? s.fichiers.map(function(f){ return (f.label||'Fichier') + ' : ' + f.name + (f.data?'  ✅':'  ⚠️ hors ligne'); }).join('<br>')
+      : 'Aucun fichier enregistré';
+    prev.innerHTML = '<b>Fichiers actuels :</b><br>' + fList;
+  }
+  // Reset file inputs
+  ['editIdFile','editColisFiles','editAutreFile'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var modal = document.getElementById('editModal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow='hidden'; }
+}
+
+function closeEditModal() {
+  var modal = document.getElementById('editModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+
+function saveEditModal() {
+  if (_editIdx < 0 || !_submissions[_editIdx]) return;
+  var s = _submissions[_editIdx];
+  // Mettre à jour les champs texte
+  s.expediteur    = document.getElementById('editNom').value.trim();
+  s.tel_exp       = document.getElementById('editTel').value.trim();
+  s.email_exp     = document.getElementById('editEmail').value.trim();
+  s.destination   = document.getElementById('editDest').value.trim();
+  s.adresseClient = document.getElementById('editAdresse').value.trim();
+  s.noteAdmin     = document.getElementById('editNote').value.trim();
+  // Mettre à jour premier récepteur
+  var recNom = document.getElementById('editRecNom').value.trim();
+  var recTel = document.getElementById('editRecTel').value.trim();
+  s.recepteur = recNom;
+  s.tel_rec   = recTel;
+  if (s.recepteurs && s.recepteurs.length > 0) {
+    s.recepteurs[0].nom = recNom;
+    s.recepteurs[0].tel = recTel;
+  } else {
+    s.recepteurs = [{nom: recNom, tel: recTel}];
+  }
+  // Lire les nouveaux fichiers, compresser et ajouter
+  var pending = 3, added = [];
+  function trySave() {
+    pending--;
+    if (pending > 0) return;
+    if (added.length > 0) {
+      s.fichiers = (s.fichiers||[]).filter(function(f){
+        // Remplacer les fichiers du même label
+        return !added.some(function(a){ return a.label === f.label; });
+      }).concat(added);
+    }
+    // Sauvegarder
+    try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(e){}
+    _sbUpdateEntry(s.ref, s);
+    refreshAdminTable();
+    closeEditModal();
+    showToast('✅ Demande mise à jour', s.ref + ' — modifications enregistrées.');
+  }
+  readFilesAsBase64('editIdFile', 1, 3*1024*1024, function(files){
+    files.forEach(function(f){ added.push(Object.assign({},f,{label:"Pièce d'identité"})); });
+    trySave();
+  });
+  readFilesAsBase64('editColisFiles', 5, 2*1024*1024, function(files){
+    files.forEach(function(f){ added.push(Object.assign({},f,{label:'Photo colis'})); });
+    trySave();
+  });
+  readFilesAsBase64('editAutreFile', 1, 3*1024*1024, function(files){
+    files.forEach(function(f){ added.push(Object.assign({},f,{label:'Document admin'})); });
+    trySave();
+  });
+}
+
 /* ── FICHIERS MODAL ── */
 function showFichiersModal(idx) {
   var s = _submissions[idx];
@@ -2187,12 +2423,16 @@ function showFichiersModal(idx) {
   s.fichiers.forEach(function(f, fi) {
     html += '<div style="margin-bottom:20px;border:1px solid #eee;border-radius:8px;padding:14px;">';
     html += '<div style="font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:8px;">📎 ' + (f.label||'Fichier') + ' — ' + f.name + '</div>';
-    if (f.type && f.type.indexOf('image') === 0) {
-      html += '<img src="' + f.data + '" alt="' + f.name + '" style="max-width:100%;max-height:320px;border-radius:6px;display:block;margin-bottom:8px;">';
+    if (f.data) {
+      if (f.type && f.type.indexOf('image') === 0) {
+        html += '<img src="' + f.data + '" alt="' + f.name + '" style="max-width:100%;max-height:320px;border-radius:6px;display:block;margin-bottom:8px;">';
+      } else {
+        html += '<div style="background:#f5f5f5;border-radius:6px;padding:10px;font-size:.82rem;color:#666;margin-bottom:8px;">📄 Fichier PDF — cliquez pour télécharger</div>';
+      }
+      html += '<a href="' + f.data + '" download="' + f.name + '" style="display:inline-block;background:var(--navy);color:#fff;font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:4px;text-decoration:none;">⬇ Télécharger</a>';
     } else {
-      html += '<div style="background:#f5f5f5;border-radius:6px;padding:10px;font-size:.82rem;color:#666;margin-bottom:8px;">📄 Fichier PDF — cliquez ci-dessous pour télécharger</div>';
+      html += '<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:10px;font-size:.82rem;color:#795548;">📵 Fichier non disponible en cloud — ' + Math.round((f.size||0)/1024) + ' KB — disponible sur l\'appareil d\'origine</div>';
     }
-    html += '<a href="' + f.data + '" download="' + f.name + '" style="display:inline-block;background:var(--navy);color:#fff;font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:4px;text-decoration:none;">⬇ Télécharger</a>';
     html += '</div>';
   });
   content.innerHTML = html;
