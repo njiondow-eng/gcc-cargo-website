@@ -720,14 +720,25 @@ function doAdminLogin() {
     .then(function(rows){
       if(!Array.isArray(rows)){ _sbOk=false; if(done)done(false); return; }
       _sbOk = true;
+      // Sauvegarder une copie locale avant tout remplacement
+      var localBackup = (_submissions && _submissions.length > 0) ? _submissions.slice() : [];
       // Préserver seulement les fichiers binaires locaux (trop lourds pour Supabase)
       var localFileMap={};
-      (_submissions||[]).forEach(function(s){
+      localBackup.forEach(function(s){
         if(s.ref && s.fichiers && s.fichiers[0] && s.fichiers[0].data){
           localFileMap[s.ref]=s.fichiers;
         }
       });
-      // Supabase est la source de vérité : on ne garde QUE ce qui est dans Supabase
+      // PROTECTION : si Supabase renvoie 0 lignes mais qu'on a des données locales,
+      // on conserve le local — la table Supabase est peut-être vide (setup initial)
+      if(rows.length === 0 && localBackup.length > 0){
+        _sbOk = true;
+        if(syncBtn){ syncBtn.textContent='⚠️ Supabase vide ('+localBackup.length+' locaux)'; setTimeout(function(){ if(syncBtn)syncBtn.textContent='🔄 Sync'; },4000); }
+        refreshAdminTable();
+        if(done) done(true);
+        return;
+      }
+      // Supabase est la source de vérité (>0 lignes) : on applique les suppressions distantes
       _submissions = rows.map(function(row){
         var d = (typeof row.data==='string') ? JSON.parse(row.data) : (row.data||{});
         // Le statut de Supabase prime toujours sur le statut dans le champ data
