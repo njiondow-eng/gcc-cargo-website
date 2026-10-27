@@ -1784,10 +1784,14 @@ function doAdminLogin() {
             <input type="text" id="paramGcashNom" placeholder="WILLIAM NJIONDO" style="font-size:1rem;">
           </div>
         </div>
-        <div class="au-row" style="grid-template-columns:1fr 1fr;margin-top:10px;align-items:end;">
+        <div class="au-row" style="grid-template-columns:1fr 1fr 1fr;margin-top:10px;align-items:end;">
           <div class="au-field">
-            <label>Numéro Bank Transfer</label>
-            <input type="text" id="paramBankNum" placeholder="BPI / BDO / Metrobank..." style="font-size:1rem;">
+            <label>Nom de la banque</label>
+            <input type="text" id="paramBankName" placeholder="ex: BPI, BDO, Metrobank" style="font-size:1rem;">
+          </div>
+          <div class="au-field">
+            <label>Numéro de compte</label>
+            <input type="text" id="paramBankNum" placeholder="ex: 1234567890" style="font-size:1rem;">
           </div>
           <div class="au-field">
             <label>Nom titulaire du compte</label>
@@ -2319,14 +2323,15 @@ function showTab(name,btn){
 }
 
 // ═══════════ PARAMÈTRES ═══════════
-function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankNum, bankNom) {
+function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankName, bankNum, bankNom) {
   var el = function(id){ return document.getElementById(id); };
-  if(el('paramPrixKg'))    el('paramPrixKg').value    = prix    || '';
-  if(el('paramPrixKgXaf')) el('paramPrixKgXaf').value = prixXaf || '';
-  if(el('paramGcashNum'))  el('paramGcashNum').value  = gcashNum|| '';
-  if(el('paramGcashNom'))  el('paramGcashNom').value  = gcashNom|| '';
-  if(el('paramBankNum'))   el('paramBankNum').value   = bankNum || '';
-  if(el('paramBankNom'))   el('paramBankNom').value   = bankNom || '';
+  if(el('paramPrixKg'))    el('paramPrixKg').value    = prix     || '';
+  if(el('paramPrixKgXaf')) el('paramPrixKgXaf').value = prixXaf  || '';
+  if(el('paramGcashNum'))  el('paramGcashNum').value  = gcashNum || '';
+  if(el('paramGcashNom'))  el('paramGcashNom').value  = gcashNom || '';
+  if(el('paramBankName'))  el('paramBankName').value  = bankName || '';
+  if(el('paramBankNum'))   el('paramBankNum').value   = bankNum  || '';
+  if(el('paramBankNom'))   el('paramBankNom').value   = bankNom  || '';
   var qr = localStorage.getItem('gcc_qr') || '';
   if (qr) {
     var img = document.getElementById('paramQrPreview');
@@ -2338,10 +2343,11 @@ function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankNum, bankNom) 
     var delBtn = document.getElementById('paramQrDelBtn');
     if(delBtn) delBtn.style.display='inline-block';
   }
+  var bankLabel = (bankName || '') + (bankNum ? ' · ' + bankNum : '') + (bankNom ? ' (' + bankNom + ')' : '');
   var lines = [
     '<b>Prix par kg :</b> ' + (prix ? '₱ ' + prix : '—') + (prixXaf ? '  /  ' + prixXaf + ' XAF' : ''),
     '<b>GCash / Maya :</b> ' + (gcashNum || '—') + (gcashNom ? ' (' + gcashNom + ')' : ''),
-    '<b>Bank transfer :</b> ' + (bankNum || '—') + (bankNom ? ' (' + bankNom + ')' : ''),
+    '<b>Bank transfer :</b> ' + (bankLabel || '—'),
     '<b>QR code :</b> ' + (qr ? '✅ Enregistré' : '❌ Aucun')
   ];
   var prev = document.getElementById('paramPreview');
@@ -2349,32 +2355,29 @@ function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankNum, bankNom) 
 }
 
 function loadParamSettings() {
-  // Capturer les valeurs locales EN PREMIER — avant que _sbLoadSettings puisse les effacer
-  var lPrix     = ''; var lPrixXaf = ''; var lGcash = '';
-  var lGcashNom = ''; var lBank    = ''; var lBankNom= '';
+  var lPrix=''; var lPrixXaf=''; var lGcash=''; var lGcashNom='';
+  var lBankName=''; var lBank=''; var lBankNom='';
   try {
-    lPrix     = localStorage.getItem('gcc_prix')    ||'';
-    lPrixXaf  = localStorage.getItem('gcc_prix_xaf')||'';
-    lGcash    = localStorage.getItem('gcc_gcash')   ||'';
-    lGcashNom = localStorage.getItem('gcc_gcash_nom')||'';
-    lBank     = localStorage.getItem('gcc_bank')    ||'';
-    lBankNom  = localStorage.getItem('gcc_bank_nom')||'';
+    lPrix     = localStorage.getItem('gcc_prix')      ||'';
+    lPrixXaf  = localStorage.getItem('gcc_prix_xaf')  ||'';
+    lGcash    = localStorage.getItem('gcc_gcash')     ||'';
+    lGcashNom = localStorage.getItem('gcc_gcash_nom') ||'';
+    lBankName = localStorage.getItem('gcc_bank_name') ||'';
+    lBank     = localStorage.getItem('gcc_bank')      ||'';
+    lBankNom  = localStorage.getItem('gcc_bank_nom')  ||'';
   } catch(e) {}
-  // 1. Afficher immédiatement depuis localStorage (réponse instantanée)
-  try { _applyParamValues(lPrix, lPrixXaf, lGcash, lGcashNom, lBank, lBankNom); } catch(e) {}
-  // 2. Puis charger depuis Supabase (synchronisation entre admins)
+  try { _applyParamValues(lPrix, lPrixXaf, lGcash, lGcashNom, lBankName, lBank, lBankNom); } catch(e) {}
   _sbLoadSettings(function(obj) {
-    if (!obj) return; // Supabase indisponible — on garde le local
+    if (!obj) return;
     try {
-      // Si une clé est absente ou vide dans Supabase (sauvegarde pas encore terminée),
-      // on utilise la valeur locale capturée AVANT le fetch
       _applyParamValues(
-        obj.gcc_prix     || lPrix,
-        obj.gcc_prix_xaf || lPrixXaf,
-        obj.gcc_gcash    || lGcash,
-        obj.gcc_gcash_nom|| lGcashNom,
-        obj.gcc_bank     || lBank,
-        obj.gcc_bank_nom || lBankNom
+        obj.gcc_prix      || lPrix,
+        obj.gcc_prix_xaf  || lPrixXaf,
+        obj.gcc_gcash     || lGcash,
+        obj.gcc_gcash_nom || lGcashNom,
+        obj.gcc_bank_name || lBankName,
+        obj.gcc_bank      || lBank,
+        obj.gcc_bank_nom  || lBankNom
       );
     } catch(e) {}
   });
@@ -2392,10 +2395,10 @@ function syncParamFromCloud(btn) {
       if(obj.gcc_prix_xaf)  { document.getElementById('paramPrixKgXaf').value = obj.gcc_prix_xaf;  got.push('Prix XAF'); }
       if(obj.gcc_gcash)     { document.getElementById('paramGcashNum').value  = obj.gcc_gcash;     got.push('GCash'); }
       if(obj.gcc_gcash_nom) { document.getElementById('paramGcashNom').value  = obj.gcc_gcash_nom; got.push('Nom GCash'); }
-      if(obj.gcc_bank)      { document.getElementById('paramBankNum').value   = obj.gcc_bank;      got.push('Bank'); }
-      if(obj.gcc_bank_nom)  { document.getElementById('paramBankNom').value   = obj.gcc_bank_nom;  got.push('Nom Bank'); }
-      // Mettre à jour le preview aussi
-      try { _applyParamValues(obj.gcc_prix||'', obj.gcc_prix_xaf||'', obj.gcc_gcash||'', obj.gcc_gcash_nom||'', obj.gcc_bank||'', obj.gcc_bank_nom||''); } catch(e){}
+      if(obj.gcc_bank_name) { document.getElementById('paramBankName').value  = obj.gcc_bank_name; got.push('Nom banque'); }
+      if(obj.gcc_bank)      { document.getElementById('paramBankNum').value   = obj.gcc_bank;      got.push('Numéro bank'); }
+      if(obj.gcc_bank_nom)  { document.getElementById('paramBankNom').value   = obj.gcc_bank_nom;  got.push('Titulaire bank'); }
+      try { _applyParamValues(obj.gcc_prix||'', obj.gcc_prix_xaf||'', obj.gcc_gcash||'', obj.gcc_gcash_nom||'', obj.gcc_bank_name||'', obj.gcc_bank||'', obj.gcc_bank_nom||''); } catch(e){}
       if(got.length > 0){
         showToast('✅ Synchronisé', 'Champs chargés : '+got.join(', ')+'.');
       } else {
@@ -2407,27 +2410,30 @@ function syncParamFromCloud(btn) {
 
 function saveParams() {
   try {
-    var prix    = document.getElementById('paramPrixKg')    ? document.getElementById('paramPrixKg').value.trim()    : '';
-    var prixXaf = document.getElementById('paramPrixKgXaf') ? document.getElementById('paramPrixKgXaf').value.trim() : '';
-    var gNum    = document.getElementById('paramGcashNum')  ? document.getElementById('paramGcashNum').value.trim()  : '';
-    var gNom    = document.getElementById('paramGcashNom')  ? document.getElementById('paramGcashNom').value.trim()  : '';
-    var bNum    = document.getElementById('paramBankNum')   ? document.getElementById('paramBankNum').value.trim()   : '';
-    var bNom    = document.getElementById('paramBankNom')   ? document.getElementById('paramBankNom').value.trim()   : '';
+    var prix     = document.getElementById('paramPrixKg')    ? document.getElementById('paramPrixKg').value.trim()    : '';
+    var prixXaf  = document.getElementById('paramPrixKgXaf') ? document.getElementById('paramPrixKgXaf').value.trim() : '';
+    var gNum     = document.getElementById('paramGcashNum')  ? document.getElementById('paramGcashNum').value.trim()  : '';
+    var gNom     = document.getElementById('paramGcashNom')  ? document.getElementById('paramGcashNom').value.trim()  : '';
+    var bName    = document.getElementById('paramBankName')  ? document.getElementById('paramBankName').value.trim()  : '';
+    var bNum     = document.getElementById('paramBankNum')   ? document.getElementById('paramBankNum').value.trim()   : '';
+    var bNom     = document.getElementById('paramBankNom')   ? document.getElementById('paramBankNom').value.trim()   : '';
     // 1. Sauvegarder dans localStorage (fallback hors-ligne)
-    if(prix)    localStorage.setItem('gcc_prix',      prix);    else localStorage.removeItem('gcc_prix');
-    if(prixXaf) localStorage.setItem('gcc_prix_xaf',  prixXaf); else localStorage.removeItem('gcc_prix_xaf');
-    if(gNum)    localStorage.setItem('gcc_gcash',     gNum);    else localStorage.removeItem('gcc_gcash');
-    if(gNom)    localStorage.setItem('gcc_gcash_nom', gNom);    else localStorage.removeItem('gcc_gcash_nom');
-    if(bNum)    localStorage.setItem('gcc_bank',      bNum);    else localStorage.removeItem('gcc_bank');
-    if(bNom)    localStorage.setItem('gcc_bank_nom',  bNom);    else localStorage.removeItem('gcc_bank_nom');
-    // 2. Sync vers Supabase (seulement les champs non-vides pour ne pas écraser les valeurs des autres admins)
+    if(prix)    localStorage.setItem('gcc_prix',      prix);     else localStorage.removeItem('gcc_prix');
+    if(prixXaf) localStorage.setItem('gcc_prix_xaf',  prixXaf);  else localStorage.removeItem('gcc_prix_xaf');
+    if(gNum)    localStorage.setItem('gcc_gcash',     gNum);     else localStorage.removeItem('gcc_gcash');
+    if(gNom)    localStorage.setItem('gcc_gcash_nom', gNom);     else localStorage.removeItem('gcc_gcash_nom');
+    if(bName)   localStorage.setItem('gcc_bank_name', bName);    else localStorage.removeItem('gcc_bank_name');
+    if(bNum)    localStorage.setItem('gcc_bank',      bNum);     else localStorage.removeItem('gcc_bank');
+    if(bNom)    localStorage.setItem('gcc_bank_nom',  bNom);     else localStorage.removeItem('gcc_bank_nom');
+    // 2. Sync vers Supabase (seulement les champs non-vides)
     var sbData = {};
-    if(prix)    sbData.gcc_prix     = prix;
-    if(prixXaf) sbData.gcc_prix_xaf = prixXaf;
-    if(gNum)    sbData.gcc_gcash    = gNum;
-    if(gNom)    sbData.gcc_gcash_nom= gNom;
-    if(bNum)    sbData.gcc_bank     = bNum;
-    if(bNom)    sbData.gcc_bank_nom = bNom;
+    if(prix)    sbData.gcc_prix      = prix;
+    if(prixXaf) sbData.gcc_prix_xaf  = prixXaf;
+    if(gNum)    sbData.gcc_gcash     = gNum;
+    if(gNom)    sbData.gcc_gcash_nom = gNom;
+    if(bName)   sbData.gcc_bank_name = bName;
+    if(bNum)    sbData.gcc_bank      = bNum;
+    if(bNom)    sbData.gcc_bank_nom  = bNom;
     if(Object.keys(sbData).length > 0) _sbSaveSettings(sbData);
     loadParamSettings();
     showToast('Paramètres sauvegardés', 'Synchronisé avec tous les appareils admin.');
