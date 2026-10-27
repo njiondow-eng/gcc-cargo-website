@@ -1763,7 +1763,10 @@ function doAdminLogin() {
             <label>Prix par kg (XAF)</label>
             <input type="number" id="paramPrixKgXaf" min="0" step="100" placeholder="ex: 3500" style="font-size:1rem;">
           </div>
-          <button class="btn-update" onclick="saveParams()">💾 Enregistrer</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn-update" onclick="saveParams()">💾 Enregistrer</button>
+            <button class="btn-update" onclick="syncParamFromCloud(this)" style="background:#27ae60;">🔄 Actualiser depuis cloud</button>
+          </div>
         </div>
         <div style="font-size:.8rem;color:#888;margin-top:8px;">Ces tarifs s'affichent dans la section Tarifs du site.</div>
       </div>
@@ -1791,7 +1794,8 @@ function doAdminLogin() {
             <input type="text" id="paramBankNom" placeholder="WILLIAM NJIONDO" style="font-size:1rem;">
           </div>
         </div>
-        <div style="margin-top:12px;text-align:right;">
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn-update" onclick="syncParamFromCloud(this)" style="background:#27ae60;">🔄 Actualiser depuis cloud</button>
           <button class="btn-update" onclick="saveParams()">💾 Enregistrer</button>
         </div>
       </div>
@@ -2376,6 +2380,31 @@ function loadParamSettings() {
   });
 }
 
+function syncParamFromCloud(btn) {
+  var origText = btn ? btn.textContent : '';
+  if(btn){ btn.textContent='⏳ Chargement...'; btn.disabled=true; }
+  _sbLoadSettings(function(obj){
+    if(btn){ btn.textContent=origText; btn.disabled=false; }
+    if(!obj){ showToast('Erreur sync', 'Impossible de contacter Supabase.'); return; }
+    var got = [];
+    try {
+      if(obj.gcc_prix)      { document.getElementById('paramPrixKg').value    = obj.gcc_prix;      got.push('Prix kg'); }
+      if(obj.gcc_prix_xaf)  { document.getElementById('paramPrixKgXaf').value = obj.gcc_prix_xaf;  got.push('Prix XAF'); }
+      if(obj.gcc_gcash)     { document.getElementById('paramGcashNum').value  = obj.gcc_gcash;     got.push('GCash'); }
+      if(obj.gcc_gcash_nom) { document.getElementById('paramGcashNom').value  = obj.gcc_gcash_nom; got.push('Nom GCash'); }
+      if(obj.gcc_bank)      { document.getElementById('paramBankNum').value   = obj.gcc_bank;      got.push('Bank'); }
+      if(obj.gcc_bank_nom)  { document.getElementById('paramBankNom').value   = obj.gcc_bank_nom;  got.push('Nom Bank'); }
+      // Mettre à jour le preview aussi
+      try { _applyParamValues(obj.gcc_prix||'', obj.gcc_prix_xaf||'', obj.gcc_gcash||'', obj.gcc_gcash_nom||'', obj.gcc_bank||'', obj.gcc_bank_nom||''); } catch(e){}
+      if(got.length > 0){
+        showToast('✅ Synchronisé', 'Champs chargés : '+got.join(', ')+'.');
+      } else {
+        showToast('Aucune donnée cloud', 'Supabase ne contient pas encore de paramètres.');
+      }
+    } catch(e){ showToast('Erreur', 'Problème lors de l\'application des données.'); }
+  });
+}
+
 function saveParams() {
   try {
     var prix    = document.getElementById('paramPrixKg')    ? document.getElementById('paramPrixKg').value.trim()    : '';
@@ -2391,12 +2420,15 @@ function saveParams() {
     if(gNom)    localStorage.setItem('gcc_gcash_nom', gNom);    else localStorage.removeItem('gcc_gcash_nom');
     if(bNum)    localStorage.setItem('gcc_bank',      bNum);    else localStorage.removeItem('gcc_bank');
     if(bNom)    localStorage.setItem('gcc_bank_nom',  bNom);    else localStorage.removeItem('gcc_bank_nom');
-    // 2. Sync vers Supabase (visible par tous les admins)
-    _sbSaveSettings({
-      gcc_prix: prix, gcc_prix_xaf: prixXaf,
-      gcc_gcash: gNum, gcc_gcash_nom: gNom,
-      gcc_bank: bNum, gcc_bank_nom: bNom
-    });
+    // 2. Sync vers Supabase (seulement les champs non-vides pour ne pas écraser les valeurs des autres admins)
+    var sbData = {};
+    if(prix)    sbData.gcc_prix     = prix;
+    if(prixXaf) sbData.gcc_prix_xaf = prixXaf;
+    if(gNum)    sbData.gcc_gcash    = gNum;
+    if(gNom)    sbData.gcc_gcash_nom= gNom;
+    if(bNum)    sbData.gcc_bank     = bNum;
+    if(bNom)    sbData.gcc_bank_nom = bNom;
+    if(Object.keys(sbData).length > 0) _sbSaveSettings(sbData);
     loadParamSettings();
     showToast('Paramètres sauvegardés', 'Synchronisé avec tous les appareils admin.');
   } catch(e) { showToast('Erreur', 'Impossible de sauvegarder.'); }
