@@ -672,15 +672,25 @@ function doAdminLogin() {
   // ── SETTINGS Supabase ──────────────────────────────────────────────────────
   // Sauvegarder un ou plusieurs paramètres dans gcc_settings (upsert par clé)
   function _sbSaveSettings(obj) {
-    var rows = Object.keys(obj).map(function(k){
-      return {key: k, value: obj[k] === null || obj[k] === undefined ? '' : String(obj[k])};
+    // Envoyer une requête par clé pour éviter les problèmes d'upsert en batch
+    Object.keys(obj).forEach(function(k) {
+      var val = (obj[k] === null || obj[k] === undefined) ? '' : String(obj[k]);
+      // 1. Essayer PATCH (mise à jour si la ligne existe)
+      fetch(_SB_URL+'/rest/v1/gcc_settings?key=eq.'+encodeURIComponent(k), {
+        method: 'PATCH',
+        headers: _sbHeaders({'Prefer':'return=representation'}),
+        body: JSON.stringify({value: val})
+      }).then(function(r){ return r.json(); }).then(function(res){
+        // Si aucune ligne mise à jour → la clé n'existe pas encore → INSERT
+        if (!Array.isArray(res) || res.length === 0) {
+          fetch(_SB_URL+'/rest/v1/gcc_settings', {
+            method: 'POST',
+            headers: _sbHeaders({'Prefer':'return=minimal'}),
+            body: JSON.stringify({key: k, value: val})
+          }).catch(function(){});
+        }
+      }).catch(function(){});
     });
-    if (!rows.length) return;
-    fetch(_SB_URL+'/rest/v1/gcc_settings?on_conflict=key', {
-      method:'POST',
-      headers:_sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
-      body: JSON.stringify(rows)
-    }).catch(function(){});
   }
 
   // Charger tous les paramètres depuis gcc_settings
