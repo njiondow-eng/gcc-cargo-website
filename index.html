@@ -2306,6 +2306,7 @@ function showTab(name,btn){
   document.getElementById('tab-'+name).style.display='block';
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  try { localStorage.setItem('gcc_admin_tab', name); } catch(e) {}
   if (name === 'departs') initAdminFlyerPanel();
   if (name === 'parametres') loadParamSettings();
   if (name === 'colis') initColisTab();
@@ -2344,30 +2345,32 @@ function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankNum, bankNom) 
 }
 
 function loadParamSettings() {
-  // 1. Afficher immédiatement depuis localStorage (réponse instantanée)
+  // Capturer les valeurs locales EN PREMIER — avant que _sbLoadSettings puisse les effacer
+  var lPrix     = ''; var lPrixXaf = ''; var lGcash = '';
+  var lGcashNom = ''; var lBank    = ''; var lBankNom= '';
   try {
-    _applyParamValues(
-      localStorage.getItem('gcc_prix')||'',
-      localStorage.getItem('gcc_prix_xaf')||'',
-      localStorage.getItem('gcc_gcash')||'',
-      localStorage.getItem('gcc_gcash_nom')||'',
-      localStorage.getItem('gcc_bank')||'',
-      localStorage.getItem('gcc_bank_nom')||''
-    );
+    lPrix     = localStorage.getItem('gcc_prix')    ||'';
+    lPrixXaf  = localStorage.getItem('gcc_prix_xaf')||'';
+    lGcash    = localStorage.getItem('gcc_gcash')   ||'';
+    lGcashNom = localStorage.getItem('gcc_gcash_nom')||'';
+    lBank     = localStorage.getItem('gcc_bank')    ||'';
+    lBankNom  = localStorage.getItem('gcc_bank_nom')||'';
   } catch(e) {}
+  // 1. Afficher immédiatement depuis localStorage (réponse instantanée)
+  try { _applyParamValues(lPrix, lPrixXaf, lGcash, lGcashNom, lBank, lBankNom); } catch(e) {}
   // 2. Puis charger depuis Supabase (synchronisation entre admins)
   _sbLoadSettings(function(obj) {
     if (!obj) return; // Supabase indisponible — on garde le local
     try {
-      // Si Supabase n'a pas encore la valeur (sauvegarde async pas terminée),
-      // on garde le localStorage plutôt que d'effacer le champ
+      // Si une clé est absente ou vide dans Supabase (sauvegarde pas encore terminée),
+      // on utilise la valeur locale capturée AVANT le fetch
       _applyParamValues(
-        obj.gcc_prix     || localStorage.getItem('gcc_prix')    ||'',
-        obj.gcc_prix_xaf || localStorage.getItem('gcc_prix_xaf')||'',
-        obj.gcc_gcash    || localStorage.getItem('gcc_gcash')   ||'',
-        obj.gcc_gcash_nom|| localStorage.getItem('gcc_gcash_nom')||'',
-        obj.gcc_bank     || localStorage.getItem('gcc_bank')    ||'',
-        obj.gcc_bank_nom || localStorage.getItem('gcc_bank_nom')||''
+        obj.gcc_prix     || lPrix,
+        obj.gcc_prix_xaf || lPrixXaf,
+        obj.gcc_gcash    || lGcash,
+        obj.gcc_gcash_nom|| lGcashNom,
+        obj.gcc_bank     || lBank,
+        obj.gcc_bank_nom || lBankNom
       );
     } catch(e) {}
   });
@@ -2470,6 +2473,14 @@ function doLogout() {
       document.addEventListener('DOMContentLoaded', function() {
         var panel = document.getElementById('adminPanel');
         if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+        // Restaurer le dernier onglet actif avant le refresh
+        try {
+          var lastTab = localStorage.getItem('gcc_admin_tab');
+          if (lastTab && lastTab !== 'demandes') {
+            var tabBtn = document.querySelector('.adm-tab[onclick*="\''+lastTab+'\'"]');
+            if (tabBtn) { showTab(lastTab, tabBtn); }
+          }
+        } catch(e) {}
         setTimeout(function(){ _sbSyncAll(); }, 500); // Sync Supabase au rechargement
       });
     }
