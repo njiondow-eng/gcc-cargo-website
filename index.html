@@ -669,31 +669,75 @@ function doAdminLogin() {
     }).catch(function(){});
   }
 
-  // Charger toutes les demandes depuis Supabase + fusionner avec localStorage
+  // ── SETTINGS Supabase ──────────────────────────────────────────────────────
+  // Sauvegarder un ou plusieurs paramètres dans gcc_settings (upsert par clé)
+  function _sbSaveSettings(obj) {
+    var rows = Object.keys(obj).map(function(k){
+      return {key: k, value: obj[k] === null || obj[k] === undefined ? '' : String(obj[k])};
+    });
+    if (!rows.length) return;
+    fetch(_SB_URL+'/rest/v1/gcc_settings', {
+      method:'POST',
+      headers:_sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
+      body: JSON.stringify(rows)
+    }).catch(function(){});
+  }
+
+  // Charger tous les paramètres depuis gcc_settings
+  function _sbLoadSettings(done) {
+    fetch(_SB_URL+'/rest/v1/gcc_settings?select=key,value', {
+      headers:_sbHeaders()
+    }).then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(function(rows){
+      if(!Array.isArray(rows)) { if(done)done(null); return; }
+      var obj={};
+      rows.forEach(function(r){ obj[r.key]=r.value; });
+      // Sync dans localStorage aussi pour fallback hors-ligne
+      Object.keys(obj).forEach(function(k){
+        try{
+          if(obj[k]) localStorage.setItem(k, obj[k]);
+          else localStorage.removeItem(k);
+        }catch(e){}
+      });
+      if(done) done(obj);
+    }).catch(function(){ if(done) done(null); });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // Charger toutes les demandes depuis Supabase — Supabase est LA source de vérité
+  // Les suppressions/ajouts distants se propagent immédiatement
   function _sbSyncAll(done) {
     var syncBtn = document.getElementById('admSyncBtn');
     if(syncBtn) syncBtn.textContent = '⏳ Sync...';
     fetch(_SB_URL+'/rest/v1/gcc_demandes?select=ref,statut,data,created_at&order=created_at.desc&limit=500', {
       headers:_sbHeaders()
-    }).then(function(r){ return r.json(); })
+    }).then(function(r){
+      if(!r.ok){ return r.text().then(function(t){ throw new Error(r.status+' '+t); }); }
+      return r.json();
+    })
     .then(function(rows){
       if(!Array.isArray(rows)){ _sbOk=false; if(done)done(false); return; }
       _sbOk = true;
-      // Map local pour préserver les fichiers
-      var localMap={};
-      (_submissions||[]).forEach(function(s){ if(s.ref) localMap[s.ref]=s; });
-      rows.forEach(function(row){
-        var d = (typeof row.data==='string') ? JSON.parse(row.data) : (row.data||{});
-        d.statut = row.statut || d.statut || 'En attente';
-        // Préserver les fichiers locaux si disponibles
-        if(localMap[row.ref] && localMap[row.ref].fichiers && localMap[row.ref].fichiers[0] && localMap[row.ref].fichiers[0].data) {
-          d.fichiers = localMap[row.ref].fichiers;
+      // Préserver seulement les fichiers binaires locaux (trop lourds pour Supabase)
+      var localFileMap={};
+      (_submissions||[]).forEach(function(s){
+        if(s.ref && s.fichiers && s.fichiers[0] && s.fichiers[0].data){
+          localFileMap[s.ref]=s.fichiers;
         }
-        localMap[row.ref] = d;
       });
-      _submissions = Object.values(localMap).sort(function(a,b){ return (b.date||'')>(a.date||'')?1:-1; });
+      // Supabase est la source de vérité : on ne garde QUE ce qui est dans Supabase
+      _submissions = rows.map(function(row){
+        var d = (typeof row.data==='string') ? JSON.parse(row.data) : (row.data||{});
+        // Le statut de Supabase prime toujours sur le statut dans le champ data
+        d.statut = row.statut || d.statut || 'En attente';
+        // Restaurer les fichiers binaires locaux si disponibles
+        if(localFileMap[row.ref]) d.fichiers = localFileMap[row.ref];
+        return d;
+      }).sort(function(a,b){ return (b.date||'')>(a.date||'')?1:-1; });
       try{ localStorage.setItem('gcc_submissions',JSON.stringify(_submissions.slice(0,200))); }catch(ex){}
-      if(syncBtn){ syncBtn.textContent='✅ Synchronisé'; setTimeout(function(){ if(syncBtn)syncBtn.textContent='🔄 Sync'; },2000); }
+      if(syncBtn){ syncBtn.textContent='✅ Synchronisé ('+rows.length+')'; setTimeout(function(){ if(syncBtn)syncBtn.textContent='🔄 Sync'; },2500); }
       refreshAdminTable();
       if(done) done(true);
     })
@@ -1077,10 +1121,11 @@ function doAdminLogin() {
     <div class="form-grid">
       <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
       <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input type="tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" placeholder="votre@email.com"></div>
+      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input type="email" id="emailExp" placeholder="votre@email.com" required></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
-        <select>
+        <select required>
+          <option value="">— Choisir la destination —</option>
           <option>🇨🇲 Yaoundé — Cameroun</option>
           <option>🇨🇲 Douala — Cameroun</option>
           <option>🇨🇬 Brazzaville — Congo</option>
@@ -1108,7 +1153,7 @@ function doAdminLogin() {
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
-        <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
+        <select id="modeDepot" onchange="handleModeDepot(this.value)" required style="font-size:.95rem;padding:12px;">
           <option value="">— Choisir le mode de dépôt —</option>
           <option value="presentiel">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
           <option value="lalamove">🛵 Lalamove — collecte à mon domicile / adresse</option>
@@ -1237,9 +1282,9 @@ function doAdminLogin() {
           <option>Autre</option>
         </select>
       </div>
-      <div class="fg"><label data-fr="Poids estimé (KG)" data-en="Estimated weight (KG)">Poids estimé (KG)</label><input type="number" placeholder="Ex : 10" min="1"></div>
-      <div class="fg"><label data-fr="Valeur déclarée (₱)" data-en="Declared value (₱)">Valeur déclarée (₱)</label><input type="number" placeholder="Ex : 5000" min="0"></div>
-      <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..."></textarea></div>
+      <div class="fg"><label data-fr="Poids estimé (KG)" data-en="Estimated weight (KG)">Poids estimé (KG)</label><input type="number" placeholder="Ex : 10" min="1" required></div>
+      <div class="fg"><label data-fr="Valeur déclarée (₱)" data-en="Declared value (₱)">Valeur déclarée (₱)</label><input type="number" placeholder="Ex : 5000" min="0" required></div>
+      <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..." required></textarea></div>
       <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage <span style="font-weight:400;color:#888;">(optionnel)</span></label><input id="codeParrain" type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042" style="text-transform:uppercase;"></div>
 
       <!-- UPLOADS -->
@@ -1937,6 +1982,8 @@ var _parrains = (function(){
 
 function _saveParrains(){
   try{ localStorage.setItem('gcc_parrains', JSON.stringify(_parrains)); }catch(e){}
+  // Sync vers Supabase — visible par tous les admins
+  _sbSaveSettings({ gcc_parrains: JSON.stringify(_parrains) });
 }
 
 function _nextRefCode(){
@@ -1988,7 +2035,7 @@ function shareParrain(code, nom){
   else{ showToast('📤 Code : '+code,'Partagez ce code : '+code); }
 }
 
-function initParrainageTab(){
+function _renderParrainageTable(){
   var tbody = document.getElementById('parrainage-tbody');
   if(!tbody) return;
   if(!_parrains.length){
@@ -2019,6 +2066,24 @@ function initParrainageTab(){
       '</td>'+
     '</tr>';
   }).join('');
+}
+
+function initParrainageTab(){
+  // Charger les parrains depuis Supabase, puis afficher
+  _sbLoadSettings(function(obj){
+    if(obj && obj.gcc_parrains){
+      try{
+        var remote = JSON.parse(obj.gcc_parrains);
+        if(Array.isArray(remote)){
+          _parrains = remote;
+          try{ localStorage.setItem('gcc_parrains', obj.gcc_parrains); }catch(e){}
+        }
+      }catch(e){}
+    }
+    _renderParrainageTable();
+  });
+  // Afficher immédiatement avec données locales en attendant Supabase
+  _renderParrainageTable();
 }
 
 function initColisTab(){
@@ -2238,41 +2303,58 @@ function showTab(name,btn){
 }
 
 // ═══════════ PARAMÈTRES ═══════════
+function _applyParamValues(prix, prixXaf, gcashNum, gcashNom, bankNum, bankNom) {
+  var el = function(id){ return document.getElementById(id); };
+  if(el('paramPrixKg'))    el('paramPrixKg').value    = prix    || '';
+  if(el('paramPrixKgXaf')) el('paramPrixKgXaf').value = prixXaf || '';
+  if(el('paramGcashNum'))  el('paramGcashNum').value  = gcashNum|| '';
+  if(el('paramGcashNom'))  el('paramGcashNom').value  = gcashNom|| '';
+  if(el('paramBankNum'))   el('paramBankNum').value   = bankNum || '';
+  if(el('paramBankNom'))   el('paramBankNom').value   = bankNom || '';
+  var qr = localStorage.getItem('gcc_qr') || '';
+  if (qr) {
+    var img = document.getElementById('paramQrPreview');
+    if(img){ img.src = qr; }
+    var wrap = document.getElementById('paramQrPreviewWrap');
+    if(wrap) wrap.style.display='block';
+    var st = document.getElementById('paramQrStatus');
+    if(st) st.style.display='block';
+    var delBtn = document.getElementById('paramQrDelBtn');
+    if(delBtn) delBtn.style.display='inline-block';
+  }
+  var lines = [
+    '<b>Prix par kg :</b> ' + (prix ? '₱ ' + prix : '—') + (prixXaf ? '  /  ' + prixXaf + ' XAF' : ''),
+    '<b>GCash / Maya :</b> ' + (gcashNum || '—') + (gcashNom ? ' (' + gcashNom + ')' : ''),
+    '<b>Bank transfer :</b> ' + (bankNum || '—') + (bankNom ? ' (' + bankNom + ')' : ''),
+    '<b>QR code :</b> ' + (qr ? '✅ Enregistré' : '❌ Aucun')
+  ];
+  var prev = document.getElementById('paramPreview');
+  if(prev) prev.innerHTML = lines.join('<br>');
+}
+
 function loadParamSettings() {
+  // 1. Afficher immédiatement depuis localStorage (réponse instantanée)
   try {
-    var prix = localStorage.getItem('gcc_prix') || '';
-    var prixXaf = localStorage.getItem('gcc_prix_xaf') || '';
-    var gcashNum = localStorage.getItem('gcc_gcash') || '';
-    var gcashNom = localStorage.getItem('gcc_gcash_nom') || '';
-    var bankNum = localStorage.getItem('gcc_bank') || '';
-    var bankNom = localStorage.getItem('gcc_bank_nom') || '';
-    var el = function(id){ return document.getElementById(id); };
-    if(el('paramPrixKg'))    el('paramPrixKg').value    = prix;
-    if(el('paramPrixKgXaf')) el('paramPrixKgXaf').value = prixXaf;
-    if(el('paramGcashNum'))  el('paramGcashNum').value  = gcashNum;
-    if(el('paramGcashNom'))  el('paramGcashNom').value  = gcashNom;
-    if(el('paramBankNum'))   el('paramBankNum').value   = bankNum;
-    if(el('paramBankNom'))   el('paramBankNom').value   = bankNom;
-    // QR preview
-    var qr = localStorage.getItem('gcc_qr') || '';
-    if (qr) {
-      var img = document.getElementById('paramQrPreview');
-      if(img){ img.src = qr; document.getElementById('paramQrPreviewWrap').style.display='block'; }
-      var st = document.getElementById('paramQrStatus');
-      if(st) st.style.display='block';
-      var delBtn = document.getElementById('paramQrDelBtn');
-      if(delBtn) delBtn.style.display='inline-block';
-    }
-    // Summary preview
-    var lines = [
-      '<b>Prix par kg :</b> ' + (prix ? '₱ ' + prix : '—') + (prixXaf ? '  /  ' + prixXaf + ' XAF' : ''),
-      '<b>GCash / Maya :</b> ' + (gcashNum || '—') + (gcashNom ? ' (' + gcashNom + ')' : ''),
-      '<b>Bank transfer :</b> ' + (bankNum || '—') + (bankNom ? ' (' + bankNom + ')' : ''),
-      '<b>QR code :</b> ' + (qr ? '✅ Enregistré' : '❌ Aucun')
-    ];
-    var prev = document.getElementById('paramPreview');
-    if(prev) prev.innerHTML = lines.join('<br>');
+    _applyParamValues(
+      localStorage.getItem('gcc_prix')||'',
+      localStorage.getItem('gcc_prix_xaf')||'',
+      localStorage.getItem('gcc_gcash')||'',
+      localStorage.getItem('gcc_gcash_nom')||'',
+      localStorage.getItem('gcc_bank')||'',
+      localStorage.getItem('gcc_bank_nom')||''
+    );
   } catch(e) {}
+  // 2. Puis charger depuis Supabase (synchronisation entre admins)
+  _sbLoadSettings(function(obj) {
+    if (!obj) return; // Supabase indisponible — on garde le local
+    try {
+      _applyParamValues(
+        obj.gcc_prix||'', obj.gcc_prix_xaf||'',
+        obj.gcc_gcash||'', obj.gcc_gcash_nom||'',
+        obj.gcc_bank||'', obj.gcc_bank_nom||''
+      );
+    } catch(e) {}
+  });
 }
 
 function saveParams() {
@@ -2283,14 +2365,21 @@ function saveParams() {
     var gNom    = document.getElementById('paramGcashNom')  ? document.getElementById('paramGcashNom').value.trim()  : '';
     var bNum    = document.getElementById('paramBankNum')   ? document.getElementById('paramBankNum').value.trim()   : '';
     var bNom    = document.getElementById('paramBankNom')   ? document.getElementById('paramBankNom').value.trim()   : '';
+    // 1. Sauvegarder dans localStorage (fallback hors-ligne)
     if(prix)    localStorage.setItem('gcc_prix',      prix);    else localStorage.removeItem('gcc_prix');
     if(prixXaf) localStorage.setItem('gcc_prix_xaf',  prixXaf); else localStorage.removeItem('gcc_prix_xaf');
     if(gNum)    localStorage.setItem('gcc_gcash',     gNum);    else localStorage.removeItem('gcc_gcash');
     if(gNom)    localStorage.setItem('gcc_gcash_nom', gNom);    else localStorage.removeItem('gcc_gcash_nom');
     if(bNum)    localStorage.setItem('gcc_bank',      bNum);    else localStorage.removeItem('gcc_bank');
     if(bNom)    localStorage.setItem('gcc_bank_nom',  bNom);    else localStorage.removeItem('gcc_bank_nom');
+    // 2. Sync vers Supabase (visible par tous les admins)
+    _sbSaveSettings({
+      gcc_prix: prix, gcc_prix_xaf: prixXaf,
+      gcc_gcash: gNum, gcc_gcash_nom: gNom,
+      gcc_bank: bNum, gcc_bank_nom: bNom
+    });
     loadParamSettings();
-    showToast('Paramètres sauvegardés', 'Les informations ont été mises à jour.');
+    showToast('Paramètres sauvegardés', 'Synchronisé avec tous les appareils admin.');
   } catch(e) { showToast('Erreur', 'Impossible de sauvegarder.'); }
 }
 
