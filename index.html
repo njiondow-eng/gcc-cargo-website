@@ -2359,10 +2359,15 @@ function loadParamSettings() {
   _sbLoadSettings(function(obj) {
     if (!obj) return; // Supabase indisponible — on garde le local
     try {
+      // Si Supabase n'a pas encore la valeur (sauvegarde async pas terminée),
+      // on garde le localStorage plutôt que d'effacer le champ
       _applyParamValues(
-        obj.gcc_prix||'', obj.gcc_prix_xaf||'',
-        obj.gcc_gcash||'', obj.gcc_gcash_nom||'',
-        obj.gcc_bank||'', obj.gcc_bank_nom||''
+        obj.gcc_prix     || localStorage.getItem('gcc_prix')    ||'',
+        obj.gcc_prix_xaf || localStorage.getItem('gcc_prix_xaf')||'',
+        obj.gcc_gcash    || localStorage.getItem('gcc_gcash')   ||'',
+        obj.gcc_gcash_nom|| localStorage.getItem('gcc_gcash_nom')||'',
+        obj.gcc_bank     || localStorage.getItem('gcc_bank')    ||'',
+        obj.gcc_bank_nom || localStorage.getItem('gcc_bank_nom')||''
       );
     } catch(e) {}
   });
@@ -2416,6 +2421,8 @@ function saveParamQr() {
   if (!img || !img._pendingQr) { showToast('Aucun fichier', 'Sélectionnez d\'abord une image.'); return; }
   try {
     localStorage.setItem('gcc_qr', img._pendingQr);
+    // Sync vers Supabase pour que tous les admins voient le QR
+    _sbSaveSettings({ gcc_qr: img._pendingQr });
     var st = document.getElementById('paramQrStatus');
     if(st) st.style.display = 'block';
     var delBtn = document.getElementById('paramQrDelBtn');
@@ -2424,7 +2431,7 @@ function saveParamQr() {
     if(saveBtn) saveBtn.style.display = 'none';
     img._pendingQr = null;
     loadParamSettings();
-    showToast('QR code enregistré', 'Le QR code est maintenant actif sur le site.');
+    showToast('QR code enregistré', 'Synchronisé avec tous les appareils admin.');
   } catch(e) { showToast('Erreur', 'Impossible de sauvegarder le QR code.'); }
 }
 
@@ -2432,6 +2439,8 @@ function removeParamQr() {
   if (!confirm('Supprimer le QR code ? Il ne sera plus affiché sur le site.')) return;
   try {
     localStorage.removeItem('gcc_qr');
+    // Sync suppression vers Supabase
+    _sbSaveSettings({ gcc_qr: '' });
     var img = document.getElementById('paramQrPreview');
     if(img) { img.src=''; img._pendingQr=null; }
     var wrap = document.getElementById('paramQrPreviewWrap');
