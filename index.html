@@ -496,6 +496,7 @@ function doAdminLogin() {
     closeAdminLogin();
     var panel = document.getElementById('adminPanel');
     if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+    setTimeout(function(){ _sbSyncAll(); }, 300); // Sync Supabase au login
     if (typeof showToast === 'function') showToast(tr('connected'), tr('welcomeAdmin'));
   } else {
     _loginAttempts++;
@@ -626,6 +627,84 @@ function doAdminLogin() {
     if (Array.isArray(_stored)) _submissions = _stored;
   } catch(ex){}
 
+  // ─── SUPABASE SYNC ────────────────────────────────────────────────────────
+  var _SB_URL = 'https://voxgdylvevwfpomamhjo.supabase.co';
+  var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZveGdkeWx2ZXZ3ZnBvbWFtaGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NDkzMjcsImV4cCI6MjEwODMyNTMyN30.yXR3WFsSUBnQ9O6XpXAYdKspRf29Mq33EZBlebWnU8U';
+  var _sbOk = null; // null=unknown, true=connected, false=error
+
+  function _sbHeaders(extra) {
+    return Object.assign({'apikey':_SB_KEY,'Authorization':'Bearer '+_SB_KEY,'Content-Type':'application/json','Accept':'application/json'}, extra||{});
+  }
+
+  // Strip large file base64 for DB (garde nom/type/taille seulement)
+  function _sbPrepEntry(entry) {
+    var e = JSON.parse(JSON.stringify(entry));
+    if (e.fichiers && e.fichiers.length) {
+      e.fichiers = e.fichiers.map(function(f){ return {name:f.name,type:f.type,label:f.label,size:f.data?Math.round(f.data.length*.75):0}; });
+    }
+    return e;
+  }
+
+  // Sauvegarder une demande dans Supabase
+  function _sbSave(entry) {
+    fetch(_SB_URL+'/rest/v1/gcc_demandes', {
+      method:'POST',
+      headers:_sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
+      body:JSON.stringify({ref:entry.ref, statut:entry.statut||'En attente', expediteur:entry.expediteur||'', destination:entry.destination||'', data:_sbPrepEntry(entry)})
+    }).then(function(r){ _sbOk = r.ok || r.status===201 || r.status===200; })
+    .catch(function(){ _sbOk = false; });
+  }
+
+  // Mettre à jour le statut dans Supabase
+  function _sbUpdateStatus(ref, statut) {
+    fetch(_SB_URL+'/rest/v1/gcc_demandes?ref=eq.'+encodeURIComponent(ref), {
+      method:'PATCH', headers:_sbHeaders({'Prefer':'return=minimal'}), body:JSON.stringify({statut:statut})
+    }).catch(function(){});
+  }
+
+  // Supprimer depuis Supabase
+  function _sbDelete(ref) {
+    fetch(_SB_URL+'/rest/v1/gcc_demandes?ref=eq.'+encodeURIComponent(ref), {
+      method:'DELETE', headers:_sbHeaders({'Prefer':'return=minimal'})
+    }).catch(function(){});
+  }
+
+  // Charger toutes les demandes depuis Supabase + fusionner avec localStorage
+  function _sbSyncAll(done) {
+    var syncBtn = document.getElementById('admSyncBtn');
+    if(syncBtn) syncBtn.textContent = '⏳ Sync...';
+    fetch(_SB_URL+'/rest/v1/gcc_demandes?select=ref,statut,data,created_at&order=created_at.desc&limit=500', {
+      headers:_sbHeaders()
+    }).then(function(r){ return r.json(); })
+    .then(function(rows){
+      if(!Array.isArray(rows)){ _sbOk=false; if(done)done(false); return; }
+      _sbOk = true;
+      // Map local pour préserver les fichiers
+      var localMap={};
+      (_submissions||[]).forEach(function(s){ if(s.ref) localMap[s.ref]=s; });
+      rows.forEach(function(row){
+        var d = (typeof row.data==='string') ? JSON.parse(row.data) : (row.data||{});
+        d.statut = row.statut || d.statut || 'En attente';
+        // Préserver les fichiers locaux si disponibles
+        if(localMap[row.ref] && localMap[row.ref].fichiers && localMap[row.ref].fichiers[0] && localMap[row.ref].fichiers[0].data) {
+          d.fichiers = localMap[row.ref].fichiers;
+        }
+        localMap[row.ref] = d;
+      });
+      _submissions = Object.values(localMap).sort(function(a,b){ return (b.date||'')>(a.date||'')?1:-1; });
+      try{ localStorage.setItem('gcc_submissions',JSON.stringify(_submissions.slice(0,200))); }catch(ex){}
+      if(syncBtn){ syncBtn.textContent='✅ Synchronisé'; setTimeout(function(){ if(syncBtn)syncBtn.textContent='🔄 Sync'; },2000); }
+      refreshAdminTable();
+      if(done) done(true);
+    })
+    .catch(function(e){
+      _sbOk=false;
+      if(syncBtn){ syncBtn.textContent='❌ Erreur sync'; setTimeout(function(){ if(syncBtn)syncBtn.textContent='🔄 Sync'; },3000); }
+      console.warn('[GCC Supabase]',e);
+      if(done) done(false);
+    });
+  }
+
   // Read up to maxFiles files from a file input, max sizeLimit bytes each, returns array of {name,type,data}
   function readFilesAsBase64(inputId, maxFiles, sizeLimitBytes, callback) {
     var inp = document.getElementById(inputId);
@@ -686,14 +765,14 @@ function doAdminLogin() {
           entry.fichiers = entry.fichiers.concat(capFiles.map(function(f){ return Object.assign({}, f, {label:'Capture'}); }));
           readFilesAsBase64('captureEcommerce', 1, 1.5*1024*1024, function(capEFiles) {
             entry.fichiers = entry.fichiers.concat(capEFiles.map(function(f){ return Object.assign({}, f, {label:'Capture e-commerce'}); }));
-            // Save everything
+            // Save everything — localStorage + Supabase
             _submissions.unshift(entry);
             try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){
-              // Storage full — save without files
               entry.fichiers = [];
               _submissions[0] = entry;
               try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex2){}
             }
+            _sbSave(entry); // → Supabase (async, non-bloquant)
             showToast(tr('sent'), tr('sentMsg') + ref + tr('sentMsg2'));
             form.reset();
             handleModeDepot('');
@@ -804,6 +883,7 @@ function doAdminLogin() {
         var newStatut = this.value;
         _submissions[idx].statut = newStatut;
         try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+        _sbUpdateStatus(_submissions[idx].ref, newStatut); // → Supabase
         refreshAdminTable();
         showToast('Statut mis à jour', _submissions[idx] ? _submissions[idx].ref + ' → ' + newStatut : newStatut);
       });
@@ -823,6 +903,7 @@ function doAdminLogin() {
         if (!confirm('Supprimer la demande ' + s.ref + ' ?\nCette action est irréversible.')) return;
         _submissions.splice(idx, 1);
         try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(ex){}
+        _sbDelete(s.ref); // → Supabase
         refreshAdminTable();
         showToast('Demande supprimée', s.ref + ' a été supprimée.');
       });
@@ -1406,6 +1487,7 @@ function doAdminLogin() {
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div class="admin-section-title" style="font-size:1.1rem;margin-bottom:0;">Demandes reçues via le formulaire</div>
         <div style="display:flex;gap:8px;">
+          <button id="admSyncBtn" class="notif-btn" style="background:#2196f3;" onclick="_sbSyncAll()">🔄 Sync</button>
           <button class="notif-btn" style="background:#27ae60;" onclick="exportDemandes()">⬇ Exporter CSV</button>
           <button class="notif-btn" style="background:var(--navy);" onclick="if(confirm('Effacer toutes les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();}">🗑 Vider</button>
         </div>
@@ -2152,6 +2234,7 @@ function showTab(name,btn){
   if (name === 'parametres') loadParamSettings();
   if (name === 'colis') initColisTab();
   if (name === 'parrainage') initParrainageTab();
+  if (name === 'demandes') _sbSyncAll();
 }
 
 // ═══════════ PARAMÈTRES ═══════════
@@ -2278,6 +2361,7 @@ function doLogout() {
       document.addEventListener('DOMContentLoaded', function() {
         var panel = document.getElementById('adminPanel');
         if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
+        setTimeout(function(){ _sbSyncAll(); }, 500); // Sync Supabase au rechargement
       });
     }
   } catch(e) {}
