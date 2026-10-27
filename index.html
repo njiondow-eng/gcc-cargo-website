@@ -676,7 +676,7 @@ function doAdminLogin() {
       return {key: k, value: obj[k] === null || obj[k] === undefined ? '' : String(obj[k])};
     });
     if (!rows.length) return;
-    fetch(_SB_URL+'/rest/v1/gcc_settings', {
+    fetch(_SB_URL+'/rest/v1/gcc_settings?on_conflict=key', {
       method:'POST',
       headers:_sbHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),
       body: JSON.stringify(rows)
@@ -2398,7 +2398,9 @@ function syncParamFromCloud(btn) {
       if(obj.gcc_bank_name) { document.getElementById('paramBankName').value  = obj.gcc_bank_name; got.push('Nom banque'); }
       if(obj.gcc_bank)      { document.getElementById('paramBankNum').value   = obj.gcc_bank;      got.push('Numéro bank'); }
       if(obj.gcc_bank_nom)  { document.getElementById('paramBankNom').value   = obj.gcc_bank_nom;  got.push('Titulaire bank'); }
-      try { _applyParamValues(obj.gcc_prix||'', obj.gcc_prix_xaf||'', obj.gcc_gcash||'', obj.gcc_gcash_nom||'', obj.gcc_bank_name||'', obj.gcc_bank||'', obj.gcc_bank_nom||''); } catch(e){}
+      // Mettre à jour le preview avec les valeurs actuelles des champs (après merge)
+      var g = function(id){ var e=document.getElementById(id); return e?e.value:''; };
+      try { _applyParamValues(g('paramPrixKg'),g('paramPrixKgXaf'),g('paramGcashNum'),g('paramGcashNom'),g('paramBankName'),g('paramBankNum'),g('paramBankNom')); } catch(e){}
       if(got.length > 0){
         showToast('✅ Synchronisé', 'Champs chargés : '+got.join(', ')+'.');
       } else {
