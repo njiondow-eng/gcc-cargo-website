@@ -623,45 +623,63 @@ function doAdminLogin() {
   }
 
   function supaInsert(entry) {
-    var row = {
-      ref: entry.ref, date: entry.date,
-      expediteur: entry.expediteur, tel_exp: entry.tel_exp, email_exp: entry.email_exp,
+    // Stocker toutes les données dans la colonne data (jsonb) de gcc_demandes
+    var data = {
+      date: entry.date,
+      tel_exp: entry.tel_exp, email_exp: entry.email_exp,
       recepteur: entry.recepteur, tel_rec: entry.tel_rec,
-      destination: entry.destination,
       mode: entry.mode, mode_depot: entry.modeDepot,
       mode_envoi: entry.modeEnvoi,
       paiement: entry.paiement, mode_paiement: entry.modePaiement,
       adresse: entry.adresse, adresse_lalamove: entry.adresse_lalamove,
       adresse_client: entry.adresseClient,
-      date_coll: entry.dateColl, creneau: entry.creneau,
-      statut: entry.statut
+      date_coll: entry.dateColl, creneau: entry.creneau
     };
-    // Ajouter les colonnes fichiers seulement si elles existent (évite erreur 400)
-    if (entry.piece_identite)  row.piece_identite  = entry.piece_identite;
-    if (entry.photos_colis)    row.photos_colis    = entry.photos_colis;
-    if (entry.capture_paiement) row.capture_paiement = entry.capture_paiement;
-    return supaFetch('submissions', { method: 'POST', body: JSON.stringify(row) });
+    if (entry.piece_identite)   data.piece_identite   = entry.piece_identite;
+    if (entry.photos_colis)     data.photos_colis     = entry.photos_colis;
+    if (entry.capture_paiement) data.capture_paiement = entry.capture_paiement;
+    var row = {
+      ref: entry.ref,
+      statut: entry.statut || 'En attente',
+      expediteur: entry.expediteur,
+      destination: entry.destination,
+      data: data
+    };
+    return supaFetch('gcc_demandes', { method: 'POST', body: JSON.stringify(row) });
   }
 
   function supaGetAll(cb) {
-    supaFetch('submissions?order=created_at.desc&limit=200')
+    supaFetch('gcc_demandes?order=created_at.desc&limit=200')
       .then(function(r){ return r.json(); })
       .then(function(rows){
         if (!Array.isArray(rows)) { cb([]); return; }
         var mapped = rows.map(function(r){
+          var d = r.data || {};
           return {
             id: r.id,
-            ref: r.ref, date: r.date,
-            expediteur: r.expediteur, tel_exp: r.tel_exp, email_exp: r.email_exp,
-            recepteur: r.recepteur, tel_rec: r.tel_rec,
-            destinataire: r.recepteur, tel_dest: r.tel_rec,
-            destination: r.destination,
-            mode: r.mode, modeDepot: r.mode_depot,
-            modeEnvoi: r.mode_envoi,
-            paiement: r.paiement, modePaiement: r.mode_paiement,
-            adresse: r.adresse, adresse_lalamove: r.adresse_lalamove,
-            adresseClient: r.adresse_client,
-            dateColl: r.date_coll, creneau: r.creneau,
+            ref: r.ref,
+            date: d.date || (r.created_at ? r.created_at.substring(0,10) : ''),
+            expediteur: r.expediteur || d.expediteur || '',
+            tel_exp: d.tel_exp || '',
+            email_exp: d.email_exp || '',
+            recepteur: d.recepteur || '',
+            tel_rec: d.tel_rec || '',
+            destinataire: d.recepteur || '',
+            tel_dest: d.tel_rec || '',
+            destination: r.destination || d.destination || '',
+            mode: d.mode || '',
+            modeDepot: d.mode_depot || '',
+            modeEnvoi: d.mode_envoi || '',
+            paiement: d.paiement || '',
+            modePaiement: d.mode_paiement || '',
+            adresse: d.adresse || '',
+            adresse_lalamove: d.adresse_lalamove || '',
+            adresseClient: d.adresse_client || '',
+            dateColl: d.date_coll || '',
+            creneau: d.creneau || '',
+            piece_identite: d.piece_identite || '',
+            photos_colis: d.photos_colis || '',
+            capture_paiement: d.capture_paiement || '',
             statut: r.statut || 'En attente'
           };
         });
@@ -671,7 +689,7 @@ function doAdminLogin() {
   }
 
   function supaUpdateStatut(id, statut) {
-    return supaFetch('submissions?id=eq.' + id, {
+    return supaFetch('gcc_demandes?id=eq.' + id, {
       method: 'PATCH',
       body: JSON.stringify({ statut: statut })
     });
@@ -1077,7 +1095,7 @@ function doAdminLogin() {
         if (!confirm('Supprimer la demande ' + (s.ref||'') + ' ?')) return;
         // Supprimer dans Supabase si ID existe
         if (s.id) {
-          fetch(SUPA_URL + '/rest/v1/submissions?id=eq.' + s.id, {
+          fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
             method: 'DELETE',
             headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
           }).catch(function(){});
@@ -1548,7 +1566,7 @@ function doAdminLogin() {
   }
 
   function refreshAnnonces() {
-    supaAnnonceGetAll(function(){ _renderAnnonces(); });
+    supaAnnonceGetAll(function(){ _renderAnnonces(); loadHeroAnnonces(); });
   }
 
   function _renderAnnonces() {
@@ -1622,8 +1640,10 @@ function doAdminLogin() {
     try { localStorage.setItem('gcc_tarifs', JSON.stringify(tarifs)); } catch(e) {}
     supaParamSet('tarifs', tarifs).then(function(){
       showToast('✅','Tarifs sauvegardés (Supabase)');
+      loadHeroTarifs();
     }).catch(function(){
       showToast('✅','Tarifs sauvegardés (local)');
+      loadHeroTarifs();
     });
   }
 
@@ -1744,10 +1764,58 @@ function doLogout() {
     if (panel) { panel.style.display = 'none'; document.body.style.overflow = ''; }
   }
 
+  /* ── Hero: annonces en temps réel ── */
+  function loadHeroAnnonces() {
+    var body = document.getElementById('hero-departures-body');
+    var countEl = document.getElementById('hero-departures-count');
+    if (!body) return;
+    fetch(SUPA_URL + '/rest/v1/annonces?order=date.asc&limit=5', {
+      headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Accept':'application/json'}
+    }).then(function(r){return r.json();}).then(function(rows){
+      if (!Array.isArray(rows) || rows.length === 0) {
+        body.innerHTML = '<div class="db-placeholder"><div class="db-icon">📋</div><p style="font-size:.8rem;color:#90a4ae;">Les prochaines dates de départ seront annoncées ici.</p></div>';
+        if (countEl) countEl.textContent = 'Aucune annonce active';
+        return;
+      }
+      var modeIcons = {aerien:'✈️',maritime:'🚢',terrestre:'🚛'};
+      body.innerHTML = rows.map(function(a){
+        var icon = modeIcons[a.mode] || '📦';
+        var dateStr = a.date ? new Date(a.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);">'
+          + '<span style="font-size:1.3rem;">' + icon + '</span>'
+          + '<div style="flex:1;">'
+          + '<div style="font-weight:700;color:#fff;font-size:.88rem;">' + (a.dest||'Destination') + '</div>'
+          + '<div style="font-size:.75rem;color:#90caf9;">' + dateStr + (a.heure?' · '+a.heure:'') + (a.note?' · '+a.note:'') + '</div>'
+          + '</div></div>';
+      }).join('');
+      if (countEl) countEl.textContent = rows.length + ' départ'+(rows.length>1?'s':'')+' programmé'+(rows.length>1?'s':'');
+    }).catch(function(){
+      body.innerHTML = '<div class="db-placeholder"><div class="db-icon">📋</div><p style="font-size:.8rem;color:#90a4ae;">Les prochaines dates seront annoncées ici.</p></div>';
+      if (countEl) countEl.textContent = 'Aucune annonce active';
+    });
+  }
+
+  /* ── Hero: tarifs temps réel depuis Supabase ── */
+  function loadHeroTarifs() {
+    supaParamGet('tarifs', function(tarifs) {
+      var defaults = {air:350, sea:180, lalamove:150};
+      var t = tarifs || defaults;
+      var airEl = document.getElementById('hero-tarif-air');
+      var seaEl = document.getElementById('hero-tarif-sea');
+      var llEl  = document.getElementById('hero-tarif-lalamove');
+      if (airEl) airEl.textContent = '₱'+(t.air||defaults.air)+'/kg';
+      if (seaEl) seaEl.textContent = '₱'+(t.sea||defaults.sea)+'/kg';
+      if (llEl)  llEl.textContent  = '₱'+(t.lalamove||defaults.lalamove);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     setLang(LANG);
     handleModePaiement('transfer');
     refreshAdminTable();
+    // Charger annonces et tarifs dans le hero (visible par tous les visiteurs)
+    loadHeroAnnonces();
+    loadHeroTarifs();
     // Restore admin session if still active
     try {
       if (localStorage.getItem('gcc_admin_session') === '1') {
@@ -1842,16 +1910,39 @@ function doLogout() {
           <div class="dh2" data-fr="Annonces & Arrivées" data-en="Announcements & Arrivals">Annonces & Arrivées</div>
         </div>
       </div>
-      <div class="db-body">
+      <div class="db-body" id="hero-departures-body">
         <div class="db-placeholder">
-          <div class="db-icon">📋</div>
-          <p data-fr="Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé." data-en="Upcoming departure dates<br>will be announced here.<br><br>Sign up to be notified when a departure is scheduled.">Les prochaines dates de départ<br>seront annoncées ici.<br><br>Inscrivez-vous pour être notifié dès qu'un départ est programmé.</p>
+          <div class="db-icon" style="font-size:1.4rem;">⏳</div>
+          <p style="font-size:.8rem;color:#90a4ae;">Chargement...</p>
         </div>
       </div>
-      <div class="db-meta">
-        <span data-fr="Aucune annonce active" data-en="No active announcement">Aucune annonce active</span>
-        <button class="db-notify-btn" data-fr="Me notifier" data-en="Notify me" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
+      <div class="db-meta" id="hero-departures-meta">
+        <span id="hero-departures-count">—</span>
+        <button class="db-notify-btn" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
       </div>
+    </div>
+
+    <!-- WIDGET TARIFS EN TEMPS RÉEL -->
+    <div id="hero-tarifs-widget" style="margin-top:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:14px 18px;">
+      <div style="font-size:.7rem;font-weight:700;color:var(--orange);letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase;">💱 Tarifs actuels</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:90px;background:rgba(26,114,184,.18);border-radius:8px;padding:10px 12px;text-align:center;">
+          <div style="font-size:1.1rem;">✈️</div>
+          <div style="font-size:.68rem;color:#b0bec5;margin:2px 0;">Air / kg</div>
+          <div id="hero-tarif-air" style="font-size:1.15rem;font-weight:700;color:#fff;">—</div>
+        </div>
+        <div style="flex:1;min-width:90px;background:rgba(26,114,184,.18);border-radius:8px;padding:10px 12px;text-align:center;">
+          <div style="font-size:1.1rem;">🚢</div>
+          <div style="font-size:.68rem;color:#b0bec5;margin:2px 0;">Mer / kg</div>
+          <div id="hero-tarif-sea" style="font-size:1.15rem;font-weight:700;color:#fff;">—</div>
+        </div>
+        <div style="flex:1;min-width:90px;background:rgba(26,114,184,.18);border-radius:8px;padding:10px 12px;text-align:center;">
+          <div style="font-size:1.1rem;">🛵</div>
+          <div style="font-size:.68rem;color:#b0bec5;margin:2px 0;">Livraison</div>
+          <div id="hero-tarif-lalamove" style="font-size:1.15rem;font-weight:700;color:#fff;">—</div>
+        </div>
+      </div>
+      <div style="font-size:.67rem;color:#78909c;margin-top:8px;text-align:center;">Prix en ₱ PHP · Mis à jour en temps réel</div>
     </div>
   </div>
 </section>
