@@ -1589,7 +1589,7 @@ function doAdminLogin() {
     listEl.innerHTML = _annonces.map(function(a) {
       var d = new Date(a.date + 'T12:00:00');
       var isPast = d < new Date();
-      var modeIco = a.mode === 'bateau' ? '🚢' : '✈️';
+      var modeIco = a.mode === 'maritime' ? '🚢' : a.mode === 'terrestre' ? '🚛' : '✈️';
       var docHtml = '';
       if (a.doc && a.doc.dataUrl) {
         if (a.doc.type && a.doc.type.startsWith('image/')) {
@@ -1606,7 +1606,7 @@ function doAdminLogin() {
         + (a.note ? '<div style="font-size:.78rem;color:var(--slate);margin-top:4px;font-style:italic;">📝 ' + a.note + '</div>' : '')
         + docHtml
         + '</div>'
-        + '<button onclick="deleteAnnonce(' + a.id + ')" style="background:#fde8e8;border:none;cursor:pointer;color:#e74c3c;font-size:.8rem;padding:4px 9px;border-radius:5px;font-weight:700;margin-left:10px;flex-shrink:0;">✕</button>'
+        + '<button onclick="deleteAnnonce(\'' + a.id + '\')" style="background:#fde8e8;border:none;cursor:pointer;color:#e74c3c;font-size:.8rem;padding:4px 9px;border-radius:5px;font-weight:700;margin-left:10px;flex-shrink:0;">✕</button>'
         + '</div></div>';
     }).join('');
   }
