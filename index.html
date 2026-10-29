@@ -108,6 +108,22 @@ nav{
 .db-meta span{font-size:.78rem;color:rgba(255,255,255,.4);}
 .db-notify-btn{background:var(--orange);border:none;color:#fff;font-size:.78rem;font-weight:700;padding:7px 16px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;transition:filter .15s;}
 .db-notify-btn:hover{filter:brightness(1.12);}
+/* ─── Modal parrain inscription ──────────────────────────────── */
+#parrain-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+#parrain-modal.open{display:flex;}
+.parrain-box{background:linear-gradient(135deg,#0b1f3a 0%,#1a2a4a 100%);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:32px 28px;width:100%;max-width:400px;position:relative;}
+.parrain-box h3{margin:0 0 4px;font-size:1.15rem;color:#fff;font-family:'Barlow',sans-serif;}
+.parrain-box .parrain-sub{font-size:.82rem;color:#90caf9;margin-bottom:22px;}
+.parrain-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#90a4ae;font-size:1.3rem;cursor:pointer;line-height:1;}
+.parrain-field{margin-bottom:14px;}
+.parrain-field label{display:block;font-size:.75rem;color:#90caf9;margin-bottom:5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.parrain-field input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px 13px;color:#fff;font-size:.9rem;font-family:'Barlow',sans-serif;}
+.parrain-field input:focus{outline:none;border-color:var(--orange);background:rgba(255,255,255,.1);}
+.parrain-code-reveal{background:rgba(255,165,0,.12);border:2px dashed var(--orange);border-radius:10px;padding:16px;text-align:center;margin:18px 0;display:none;}
+.parrain-code-reveal .code-val{font-size:1.6rem;font-weight:900;color:var(--orange);letter-spacing:.1em;font-family:'Barlow Condensed',sans-serif;}
+.parrain-code-reveal p{font-size:.78rem;color:rgba(255,255,255,.6);margin-top:4px;}
+.parrain-submit{width:100%;background:var(--orange);border:none;color:#fff;font-weight:800;font-size:.95rem;padding:13px;border-radius:9px;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:4px;}
+.parrain-submit:hover{filter:brightness(1.1);}
 /* ─── Modal notification ─────────────────────────────────────── */
 #notif-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;padding:20px;}
 #notif-modal.open{display:flex;}
@@ -1983,6 +1999,75 @@ function doLogout() {
     });
   }
 
+  /* ── Section parrainage : exemple dynamique ── */
+  function updateRefExample(tarifAir) {
+    var kg = 50;
+    var pct = 0.05; // 5% de commission
+    var total = kg * tarifAir;
+    var comm = total * pct;
+    var cash = comm * 0.5;
+    var kgEquiv = (comm * 0.5) / tarifAir;
+    var tarifEl = document.getElementById('ref-ex-tarif');
+    var totalEl = document.getElementById('ref-ex-total');
+    var commEl  = document.getElementById('ref-ex-comm');
+    var splitEl = document.getElementById('ref-ex-split');
+    if (tarifEl) tarifEl.textContent = '₱' + tarifAir.toLocaleString();
+    if (totalEl) totalEl.textContent = '₱' + total.toLocaleString();
+    if (commEl)  commEl.textContent  = '₱' + comm.toLocaleString();
+    if (splitEl) splitEl.innerHTML   = '🎁 ₱' + cash.toLocaleString() + ' cash + ' + kgEquiv.toFixed(1) + ' kg offerts';
+  }
+
+  /* ── Modal inscription parrain ── */
+  function openParrainModal() {
+    var m = document.getElementById('parrain-modal');
+    if (m) { m.classList.add('open'); document.getElementById('parrain-nom').focus(); }
+  }
+  function closeParrainModal() {
+    var m = document.getElementById('parrain-modal');
+    if (m) m.classList.remove('open');
+    // Reset
+    ['parrain-nom','parrain-email','parrain-wa'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+    var reveal = document.getElementById('parrain-code-reveal');
+    if (reveal) reveal.style.display = 'none';
+    var btn = document.getElementById('parrain-submit-btn');
+    if (btn) { btn.style.display = 'block'; btn.disabled = false; btn.textContent = '🤝 Obtenir mon code parrain'; }
+  }
+
+  function submitParrain() {
+    var nom   = (document.getElementById('parrain-nom')||{}).value||'';
+    var email = (document.getElementById('parrain-email')||{}).value||'';
+    var wa    = (document.getElementById('parrain-wa')||{}).value||'';
+    if (!nom.trim()) { showToast('⚠️','Veuillez entrer votre nom'); return; }
+    if (!email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) { showToast('⚠️','Email invalide'); return; }
+    var btn = document.getElementById('parrain-submit-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Inscription…'; }
+    // Générer un code unique GCC-REF-XXXX
+    var suffix = String(Math.floor(1000 + Math.random() * 9000));
+    var code = 'GCC-REF-' + suffix;
+    // Sauvegarder dans gcc_demandes (statut='parrain')
+    supaFetch('/rest/v1/gcc_demandes', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify({
+        ref: code,
+        statut: 'parrain',
+        expediteur: nom,
+        destination: 'Parrain',
+        data: { email: email, whatsapp: wa, code: code, registered_at: new Date().toISOString() }
+      })
+    }).then(function(r) {
+      if (btn) { btn.style.display = 'none'; }
+      var reveal = document.getElementById('parrain-code-reveal');
+      var codeVal = document.getElementById('parrain-code-val');
+      if (reveal) reveal.style.display = 'block';
+      if (codeVal) codeVal.textContent = code;
+      showToast('🎉', 'Bienvenue ' + nom + ' ! Votre code : ' + code);
+    }).catch(function() {
+      if (btn) { btn.disabled = false; btn.textContent = '🤝 Obtenir mon code parrain'; }
+      showToast('⚠️', 'Erreur réseau. Réessayez.');
+    });
+  }
+
   /* ── Hero: tarifs temps réel depuis Supabase ── */
   function loadHeroTarifs() {
     supaParamGet('tarifs', function(tarifs) {
@@ -1994,8 +2079,16 @@ function doLogout() {
       if (airEl) airEl.textContent = '₱'+(t.air||defaults.air)+'/kg';
       if (seaEl) seaEl.textContent = '₱'+(t.sea||defaults.sea)+'/kg';
       if (llEl)  llEl.textContent  = '₱'+(t.lalamove||defaults.lalamove);
+      // Mettre à jour l'exemple parrainage avec le tarif aérien réel
+      updateRefExample(t.air || defaults.air);
     });
   }
+
+  /* Fermer le modal parrain en cliquant sur le fond */
+  document.addEventListener('click', function(e) {
+    var m = document.getElementById('parrain-modal');
+    if (m && m.classList.contains('open') && e.target === m) closeParrainModal();
+  });
 
   document.addEventListener('DOMContentLoaded', function() {
     setLang(LANG);
@@ -2481,12 +2574,13 @@ function doLogout() {
     <div style="font-size:2.5rem;margin-bottom:10px;">💰</div>
     <div class="ref-pct">3–10%</div>
     <p data-fr="de commission sur chaque client référé" data-en="commission on each referred client">de commission sur chaque client référé</p>
-    <div class="ref-example">
-      Exemple : 5 clients référés<br>
-      × 50 kg × 1 200 ₱/kg = 300 000 ₱<br>
-      <strong>Votre commission : jusqu'à 30 000 ₱ 🎉</strong>
+    <div class="ref-example" id="ref-example-block">
+      Exemple : 1 client référé<br>
+      × 50 kg × <span id="ref-ex-tarif">₱1 200</span>/kg = <span id="ref-ex-total">₱60 000</span><br>
+      Commission 5% = <span id="ref-ex-comm">₱3 000</span><br>
+      <strong id="ref-ex-split">🎁 50% en réduction kg + 50% cash</strong>
     </div>
-    <a href="#envoyer" class="btn-primary" style="margin-top:22px;display:inline-block;" data-fr="Obtenir mon code →" data-en="Get my code →">Obtenir mon code →</a>
+    <button onclick="openParrainModal()" class="btn-primary" style="margin-top:22px;display:inline-block;border:none;cursor:pointer;" data-fr="🤝 Devenir parrain →" data-en="🤝 Become a referrer →">🤝 Devenir parrain →</button>
   </div>
   <div>
     <div class="section-eyebrow" data-fr="PROGRAMME DE PARRAINAGE" data-en="REFERRAL PROGRAM">PROGRAMME DE PARRAINAGE</div>
@@ -3375,6 +3469,38 @@ function doUpdate(){
     }
   });
 </script>
+
+<!-- ═══ MODAL INSCRIPTION PARRAIN ═══ -->
+<div id="parrain-modal" role="dialog" aria-modal="true" aria-label="Devenir parrain GCC CARGO">
+  <div class="parrain-box">
+    <button class="parrain-close" onclick="closeParrainModal()" title="Fermer">✕</button>
+    <h3>🤝 Devenir parrain GCC CARGO</h3>
+    <div class="parrain-sub">Inscrivez-vous gratuitement et recevez votre code unique.<br>Gagnez <strong style="color:var(--orange);">3–10%</strong> sur chaque client que vous référez.</div>
+    <div class="parrain-field">
+      <label>Votre nom complet</label>
+      <input type="text" id="parrain-nom" placeholder="Ex : Marie Dupont" onkeydown="if(event.key==='Enter')document.getElementById('parrain-email').focus()">
+    </div>
+    <div class="parrain-field">
+      <label>Adresse email</label>
+      <input type="email" id="parrain-email" placeholder="exemple@gmail.com" onkeydown="if(event.key==='Enter')document.getElementById('parrain-wa').focus()">
+    </div>
+    <div class="parrain-field">
+      <label>WhatsApp (optionnel)</label>
+      <input type="tel" id="parrain-wa" placeholder="+63 9XX XXX XXXX" onkeydown="if(event.key==='Enter')submitParrain()">
+    </div>
+    <!-- Révélation du code après inscription -->
+    <div class="parrain-code-reveal" id="parrain-code-reveal">
+      <div style="font-size:.8rem;color:rgba(255,255,255,.6);margin-bottom:6px;">🎉 Votre code parrain unique :</div>
+      <div class="code-val" id="parrain-code-val">GCC-REF-XXXX</div>
+      <p>Partagez ce code sur WhatsApp, TikTok, Instagram.<br>Chaque client qui l'utilise vous rapporte une commission !</p>
+      <button onclick="closeParrainModal()" style="margin-top:10px;background:var(--orange);border:none;color:#fff;font-weight:700;padding:9px 22px;border-radius:7px;cursor:pointer;font-family:'Barlow',sans-serif;">✅ Terminé</button>
+    </div>
+    <button class="parrain-submit" id="parrain-submit-btn" onclick="submitParrain()">🤝 Obtenir mon code parrain</button>
+    <div style="text-align:center;margin-top:10px;">
+      <button onclick="closeParrainModal()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;font-family:'Barlow',sans-serif;">Annuler</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ MODAL NOTIFICATION EMAIL ═══ -->
 <div id="notif-modal" role="dialog" aria-modal="true" aria-label="S'inscrire aux notifications">
