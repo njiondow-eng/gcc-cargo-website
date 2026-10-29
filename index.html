@@ -893,10 +893,17 @@ function doAdminLogin() {
   /* ═══ ADMIN NAVIGATION — onglets horizontaux ═══ */
   function showAdmTab(page, el) {
     document.querySelectorAll('.adm-tab').forEach(function(t){t.classList.remove('active');});
-    if (el) el.classList.add('active');
+    if (el) { el.classList.add('active'); }
+    else {
+      // Activer le bon tab par data ou position
+      document.querySelectorAll('.adm-tab').forEach(function(t){
+        if ((t.getAttribute('onclick')||'').indexOf("'"+page+"'") !== -1) t.classList.add('active');
+      });
+    }
     document.querySelectorAll('.adm-page').forEach(function(p){p.classList.remove('active');});
     var pg = document.getElementById('adm-' + page);
     if (pg) pg.classList.add('active');
+    try { localStorage.setItem('gcc_admin_tab', page); } catch(e) {}
     if (page === 'dash') {
       // Charger revenus et dépenses depuis Supabase avant d'afficher le dashboard
       supaRevenuGetAll(function(){
@@ -1836,7 +1843,11 @@ function doLogout() {
         if (panel) { panel.style.display = 'block'; document.body.style.overflow = 'hidden'; }
         // Boot dashboard
         if (typeof startAdmClock === 'function') startAdmClock();
-        if (typeof refreshDashboard === 'function') refreshDashboard();
+        // Restaurer l'onglet actif avant le refresh
+        var savedTab = null;
+        try { savedTab = localStorage.getItem('gcc_admin_tab'); } catch(e) {}
+        if (savedTab) { showAdmTab(savedTab, null); }
+        else { if (typeof refreshDashboard === 'function') refreshDashboard(); }
         if (typeof refreshFinance === 'function') { refreshFinance(); refreshDepenses(); }
         if (typeof refreshParrainage === 'function') refreshParrainage();
         if (typeof refreshAnnonces === 'function') refreshAnnonces();
