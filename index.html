@@ -1493,7 +1493,12 @@ function doAdminLogin() {
       method: 'POST',
       headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
       body: JSON.stringify(row)
-    }).then(function(r){return r.json();});
+    }).then(function(r){
+      return r.json().then(function(data){
+        if (!r.ok) { return Promise.reject(new Error((data && data.message) || ('Erreur ' + r.status))); }
+        return data;
+      });
+    });
   }
   function supaAnnonceDelete(id) {
     return fetch(SUPA_URL + '/rest/v1/annonces?id=eq.' + id, {
@@ -1530,10 +1535,23 @@ function doAdminLogin() {
     var date = (document.getElementById('ann-date')||{}).value || '';
     var heure = (document.getElementById('ann-heure')||{}).value || '16:00';
     var note = (document.getElementById('ann-note')||{}).value || '';
-    var mode = (document.getElementById('ann-mode')||{}).value || 'avion';
+    var mode = (document.getElementById('ann-mode')||{}).value || 'aerien';
     if (!dest || !date) { showToast('⚠️','Destination et date requises'); return; }
-    // Pour annonce, doc est stocké en base64 dans Supabase (petits fichiers)
-    var docStr = _annDocData ? JSON.stringify(_annDocData) : null;
+    // doc en base64 — limité à ~500KB pour éviter erreur Supabase
+    var docStr = null;
+    if (_annDocData && _annDocData.dataUrl) {
+      var b64 = _annDocData.dataUrl;
+      if (b64.length < 600000) { docStr = JSON.stringify(_annDocData); }
+      else { showToast('⚠️','Image trop lourde — annonce publiée sans le document'); }
+    }
+    function _clearAnnForm() {
+      ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+      var fi = document.getElementById('ann-doc-file');
+      if(fi) fi.value='';
+      _annDocData = null;
+      var prev = document.getElementById('ann-doc-preview');
+      if(prev) prev.style.display='none';
+    }
     supaAnnonceInsert({dest:dest, date:date, heure:heure, note:note, mode:mode, doc:docStr}).then(function(rows){
       if (Array.isArray(rows) && rows[0]) {
         var r = rows[0];
@@ -1542,20 +1560,12 @@ function doAdminLogin() {
       } else {
         _annonces.unshift({dest:dest, date:date, heure:heure, note:note, mode:mode, doc:_annDocData, id:Date.now()});
       }
-      ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-      var fi = document.getElementById('ann-doc-file');
-      if(fi) fi.value='';
-      _annDocData = null;
-      var prev = document.getElementById('ann-doc-preview');
-      if(prev) prev.style.display='none';
+      _clearAnnForm();
       showToast('✅','Annonce publiée pour ' + dest);
       _renderAnnonces();
-    }).catch(function(){
-      _annonces.unshift({dest:dest, date:date, heure:heure, note:note, mode:mode, doc:_annDocData, id:Date.now()});
-      ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-      _annDocData = null;
-      showToast('✅','Annonce publiée (local)');
-      _renderAnnonces();
+      loadHeroAnnonces();
+    }).catch(function(err){
+      showToast('⚠️ Erreur Supabase', String(err.message||err).substring(0,120));
     });
   }
 
@@ -2660,8 +2670,9 @@ function doLogout() {
             <div style="margin-bottom:12px;">
               <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:5px;">🚀 Mode de transport</label>
               <select class="adm-input" id="ann-mode" style="border:1.5px solid #c8d3e0;background:#f4f7fb;">
-                <option value="avion">✈️ Fret Aérien</option>
-                <option value="bateau">🚢 Fret Maritime</option>
+                <option value="aerien">✈️ Fret Aérien</option>
+                <option value="maritime">🚢 Fret Maritime</option>
+                <option value="terrestre">🚛 Fret Terrestre</option>
               </select>
             </div>
 
