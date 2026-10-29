@@ -83,8 +83,8 @@ nav{
 /* Route pills */
 .route-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;}
 .rpill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);padding:8px 16px;border-radius:50px;font-size:.8rem;font-weight:600;display:inline-flex;flex-direction:column;align-items:center;gap:4px;cursor:default;}
-.rpill-name{font-weight:700;font-size:.82rem;}
-.rpill-tarif{font-size:.82rem;color:var(--orange);font-weight:900;line-height:1.2;letter-spacing:.01em;}
+.rpill-name{font-weight:700;font-size:.9rem;}
+.rpill-tarif{font-size:.92rem;color:var(--orange);font-weight:900;line-height:1.3;letter-spacing:.01em;}
 /* Hero right — departure board placeholder */
 .hero-right{display:flex;flex-direction:column;gap:16px;align-items:center;}
 .departure-board{
@@ -1690,9 +1690,10 @@ function doAdminLogin() {
   // Liste des destinations avec leur drapeau et code
   var DEST_LIST = [
     {code:'PH', flag:'🇵🇭', name:'Manila',       label:'PH'},
-    {code:'CM', flag:'🇨🇲', name:'Cameroun',     label:'CM'},
-    {code:'CG', flag:'🇨🇬', name:'Congo',        label:'CG'},
-    {code:'GA', flag:'🇬🇦', name:'Gabon',        label:'GA'},
+    {code:'CM', flag:'🇨🇲', name:'Cameroun',      label:'CM'},
+    {code:'CG', flag:'🇨🇬', name:'Congo Bzv',    label:'CG'},
+    {code:'CD', flag:'🇨🇩', name:'Congo Kin',    label:'CD'},
+    {code:'GA', flag:'🇬🇦', name:'Gabon',         label:'GA'},
     {code:'GQ', flag:'🇬🇶', name:'Guinée Éq.',   label:'GQ'},
     {code:'BJ', flag:'🇧🇯', name:'Bénin',        label:'BJ'},
     {code:'CI', flag:'🇨🇮', name:'Côte d\'Ivoire',label:'CI'},
@@ -2079,7 +2080,8 @@ function doLogout() {
     <div class="route-pills" id="route-pills-container">
       <span class="rpill"><span class="rpill-name">🇵🇭 Manila</span></span>
       <span class="rpill"><span class="rpill-name">🇨🇲 Cameroun</span></span>
-      <span class="rpill"><span class="rpill-name">🇨🇬 Congo</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇬 Congo Bzv</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇩 Congo Kin</span></span>
       <span class="rpill"><span class="rpill-name">🇬🇦 Gabon</span></span>
       <span class="rpill"><span class="rpill-name">🇬🇶 Guinée Éq.</span></span>
       <span class="rpill"><span class="rpill-name">🇧🇯 Bénin</span></span>
