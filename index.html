@@ -82,7 +82,9 @@ nav{
 .btn-outline:hover{background:rgba(255,255,255,.1);}
 /* Route pills */
 .route-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;}
-.rpill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);padding:6px 14px;border-radius:50px;font-size:.8rem;font-weight:600;}
+.rpill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);padding:6px 14px;border-radius:50px;font-size:.8rem;font-weight:600;display:inline-flex;flex-direction:column;align-items:center;gap:2px;cursor:default;}
+.rpill-name{font-weight:700;font-size:.8rem;}
+.rpill-tarif{font-size:.68rem;color:var(--orange);font-weight:800;line-height:1;opacity:.95;}
 /* Hero right — departure board placeholder */
 .hero-right{display:flex;flex-direction:column;gap:16px;align-items:center;}
 .departure-board{
@@ -935,7 +937,7 @@ function doAdminLogin() {
     if (page === 'parrainage') refreshParrainage();
     if (page === 'departs') refreshAnnonces();
     if (page === 'notifs') refreshNotifs();
-    if (page === 'parametres') { loadTarifs(); loadPayConfig(); }
+    if (page === 'parametres') { loadTarifs(); loadPayConfig(); _buildDestTarifGrid(); loadDestTarifs(); }
   }
   function admNav(page, el) { showAdmTab(page, el); }
 
@@ -1684,6 +1686,109 @@ function doAdminLogin() {
     });
   }
 
+  // ─── TARIFS PAR DESTINATION ────────────────────────────────────────────────
+  // Liste des destinations avec leur drapeau et code
+  var DEST_LIST = [
+    {code:'PH', flag:'🇵🇭', name:'Manila',       label:'PH'},
+    {code:'CM', flag:'🇨🇲', name:'Cameroun',     label:'CM'},
+    {code:'CG', flag:'🇨🇬', name:'Congo',        label:'CG'},
+    {code:'GA', flag:'🇬🇦', name:'Gabon',        label:'GA'},
+    {code:'GQ', flag:'🇬🇶', name:'Guinée Éq.',   label:'GQ'},
+    {code:'BJ', flag:'🇧🇯', name:'Bénin',        label:'BJ'},
+    {code:'CI', flag:'🇨🇮', name:'Côte d\'Ivoire',label:'CI'},
+    {code:'CF', flag:'🇨🇫', name:'RCA',          label:'CF'},
+    {code:'TG', flag:'🇹🇬', name:'Togo',         label:'TG'},
+    {code:'BF', flag:'🇧🇫', name:'Burkina',      label:'BF'},
+    {code:'GH', flag:'🇬🇭', name:'Ghana',        label:'GH'},
+    {code:'TD', flag:'🇹🇩', name:'Tchad',        label:'TD'}
+  ];
+
+  var _destTarifs = {}; // { CM: {air:350, sea:180}, ... }
+
+  function loadDestTarifs() {
+    supaParamGet('dest_tarifs', function(data) {
+      if (data && typeof data === 'object') {
+        _destTarifs = data;
+        _applyDestTarifsToAdmin();
+        _applyDestTarifsToHero();
+      }
+    });
+  }
+
+  function _applyDestTarifsToHero() {
+    var container = document.getElementById('route-pills-container');
+    if (!container) return;
+    var pills = container.querySelectorAll('.rpill');
+    DEST_LIST.forEach(function(dest, i) {
+      var pill = pills[i];
+      if (!pill) return;
+      // Supprimer l'ancien tarif s'il existe
+      var oldTarif = pill.querySelector('.rpill-tarif');
+      if (oldTarif) oldTarif.remove();
+      var t = _destTarifs[dest.code];
+      if (t && (t.air || t.sea)) {
+        var parts = [];
+        if (t.air) parts.push('✈ ₱'+t.air);
+        if (t.sea) parts.push('🚢 ₱'+t.sea);
+        var tarifEl = document.createElement('span');
+        tarifEl.className = 'rpill-tarif';
+        tarifEl.textContent = parts.join(' · ');
+        pill.appendChild(tarifEl);
+      }
+    });
+  }
+
+  function _applyDestTarifsToAdmin() {
+    DEST_LIST.forEach(function(dest) {
+      var t = _destTarifs[dest.code] || {};
+      var airEl = document.getElementById('dtarif-air-' + dest.code);
+      var seaEl = document.getElementById('dtarif-sea-' + dest.code);
+      if (airEl) airEl.value = t.air || '';
+      if (seaEl) seaEl.value = t.sea || '';
+    });
+  }
+
+  function saveDestTarifs() {
+    var data = {};
+    DEST_LIST.forEach(function(dest) {
+      var airEl = document.getElementById('dtarif-air-' + dest.code);
+      var seaEl = document.getElementById('dtarif-sea-' + dest.code);
+      var air = airEl ? parseFloat(airEl.value) || 0 : 0;
+      var sea = seaEl ? parseFloat(seaEl.value) || 0 : 0;
+      if (air || sea) data[dest.code] = {air: air || null, sea: sea || null};
+    });
+    _destTarifs = data;
+    supaParamSet('dest_tarifs', data).then(function() {
+      showToast('✅', 'Tarifs par destination sauvegardés !');
+      _applyDestTarifsToHero();
+    }).catch(function() {
+      showToast('⚠️', 'Erreur de sauvegarde');
+    });
+  }
+
+  function _buildDestTarifGrid() {
+    var grid = document.getElementById('dest-tarif-grid');
+    if (!grid || grid.dataset.built) return;
+    grid.dataset.built = '1';
+    var html = '';
+    DEST_LIST.forEach(function(dest) {
+      html += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;">'
+        + '<div style="font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:8px;">' + dest.flag + ' ' + dest.name + '</div>'
+        + '<div style="display:flex;gap:8px;">'
+        + '<div style="flex:1;">'
+        + '<label style="font-size:.7rem;font-weight:600;color:var(--slate);display:block;margin-bottom:3px;">✈️ Aérien (₱/kg)</label>'
+        + '<input class="adm-input" type="number" id="dtarif-air-' + dest.code + '" placeholder="ex: 350" style="padding:6px 8px;font-size:.82rem;">'
+        + '</div>'
+        + '<div style="flex:1;">'
+        + '<label style="font-size:.7rem;font-weight:600;color:var(--slate);display:block;margin-bottom:3px;">🚢 Maritime (₱/kg)</label>'
+        + '<input class="adm-input" type="number" id="dtarif-sea-' + dest.code + '" placeholder="ex: 180" style="padding:6px 8px;font-size:.82rem;">'
+        + '</div>'
+        + '</div>'
+        + '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
   /* ── Gestion config paiement admin ── */
   function switchPayTab(key, btn) {
     ['transfer','gcash','momo','om','crypto'].forEach(function(k) {
@@ -1872,6 +1977,7 @@ function doLogout() {
     // Charger annonces et tarifs dans le hero (visible par tous les visiteurs)
     loadHeroAnnonces();
     loadHeroTarifs();
+    loadDestTarifs();  // Charger les tarifs par destination pour les badges héro
     // Restore admin session if still active
     try {
       if (localStorage.getItem('gcc_admin_session') === '1') {
@@ -1945,19 +2051,19 @@ function doLogout() {
       <a href="#envoyer" class="btn-primary" data-fr="Envoyer un colis →" data-en="Ship a package →">Envoyer un colis →</a>
       <a href="#tracking" class="btn-outline" data-fr="Suivre mon colis" data-en="Track my package">Suivre mon colis</a>
     </div>
-    <div class="route-pills">
-      <span class="rpill">🇵🇭 Manila</span>
-      <span class="rpill">🇨🇲 Cameroun</span>
-      <span class="rpill">🇨🇬 Congo</span>
-      <span class="rpill">🇬🇦 Gabon</span>
-      <span class="rpill">🇬🇶 Guinée Éq.</span>
-      <span class="rpill">🇧🇯 Bénin</span>
-      <span class="rpill">🇨🇮 Côte d'Ivoire</span>
-      <span class="rpill">🇨🇫 RCA</span>
-      <span class="rpill">🇹🇬 Togo</span>
-      <span class="rpill">🇧🇫 Burkina</span>
-      <span class="rpill">🇬🇭 Ghana</span>
-      <span class="rpill">🇹🇩 Tchad</span>
+    <div class="route-pills" id="route-pills-container">
+      <span class="rpill"><span class="rpill-name">🇵🇭 Manila</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇲 Cameroun</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇬 Congo</span></span>
+      <span class="rpill"><span class="rpill-name">🇬🇦 Gabon</span></span>
+      <span class="rpill"><span class="rpill-name">🇬🇶 Guinée Éq.</span></span>
+      <span class="rpill"><span class="rpill-name">🇧🇯 Bénin</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇮 Côte d'Ivoire</span></span>
+      <span class="rpill"><span class="rpill-name">🇨🇫 RCA</span></span>
+      <span class="rpill"><span class="rpill-name">🇹🇬 Togo</span></span>
+      <span class="rpill"><span class="rpill-name">🇧🇫 Burkina</span></span>
+      <span class="rpill"><span class="rpill-name">🇬🇭 Ghana</span></span>
+      <span class="rpill"><span class="rpill-name">🇹🇩 Tchad</span></span>
     </div>
   </div>
   <div class="hero-right">
@@ -2817,6 +2923,17 @@ function doLogout() {
             </div>
           </div>
         </div>
+        <!-- BLOC TARIFS PAR DESTINATION -->
+        <div class="adm-card" style="margin-top:0;">
+          <div class="adm-card-title">🌍 Tarifs par destination (affichés sur le site)</div>
+          <p style="font-size:.8rem;color:var(--slate);margin-bottom:16px;">Ces tarifs apparaissent sous chaque pays dans la section destinations de la page d'accueil. Laissez vide pour ne pas afficher de tarif.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;" id="dest-tarif-grid">
+          </div>
+          <div style="margin-top:16px;">
+            <button class="adm-btn-primary" onclick="saveDestTarifs()">💾 Sauvegarder les tarifs</button>
+          </div>
+        </div>
+
         <!-- BLOC CONFIG PAIEMENT -->
         <div class="adm-card" style="margin-top:0;">
           <div class="adm-card-title">💳 Informations de paiement (affichées aux clients)</div>
