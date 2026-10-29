@@ -1758,11 +1758,36 @@ function doAdminLogin() {
       if (air || sea) data[dest.code] = {air: air || null, sea: sea || null};
     });
     _destTarifs = data;
-    supaParamSet('dest_tarifs', data).then(function() {
-      showToast('✅', 'Tarifs par destination sauvegardés !');
-      _applyDestTarifsToHero();
-    }).catch(function() {
-      showToast('⚠️', 'Erreur de sauvegarde');
+    var btn = document.querySelector('[onclick="saveDestTarifs()"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+
+    var val = JSON.stringify(data);
+    // Essayer d'abord un UPDATE (PATCH) si la ligne existe déjà
+    fetch(SUPA_URL + '/rest/v1/parametres?key=eq.dest_tarifs', {
+      method: 'PATCH',
+      headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify({value: val})
+    }).then(function(r) {
+      if (r.ok) return r;
+      // Si pas de ligne existante (204 vide OK ou 0 rows) → INSERT
+      return fetch(SUPA_URL + '/rest/v1/parametres', {
+        method: 'POST',
+        headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body: JSON.stringify({key:'dest_tarifs', value: val})
+      });
+    }).then(function(r) {
+      if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder les tarifs'; }
+      if (r.ok) {
+        showToast('✅', 'Tarifs par destination sauvegardés !');
+        _applyDestTarifsToHero();
+      } else {
+        r.text().then(function(t){ console.error('saveDestTarifs error:', t); });
+        showToast('⚠️', 'Erreur HTTP ' + r.status + ' — vérifiez la console');
+      }
+    }).catch(function(err) {
+      if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder les tarifs'; }
+      console.error('saveDestTarifs:', err);
+      showToast('⚠️', 'Erreur réseau — vérifiez votre connexion');
     });
   }
 
