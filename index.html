@@ -1158,7 +1158,11 @@ function doAdminLogin() {
     var st = (document.getElementById('filter-statut')||{value:''}).value;
     var tbody = document.getElementById('admin-submissions-tbody');
     if (!tbody) return;
+    // Exclure les notifications et parrains — ils ont leurs propres onglets
+    var EXCLUDED = ['notification','parrain'];
     var filtered = _submissions.filter(function(s,i) {
+      if (EXCLUDED.indexOf((s.statut||'').toLowerCase()) !== -1) return false;
+      if ((s.ref||'').toUpperCase().indexOf('NOTIF-') === 0) return false;
       var matchQ = !q || (s.ref||'').toLowerCase().includes(q) || (s.expediteur||'').toLowerCase().includes(q) || (s.destination||'').toLowerCase().includes(q);
       var matchS = !st || s.statut === st;
       return matchQ && matchS;
