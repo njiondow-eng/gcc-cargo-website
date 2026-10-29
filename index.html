@@ -104,7 +104,23 @@ nav{
 .db-placeholder .db-icon{font-size:2.4rem;margin-bottom:10px;opacity:.5;}
 .db-meta{padding:0 20px 18px;display:flex;justify-content:space-between;align-items:center;}
 .db-meta span{font-size:.78rem;color:rgba(255,255,255,.4);}
-.db-notify-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--ice);font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;}
+.db-notify-btn{background:var(--orange);border:none;color:#fff;font-size:.78rem;font-weight:700;padding:7px 16px;border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;transition:filter .15s;}
+.db-notify-btn:hover{filter:brightness(1.12);}
+/* ─── Modal notification ─────────────────────────────────────── */
+#notif-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+#notif-modal.open{display:flex;}
+.notif-box{background:#1a2a3a;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:28px 24px;width:100%;max-width:360px;position:relative;}
+.notif-box h3{margin:0 0 6px;font-size:1.05rem;color:#fff;}
+.notif-box .notif-sub{font-size:.8rem;color:#90caf9;margin-bottom:18px;}
+.notif-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#90a4ae;font-size:1.2rem;cursor:pointer;line-height:1;}
+.notif-field{margin-bottom:14px;}
+.notif-field label{display:block;font-size:.75rem;color:#90caf9;margin-bottom:5px;font-weight:600;}
+.notif-field input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:9px 12px;color:#fff;font-size:.88rem;font-family:'Barlow',sans-serif;}
+.notif-field input:focus{outline:none;border-color:var(--orange);}
+.notif-submit{width:100%;background:var(--orange);border:none;color:#fff;font-weight:700;font-size:.9rem;padding:11px;border-radius:8px;cursor:pointer;font-family:'Barlow',sans-serif;}
+.notif-submit:hover{filter:brightness(1.1);}
+.notif-ann-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#90caf9;font-size:.72rem;font-weight:600;padding:5px 11px;border-radius:5px;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:8px;display:inline-block;}
+.notif-ann-btn:hover{background:rgba(255,255,255,.2);}
 /* Hero logo big */
 .hero-logo-big img{width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 8px 32px rgba(0,0,0,.4));}
 
@@ -918,6 +934,7 @@ function doAdminLogin() {
     if (page === 'clients') refreshClients();
     if (page === 'parrainage') refreshParrainage();
     if (page === 'departs') refreshAnnonces();
+    if (page === 'notifs') refreshNotifs();
     if (page === 'parametres') { loadTarifs(); loadPayConfig(); }
   }
   function admNav(page, el) { showAdmTab(page, el); }
@@ -1813,6 +1830,9 @@ function doLogout() {
             flyerHtml = '<div style="margin-top:6px;"><a href="'+docObj.dataUrl+'" style="font-size:.75rem;color:#90caf9;">📄 Voir le document</a></div>';
           }
         }
+        var notifBtn = '<button class="notif-ann-btn" onclick="openNotifyModal('
+          + JSON.stringify(a.dest||'') + ',' + JSON.stringify(dateStr) + ',' + JSON.stringify(a.id||'') + ')">'
+          + '🔔 Me notifier</button>';
         return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);">'
           + '<div style="display:flex;align-items:center;gap:10px;">'
           + '<span style="font-size:1.3rem;">' + icon + '</span>'
@@ -1821,6 +1841,7 @@ function doLogout() {
           + '<div style="font-size:.75rem;color:#90caf9;">' + dateStr + (a.heure?' · '+a.heure:'') + (a.note?' · '+a.note:'') + '</div>'
           + '</div></div>'
           + flyerHtml
+          + notifBtn
           + '</div>';
       }).join('');
       if (countEl) countEl.textContent = rows.length + ' départ'+(rows.length>1?'s':'')+' programmé'+(rows.length>1?'s':'');
@@ -1957,7 +1978,7 @@ function doLogout() {
       </div>
       <div class="db-meta" id="hero-departures-meta">
         <span id="hero-departures-count">—</span>
-        <button class="db-notify-btn" onclick="showToast(tr('notif'), tr('notifMsg'))">Me notifier</button>
+        <button class="db-notify-btn" onclick="openNotifyModal('','',null)">🔔 Me notifier</button>
       </div>
     </div>
 
@@ -2447,6 +2468,7 @@ function doLogout() {
     <div class="adm-tab" onclick="showAdmTab('departs',this)">&#128226; Départs</div>
     <div class="adm-tab" onclick="showAdmTab('clients',this)">&#128101; Clients</div>
     <div class="adm-tab" onclick="showAdmTab('parrainage',this)">&#129309; Parrainage</div>
+    <div class="adm-tab" onclick="showAdmTab('notifs',this)">&#128276; Notifications</div>
     <div class="adm-tab" onclick="showAdmTab('parametres',this)">&#9881; Paramètres</div>
   </div>
   <main class="admin-main">
@@ -2753,6 +2775,20 @@ function doLogout() {
         </div>
       </div>
 
+      <!-- PAGE: NOTIFICATIONS EMAIL ─────────────────────────────────────── -->
+      <div class="adm-page" id="adm-notifs">
+        <div class="adm-page-title">🔔 Abonnés aux notifications</div>
+        <div class="adm-page-sub">Emails inscrits via le bouton "Me notifier" sur le site</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+          <button onclick="refreshNotifs()" class="notif-btn" style="background:var(--navy);">🔄 Actualiser</button>
+          <button onclick="exportNotifsCsv()" class="notif-btn" style="background:var(--sky);">📥 Exporter CSV</button>
+          <span id="notifs-count" style="font-size:.8rem;color:var(--slate);">—</span>
+        </div>
+        <div id="notifs-list" style="overflow-x:auto;">
+          <div style="text-align:center;padding:30px;color:var(--slate);">Chargement…</div>
+        </div>
+      </div>
+
       <!-- PAGE: PARAMÈTRES -->
       <div class="adm-page" id="adm-parametres">
         <div class="adm-page-title">&#9881; Paramètres</div>
@@ -3051,6 +3087,170 @@ function doUpdate(){
   const s=document.getElementById('upStatus').value;
   showToast(tr('updated'), tr('updatedMsg1')+t+tr('updatedMsg2')+s+tr('updatedMsg3'));
 }
+
+
+  // ─── ADMIN: LISTE DES NOTIFICATIONS ───────────────────────────────────────
+  var _notifsList = [];
+
+  function refreshNotifs() {
+    var listEl = document.getElementById('notifs-list');
+    var countEl = document.getElementById('notifs-count');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--slate);">Chargement…</div>';
+    // Récupérer toutes les demandes avec statut='notification'
+    supaFetch('gcc_demandes?statut=eq.notification&order=created_at.desc&limit=200')
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        _notifsList = Array.isArray(rows) ? rows : [];
+        if (countEl) countEl.textContent = _notifsList.length + ' abonné' + (_notifsList.length !== 1 ? 's' : '');
+        if (_notifsList.length === 0) {
+          listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--slate);">Aucun abonné pour l\'instant.</div>';
+          return;
+        }
+        var html = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">'
+          + '<thead><tr style="background:var(--navy);color:#fff;">'
+          + '<th style="padding:9px 12px;text-align:left;">Email</th>'
+          + '<th style="padding:9px 12px;text-align:left;">Destination</th>'
+          + '<th style="padding:9px 12px;text-align:left;">Date départ</th>'
+          + '<th style="padding:9px 12px;text-align:left;">Inscrit le</th>'
+          + '<th style="padding:9px 12px;text-align:center;">Action</th>'
+          + '</tr></thead><tbody>';
+        _notifsList.forEach(function(row, i) {
+          var d = row.data || {};
+          var email = d.email || row.expediteur || '—';
+          var dest = d.annonce_dest || row.destination || '—';
+          var dateD = d.annonce_date || '—';
+          var createdAt = row.created_at ? new Date(row.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+          var bg = i % 2 === 0 ? '#f9fbff' : '#fff';
+          html += '<tr style="background:' + bg + ';border-bottom:1px solid #e8eef5;">'
+            + '<td style="padding:8px 12px;font-weight:600;color:var(--navy);">' + email + '</td>'
+            + '<td style="padding:8px 12px;">' + dest + '</td>'
+            + '<td style="padding:8px 12px;">' + dateD + '</td>'
+            + '<td style="padding:8px 12px;color:var(--slate);">' + createdAt + '</td>'
+            + '<td style="padding:8px 12px;text-align:center;">'
+            + '<a href="mailto:' + email + '?subject=GCC%20Cargo%20-%20Départ%20' + encodeURIComponent(dest) + '&body=Bonjour%2C%0A%0ANous%20avons%20le%20plaisir%20de%20vous%20informer%20du%20prochain%20départ%20vers%20' + encodeURIComponent(dest) + '.%0A%0ACordialement%2C%0AGCC%20Cargo%20Handling" style="font-size:.72rem;background:var(--sky);color:#fff;padding:4px 10px;border-radius:5px;text-decoration:none;font-weight:700;">✉️ Envoyer</a>'
+            + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        listEl.innerHTML = html;
+      })
+      .catch(function(){ listEl.innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c;">Erreur de chargement.</div>'; });
+  }
+
+  function exportNotifsCsv() {
+    if (!_notifsList.length) { showToast('⚠️', 'Aucun abonné à exporter'); return; }
+    var csv = 'Email,Destination,Date départ,Inscrit le\n';
+    _notifsList.forEach(function(row) {
+      var d = row.data || {};
+      var email = d.email || row.expediteur || '';
+      var dest = d.annonce_dest || row.destination || '';
+      var dateD = d.annonce_date || '';
+      var createdAt = row.created_at ? new Date(row.created_at).toLocaleDateString('fr-FR') : '';
+      csv += [email, dest, dateD, createdAt].map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'gcc-notifications-' + new Date().toISOString().substring(0,10) + '.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
+  }
+
+  // ─── NOTIFICATION EMAIL ────────────────────────────────────────────────────
+  var _notifContext = {dest:'', date:'', id:null};
+
+  function openNotifyModal(dest, date, id) {
+    _notifContext = {dest: dest || '', date: date || '', id: id || null};
+    var sub = document.getElementById('notif-modal-sub');
+    if (sub) {
+      sub.textContent = dest
+        ? ('Destination : ' + dest + (date ? ' — ' + date : ''))
+        : 'Recevez une alerte pour les prochains départs';
+    }
+    var emailEl = document.getElementById('notif-email');
+    if (emailEl) emailEl.value = '';
+    var modal = document.getElementById('notif-modal');
+    if (modal) modal.classList.add('open');
+    setTimeout(function(){ if (emailEl) emailEl.focus(); }, 100);
+  }
+
+  function closeNotifyModal() {
+    var modal = document.getElementById('notif-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function submitNotification() {
+    var emailEl = document.getElementById('notif-email');
+    var email = emailEl ? emailEl.value.trim() : '';
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('⚠️', 'Veuillez entrer une adresse email valide');
+      return;
+    }
+    var btn = document.getElementById('notif-submit-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+
+    // Stocker dans gcc_demandes avec statut='notification'
+    var row = {
+      ref: 'NOTIF-' + Date.now(),
+      statut: 'notification',
+      expediteur: email,
+      destination: _notifContext.dest || 'Général',
+      data: {
+        email: email,
+        annonce_dest: _notifContext.dest,
+        annonce_date: _notifContext.date,
+        annonce_id: _notifContext.id,
+        type: 'notification_depart',
+        registered_at: new Date().toISOString()
+      }
+    };
+    supaFetch('gcc_demandes', { method: 'POST', body: JSON.stringify(row) })
+      .then(function(r) {
+        if (r.ok) {
+          closeNotifyModal();
+          showToast('✅', 'Inscription confirmée ! Vous serez notifié par email pour ce départ.');
+        } else {
+          r.text().then(function(t){ console.error('Notif error:', t); });
+          showToast('⚠️', 'Erreur lors de l\'inscription. Réessayez.');
+        }
+      })
+      .catch(function() { showToast('⚠️', 'Erreur réseau. Vérifiez votre connexion.'); })
+      .finally(function() {
+        if (btn) { btn.disabled = false; btn.textContent = '🔔 M\'inscrire'; }
+      });
+  }
+
+  // Fermer modal si clic en dehors
+  document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('notif-modal');
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeNotifyModal();
+      });
+    }
+  });
 </script>
+
+<!-- ═══ MODAL NOTIFICATION EMAIL ═══ -->
+<div id="notif-modal" role="dialog" aria-modal="true" aria-label="S'inscrire aux notifications">
+  <div class="notif-box">
+    <button class="notif-close" onclick="closeNotifyModal()" title="Fermer">✕</button>
+    <h3>🔔 Me notifier par email</h3>
+    <div class="notif-sub" id="notif-modal-sub">Recevez une alerte pour ce départ</div>
+    <div class="notif-field">
+      <label for="notif-email">Votre adresse email</label>
+      <input type="email" id="notif-email" placeholder="exemple@gmail.com"
+        onkeydown="if(event.key==='Enter')submitNotification()">
+    </div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:14px;">
+      📧 Vous recevrez le flyer et les détails du prochain départ vers cette destination.
+    </div>
+    <button class="notif-submit" id="notif-submit-btn" onclick="submitNotification()">🔔 M'inscrire</button>
+    <div style="text-align:center;margin-top:10px;">
+      <button onclick="closeNotifyModal()" style="background:none;border:none;color:#90a4ae;font-size:.75rem;cursor:pointer;">Annuler</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
