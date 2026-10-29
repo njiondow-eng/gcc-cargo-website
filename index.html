@@ -1807,7 +1807,8 @@ function doLogout() {
         var flyerHtml = '';
         if (docObj && docObj.dataUrl) {
           if (docObj.type && docObj.type.startsWith('image/')) {
-            flyerHtml = '<img src="'+docObj.dataUrl+'" alt="flyer" style="width:100%;max-height:180px;object-fit:contain;border-radius:6px;margin-top:8px;border:1px solid rgba(255,255,255,.15);">';
+            flyerHtml = '<a href="'+docObj.dataUrl+'" target="_blank" title="Cliquer pour agrandir" style="display:block;margin-top:10px;cursor:zoom-in;"><img src="'+docObj.dataUrl+'" alt="flyer" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.2);display:block;"></a>'
+              + '<div style="font-size:.7rem;color:#90caf9;text-align:center;margin-top:4px;opacity:.8;">Cliquer pour agrandir</div>';
           } else {
             flyerHtml = '<div style="margin-top:6px;"><a href="'+docObj.dataUrl+'" style="font-size:.75rem;color:#90caf9;">📄 Voir le document</a></div>';
           }
