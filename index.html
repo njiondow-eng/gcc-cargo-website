@@ -1532,17 +1532,20 @@ function doAdminLogin() {
 
   function addAnnonce() {
     var dest = (document.getElementById('ann-dest')||{}).value || '';
-    var date = (document.getElementById('ann-date')||{}).value || '';
+    var dateEl = document.getElementById('ann-date');
+    var date = dateEl ? dateEl.value : '';
+    // Si date vide → utiliser aujourd'hui
+    if (!date) { date = new Date().toISOString().substring(0,10); if(dateEl) dateEl.value = date; }
     var heure = (document.getElementById('ann-heure')||{}).value || '16:00';
     var note = (document.getElementById('ann-note')||{}).value || '';
     var mode = (document.getElementById('ann-mode')||{}).value || 'aerien';
-    if (!dest || !date) { showToast('⚠️','Destination et date requises'); return; }
-    // doc en base64 — limité à ~500KB pour éviter erreur Supabase
+    if (!dest) { showToast('⚠️','Veuillez choisir une destination'); return; }
+    // doc en base64 — limité à 200KB pour éviter erreur Supabase (colonne text)
     var docStr = null;
     if (_annDocData && _annDocData.dataUrl) {
       var b64 = _annDocData.dataUrl;
-      if (b64.length < 600000) { docStr = JSON.stringify(_annDocData); }
-      else { showToast('⚠️','Image trop lourde — annonce publiée sans le document'); }
+      if (b64.length < 200000) { docStr = JSON.stringify(_annDocData); }
+      else { showToast('⚠️','Image trop lourde (max ~150KB) — annonce publiée sans le document'); _annDocData = null; }
     }
     function _clearAnnForm() {
       ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
