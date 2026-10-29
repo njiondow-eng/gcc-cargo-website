@@ -48,7 +48,7 @@ nav{
 .hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.8rem;cursor:pointer;padding:6px 10px;line-height:1;border-radius:6px;transition:background .15s;}
 .hamburger:hover{background:rgba(255,255,255,.12);}
 
-/* ── Responsive navbar ── */
+/* ── Responsive navbar (nav only — layout overrides are at end of <style>) ── */
 @media(max-width:768px){
   nav#main-nav{padding:0 16px;height:60px;}
   .nav-logo img{height:40px;width:40px;}
@@ -57,17 +57,8 @@ nav{
   .nav-links{display:none;}
   .nav-actions .btn-nav-cta{display:none;}
   .nav-actions .btn-admin{display:none!important;}
-  .hamburger{display:flex;align-items:center;justify-content:center;}
-  .hero{margin-top:60px;padding:40px 5vw 48px;grid-template-columns:1fr;gap:28px;min-height:auto;}
-  .hero-right{display:none;}
-  .hero h1{font-size:clamp(2rem,8vw,3rem);}
-  .hero-desc{font-size:.92rem;}
-  .route-pills{gap:6px;}
-  .rpill{padding:6px 12px;}
+  .hamburger{display:flex!important;align-items:center;justify-content:center;}
   #mobile-menu{top:60px;}
-}
-@media(max-width:480px){
-  .lang-switcher{scale:.85;}
 }
 .lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,.12);border-radius:6px;padding:3px;}
 .lang-btn{background:transparent;border:none;color:rgba(255,255,255,.65);font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .18s;letter-spacing:.04em;}
@@ -452,6 +443,54 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
 .ann-dest{font-weight:800;color:var(--navy);font-size:.9rem;}
 .ann-date{font-size:.78rem;color:var(--slate);margin-top:3px;}
 @media(max-width:768px){.admin-main{padding:14px;}.adm-grid-2,.adm-grid-3{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.adm-tab{padding:11px 10px;font-size:.75rem;gap:4px;}}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — must stay LAST to override desktop
+   ══════════════════════════════════════════════════════ */
+@media(max-width:768px){
+  /* Hero */
+  .hero{
+    margin-top:60px !important;
+    padding:40px 5vw 48px !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:28px !important;
+    min-height:auto !important;
+  }
+  .hero-right{display:none !important;}
+  .hero h1{font-size:clamp(1.8rem,8vw,2.6rem) !important;}
+  .hero-desc{font-size:.92rem !important;}
+  .route-pills{gap:6px !important;}
+  .rpill{padding:6px 12px !important;}
+  .hero-cta-row{flex-direction:column !important;gap:12px !important;}
+  .hero-cta-row .btn-cta,.hero-cta-row .btn-ghost{width:100% !important;text-align:center !important;}
+
+  /* Sections */
+  .section-inner{padding:40px 5vw !important;}
+  .destinations-grid{grid-template-columns:1fr !important;}
+  .dest-card{padding:20px 16px !important;}
+
+  /* Form */
+  .form-grid,.form-grid-2,.fg{grid-template-columns:1fr !important;}
+  .form-section{padding:24px 16px !important;}
+
+  /* Track section */
+  .track-inner{padding:32px 5vw !important;}
+  .track-form{flex-direction:column !important;gap:10px !important;}
+  .track-form input,.track-form button{width:100% !important;border-radius:8px !important;}
+
+  /* Steps / how it works */
+  .steps-grid{grid-template-columns:1fr !important;}
+
+  /* Footer */
+  .footer-grid{grid-template-columns:1fr !important;gap:28px !important;}
+  .footer-inner{padding:40px 5vw 24px !important;}
+}
+@media(max-width:480px){
+  .lang-switcher{scale:.85;}
+  .hero h1{font-size:clamp(1.6rem,7vw,2.2rem) !important;}
+  .kpi-grid{grid-template-columns:1fr 1fr !important;}
+}
 
 </style>
 <script>
