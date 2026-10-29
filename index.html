@@ -110,6 +110,11 @@ nav{
 .db-notify-btn:hover{filter:brightness(1.12);}
 /* ─── Modal parrain inscription ──────────────────────────────── */
 #parrain-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+#edit-modal.open{display:flex!important;}
+/* champs edit modal — réutilise .parrain-field mais sur fond blanc */
+#edit-modal .parrain-field label{color:#555;}
+#edit-modal .parrain-field input{background:#f8f9fa;border:1px solid #ddd;color:#1a1a1a;}
+#edit-modal .parrain-field input:focus{border-color:#2e7d32;background:#fff;}
 #parrain-modal.open{display:flex;}
 .parrain-box{background:linear-gradient(135deg,#0b1f3a 0%,#1a2a4a 100%);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:32px 28px;width:100%;max-width:400px;position:relative;}
 .parrain-box h3{margin:0 0 4px;font-size:1.15rem;color:#fff;font-family:'Barlow',sans-serif;}
@@ -911,6 +916,73 @@ function doAdminLogin() {
     showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
   }
 
+  // ─── MODAL ÉDITION DEMANDE ────────────────────────────────────────────
+  var _editIdx = null;
+  function openEditModal(s) {
+    _editIdx = _submissions.indexOf(s);
+    var fields = ['expediteur','tel_exp','email_exp','destinataire','tel_rec','destination','mode','paiement','adresseClient','poids','notes'];
+    var labels = {
+      expediteur:'Expéditeur', tel_exp:'Tél expéditeur', email_exp:'Email expéditeur',
+      destinataire:'Destinataire', tel_rec:'Tél destinataire',
+      destination:'Destination', mode:'Mode dépôt', paiement:'Mode paiement',
+      adresseClient:'Adresse', poids:'Poids (kg)', notes:'Notes'
+    };
+    var html = '';
+    fields.forEach(function(f) {
+      html += '<div class="parrain-field"><label>' + labels[f] + '</label>'
+        + '<input type="text" id="edit-field-' + f + '" value="' + ((s[f]||'').toString().replace(/"/g,'&quot;')) + '"></div>';
+    });
+    document.getElementById('edit-modal-ref').textContent = s.ref || '—';
+    document.getElementById('edit-modal-fields').innerHTML = html;
+    document.getElementById('edit-modal').classList.add('open');
+  }
+  function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+    _editIdx = null;
+  }
+  function saveEditModal() {
+    if (_editIdx === null) return;
+    var s = _submissions[_editIdx];
+    if (!s) return;
+    var fields = ['expediteur','tel_exp','email_exp','destinataire','tel_rec','destination','mode','paiement','adresseClient','poids','notes'];
+    var updates = {};
+    fields.forEach(function(f) {
+      var el = document.getElementById('edit-field-' + f);
+      if (el) { updates[f] = el.value; s[f] = el.value; }
+    });
+    var btn = document.getElementById('edit-save-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+    if (s.id) {
+      fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
+        method: 'PATCH',
+        headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body: JSON.stringify(updates)
+      }).then(function(r) {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+        if (r.ok) {
+          showToast('✅', 'Demande ' + s.ref + ' mise à jour');
+          closeEditModal();
+          refreshAdminTable();
+        } else {
+          showToast('⚠️', 'Erreur HTTP ' + r.status);
+        }
+      }).catch(function() {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+        showToast('⚠️', 'Erreur réseau');
+      });
+    } else {
+      // Pas d'ID Supabase — mise à jour locale seulement
+      try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(e){}
+      showToast('✅', 'Demande mise à jour (local)');
+      closeEditModal();
+      refreshAdminTable();
+    }
+  }
+  document.addEventListener('click', function(e) {
+    var m = document.getElementById('edit-modal');
+    if (m && m.classList.contains('open') && e.target === m) closeEditModal();
+  });
+
   // ─── TRIPLE-CLIC LOGO → ADMIN ─────────────────────────────────────────
   var _logoClicks = 0, _logoTimer = null;
   function _logoClick() {
@@ -1117,6 +1189,7 @@ function doAdminLogin() {
         + '<td style="white-space:nowrap;">'
         + '<button class="notif-btn adm-statut-btn" data-i="' + i + '" title="Changer statut" style="background:var(--navy);margin-bottom:4px;">🔄 Statut</button><br>'
         + '<button class="notif-btn adm-email-btn" data-i="' + i + '" title="Notifier client" style="background:var(--sky);margin-bottom:4px;">📧 Email</button><br>'
+        + '<button class="notif-btn adm-edit-btn" data-i="' + i + '" title="Éditer" style="background:#2e7d32;margin-bottom:4px;">✏️ Éditer</button><br>'
         + '<button class="notif-btn adm-del-btn" data-i="' + i + '" title="Supprimer" style="background:#e74c3c;">🗑 Suppr.</button>'
         + '</td></tr>';
     }).join('');
@@ -1147,6 +1220,12 @@ function doAdminLogin() {
         try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(e){}
         _renderColis();
         showToast('🗑','Demande supprimée');
+      });
+    });
+    tbody.querySelectorAll('.adm-edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        openEditModal(_submissions[idx]);
       });
     });
   }
@@ -3469,6 +3548,20 @@ function doUpdate(){
     }
   });
 </script>
+
+<!-- ═══ MODAL ÉDITION DEMANDE ═══ -->
+<div id="edit-modal" role="dialog" aria-modal="true" aria-label="Éditer la demande" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3100;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:#fff;border-radius:14px;padding:28px 24px;width:100%;max-width:500px;position:relative;margin:auto;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <button onclick="closeEditModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#666;line-height:1;">✕</button>
+    <h3 style="margin:0 0 4px;font-size:1.05rem;font-family:'Barlow',sans-serif;color:#0b1f3a;">✏️ Éditer la demande</h3>
+    <div id="edit-modal-ref" style="font-size:.8rem;color:#2196f3;font-weight:700;margin-bottom:18px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em;"></div>
+    <div id="edit-modal-fields"></div>
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button id="edit-save-btn" onclick="saveEditModal()" style="flex:1;background:#2e7d32;border:none;color:#fff;font-weight:800;font-size:.95rem;padding:12px;border-radius:9px;cursor:pointer;font-family:'Barlow',sans-serif;">💾 Sauvegarder</button>
+      <button onclick="closeEditModal()" style="background:#f5f5f5;border:1px solid #ddd;color:#555;font-size:.9rem;padding:12px 18px;border-radius:9px;cursor:pointer;font-family:'Barlow',sans-serif;">Annuler</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ MODAL INSCRIPTION PARRAIN ═══ -->
 <div id="parrain-modal" role="dialog" aria-modal="true" aria-label="Devenir parrain GCC CARGO">
