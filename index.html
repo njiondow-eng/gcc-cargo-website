@@ -1551,8 +1551,8 @@ function doAdminLogin() {
     var docStr = null;
     if (_annDocData && _annDocData.dataUrl) {
       var b64 = _annDocData.dataUrl;
-      if (b64.length < 200000) { docStr = JSON.stringify(_annDocData); }
-      else { showToast('⚠️','Image trop lourde (max ~150KB) — annonce publiée sans le document'); _annDocData = null; }
+      if (b64.length < 1000000) { docStr = JSON.stringify(_annDocData); }
+      else { showToast('⚠️','Image trop lourde (max ~750KB) — annonce publiée sans le document'); _annDocData = null; }
     }
     function _clearAnnForm() {
       ['ann-date','ann-note'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
@@ -1801,12 +1801,26 @@ function doLogout() {
       body.innerHTML = rows.map(function(a){
         var icon = modeIcons[a.mode] || '📦';
         var dateStr = a.date ? new Date(a.date+'T00:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);">'
+        // Flyer / document
+        var docObj = null;
+        if (a.doc) { try { docObj = typeof a.doc === 'string' ? JSON.parse(a.doc) : a.doc; } catch(e){} }
+        var flyerHtml = '';
+        if (docObj && docObj.dataUrl) {
+          if (docObj.type && docObj.type.startsWith('image/')) {
+            flyerHtml = '<img src="'+docObj.dataUrl+'" alt="flyer" style="width:100%;max-height:180px;object-fit:contain;border-radius:6px;margin-top:8px;border:1px solid rgba(255,255,255,.15);">';
+          } else {
+            flyerHtml = '<div style="margin-top:6px;"><a href="'+docObj.dataUrl+'" style="font-size:.75rem;color:#90caf9;">📄 Voir le document</a></div>';
+          }
+        }
+        return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);">'
+          + '<div style="display:flex;align-items:center;gap:10px;">'
           + '<span style="font-size:1.3rem;">' + icon + '</span>'
           + '<div style="flex:1;">'
           + '<div style="font-weight:700;color:#fff;font-size:.88rem;">' + (a.dest||'Destination') + '</div>'
           + '<div style="font-size:.75rem;color:#90caf9;">' + dateStr + (a.heure?' · '+a.heure:'') + (a.note?' · '+a.note:'') + '</div>'
-          + '</div></div>';
+          + '</div></div>'
+          + flyerHtml
+          + '</div>';
       }).join('');
       if (countEl) countEl.textContent = rows.length + ' départ'+(rows.length>1?'s':'')+' programmé'+(rows.length>1?'s':'');
     }).catch(function(){
