@@ -2456,12 +2456,12 @@ function doLogout() {
         <div class="adm-page-title">&#128202; Tableau de bord</div>
         <div class="adm-page-sub" id="adm-date-display">Chargement...</div>
         <div class="kpi-grid">
-          <div class="kpi sky"><div class="kpi-val" id="kpi-demandes">0</div><div class="kpi-lbl">Demandes totales</div><div class="kpi-trend neutral">Toutes périodes</div></div>
-          <div class="kpi"><div class="kpi-val" id="kpi-attente">0</div><div class="kpi-lbl">En attente</div><div class="kpi-trend neutral">À traiter</div></div>
-          <div class="kpi green"><div class="kpi-val" id="kpi-livres">0</div><div class="kpi-lbl">Livrés</div><div class="kpi-trend up">&#8593; Complétés</div></div>
-          <div class="kpi gold"><div class="kpi-val" id="kpi-revenue">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div><div class="kpi-trend up">Enregistrés</div></div>
-          <div class="kpi red"><div class="kpi-val" id="kpi-depenses-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div><div class="kpi-trend neutral">Ce mois</div></div>
-          <div class="kpi green"><div class="kpi-val" id="kpi-marge">&#8369;0</div><div class="kpi-lbl">Marge nette</div><div class="kpi-trend up" id="kpi-marge-trend">Revenus - Dépenses</div></div>
+          <div class="kpi sky" onclick="showAdmTab('colis',document.querySelector('.adm-tab[onclick*=colis]'))" style="cursor:pointer;" title="Voir les demandes"><div class="kpi-val" id="kpi-demandes">0</div><div class="kpi-lbl">Demandes totales</div><div class="kpi-trend neutral">Toutes périodes</div></div>
+          <div class="kpi" onclick="showAdmTab('colis',document.querySelector('.adm-tab[onclick*=colis]'))" style="cursor:pointer;" title="Voir les demandes en attente"><div class="kpi-val" id="kpi-attente">0</div><div class="kpi-lbl">En attente</div><div class="kpi-trend neutral">À traiter</div></div>
+          <div class="kpi green" onclick="showAdmTab('colis',document.querySelector('.adm-tab[onclick*=colis]'))" style="cursor:pointer;" title="Voir les livrés"><div class="kpi-val" id="kpi-livres">0</div><div class="kpi-lbl">Livrés</div><div class="kpi-trend up">&#8593; Complétés</div></div>
+          <div class="kpi gold" onclick="showAdmTab('finance',document.querySelector('.adm-tab[onclick*=finance]'))" style="cursor:pointer;" title="Voir les revenus"><div class="kpi-val" id="kpi-revenue">&#8369;0</div><div class="kpi-lbl">Revenus totaux</div><div class="kpi-trend up">Enregistrés</div></div>
+          <div class="kpi red" onclick="showAdmTab('depenses',document.querySelector('.adm-tab[onclick*=depenses]'))" style="cursor:pointer;" title="Voir les dépenses"><div class="kpi-val" id="kpi-depenses-total">&#8369;0</div><div class="kpi-lbl">Dépenses totales</div><div class="kpi-trend neutral">Ce mois</div></div>
+          <div class="kpi green" onclick="showAdmTab('finance',document.querySelector('.adm-tab[onclick*=finance]'))" style="cursor:pointer;" title="Voir la finance"><div class="kpi-val" id="kpi-marge">&#8369;0</div><div class="kpi-lbl">Marge nette</div><div class="kpi-trend up" id="kpi-marge-trend">Revenus - Dépenses</div></div>
         </div>
         <div class="adm-grid-2">
           <div class="adm-card">
