@@ -45,7 +45,30 @@ nav{
 .btn-admin:hover{background:rgba(255,255,255,.1);}
 .btn-nav-cta{background:var(--orange);color:var(--white);font-weight:700;padding:10px 20px;border-radius:4px;font-size:.88rem;white-space:nowrap;transition:opacity .2s;}
 .btn-nav-cta:hover{opacity:.88;}
-.hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.6rem;cursor:pointer;padding:4px;}
+.hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.8rem;cursor:pointer;padding:6px 10px;line-height:1;border-radius:6px;transition:background .15s;}
+.hamburger:hover{background:rgba(255,255,255,.12);}
+
+/* ── Responsive navbar ── */
+@media(max-width:768px){
+  nav#main-nav{padding:0 16px;height:60px;}
+  .nav-logo img{height:40px;width:40px;}
+  .nav-logo-text .gcc{font-size:1.05rem;}
+  .nav-logo-text .sub{font-size:.6rem;}
+  .nav-links{display:none;}
+  .nav-actions .btn-nav-cta{display:none;}
+  .nav-actions .btn-admin{display:none!important;}
+  .hamburger{display:flex;align-items:center;justify-content:center;}
+  .hero{margin-top:60px;padding:40px 5vw 48px;grid-template-columns:1fr;gap:28px;min-height:auto;}
+  .hero-right{display:none;}
+  .hero h1{font-size:clamp(2rem,8vw,3rem);}
+  .hero-desc{font-size:.92rem;}
+  .route-pills{gap:6px;}
+  .rpill{padding:6px 12px;}
+  #mobile-menu{top:60px;}
+}
+@media(max-width:480px){
+  .lang-switcher{scale:.85;}
+}
 .lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,.12);border-radius:6px;padding:3px;}
 .lang-btn{background:transparent;border:none;color:rgba(255,255,255,.65);font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:4px;cursor:pointer;transition:all .18s;letter-spacing:.04em;}
 .lang-btn:hover{color:var(--white);}
@@ -2229,16 +2252,18 @@ function doLogout() {
 </nav>
 
 <!-- Mobile menu -->
-<div id="mobile-menu" style="display:none;position:fixed;top:70px;left:0;right:0;background:var(--navy);z-index:190;border-bottom:2px solid var(--orange);padding:16px 5vw;">
-  <ul style="list-style:none;display:flex;flex-direction:column;gap:0;">
-    <li><a href="#destinations" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Destinations</a></li>
-    <li><a href="#services" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Services</a></li>
-    <li><a href="#envoyer" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Envoyer un colis</a></li>
-    <li><a href="#tracking" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Tracking</a></li>
-    <li><a href="#parrainage" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Parrainage</a></li>
-    <li><a href="#contact" onclick="closeMobileMenu()" style="display:block;padding:13px 0;color:var(--ice);font-weight:600;border-bottom:1px solid rgba(255,255,255,.08);">Contact</a></li>
-    <li style="padding:13px 0;"><button onclick="openAdminLogin();closeMobileMenu();" style="background:none;border:none;color:var(--gold);font-weight:700;font-family:'Barlow',sans-serif;font-size:1rem;cursor:pointer;">🔐 Espace Admin</button></li>
+<div id="mobile-menu" style="display:none;position:fixed;top:60px;left:0;right:0;background:var(--navy);z-index:190;border-bottom:3px solid var(--orange);box-shadow:0 8px 24px rgba(0,0,0,.35);">
+  <ul style="list-style:none;margin:0;padding:0 20px;">
+    <li><a href="#destinations" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🌍 Destinations</a></li>
+    <li><a href="#services" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">📦 Services</a></li>
+    <li><a href="#tracking" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🔍 Tracking</a></li>
+    <li><a href="#parrainage" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🤝 Parrainage</a></li>
+    <li><a href="#contact" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">📞 Contact</a></li>
   </ul>
+  <div style="padding:16px 20px;display:flex;gap:10px;align-items:center;">
+    <a href="#envoyer" onclick="closeMobileMenu()" style="flex:1;background:var(--orange);color:#fff;font-weight:800;font-size:1rem;padding:14px;border-radius:8px;text-align:center;font-family:'Barlow',sans-serif;display:block;">📬 Envoyer un colis</a>
+    <button onclick="openAdminLogin();closeMobileMenu();" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-size:.85rem;padding:14px 16px;border-radius:8px;cursor:pointer;font-family:'Barlow',sans-serif;">🔐</button>
+  </div>
 </div>
 
 <!-- ░░ HERO ░░ -->
