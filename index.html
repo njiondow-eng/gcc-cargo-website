@@ -443,6 +443,16 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
 .ann-dest{font-weight:800;color:var(--navy);font-size:.9rem;}
 .ann-date{font-size:.78rem;color:var(--slate);margin-top:3px;}
 @media(max-width:768px){.admin-main{padding:14px;}.adm-grid-2,.adm-grid-3{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.adm-tab{padding:11px 10px;font-size:.75rem;gap:4px;}}
+/* Sous-onglets statut colis */
+.statut-tab{background:none;border:none;border-bottom:3px solid transparent;padding:10px 16px;font-family:'Barlow',sans-serif;font-size:.83rem;font-weight:700;color:var(--slate);cursor:pointer;white-space:nowrap;transition:all .18s;margin-bottom:-2px;}
+.statut-tab:hover{color:var(--navy);}
+.statut-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+.statut-count{display:inline-block;background:#e8edf3;color:var(--slate);font-size:.72rem;font-weight:800;border-radius:10px;padding:1px 7px;margin-left:4px;min-width:18px;text-align:center;}
+.statut-tab.active .statut-count{background:var(--orange);color:#fff;}
+.statut-tab[data-statut="En attente"].active .statut-count{background:#e65100;}
+.statut-tab[data-statut="En transit"].active .statut-count{background:#1565c0;}
+.statut-tab[data-statut="Arrivé"].active .statut-count{background:#6a1b9a;}
+.statut-tab[data-statut="Livré"].active .statut-count{background:#2e7d32;}
 
 /* ══════════════════════════════════════════════════════
    MOBILE RESPONSIVE — must stay LAST to override desktop
@@ -916,53 +926,20 @@ function doAdminLogin() {
   }
 
   function refreshAdminTable() {
-    var tbody = document.getElementById('admin-submissions-tbody');
-    if (!tbody) return;
+    // Met à jour les KPI dashboard
+    var EXCLUDED = ['notification','parrain'];
+    var realColis = _submissions.filter(function(s){
+      if (EXCLUDED.indexOf((s.statut||'').toLowerCase()) !== -1) return false;
+      if ((s.ref||'').toUpperCase().indexOf('NOTIF-') === 0) return false;
+      return true;
+    });
     var kpiDem = document.getElementById('kpi-demandes');
     var kpiAtt = document.getElementById('kpi-attente');
-    if (kpiDem) kpiDem.textContent = _submissions.length;
-    if (kpiAtt) kpiAtt.textContent = _submissions.filter(function(s){return s.statut==='En attente';}).length;
-    if (_submissions.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#aaa;padding:28px;">Aucune soumission reçue</td></tr>';
-      return;
-    }
-    var statClasses = {'En attente':'b-pending','En transit':'b-transit','Arrivé':'b-arrived','Livré':'b-delivered'};
-    tbody.innerHTML = _submissions.map(function(s, i) {
-      var cls = statClasses[s.statut] || 'b-pending';
-      return '<tr>' +
-        '<td><strong style="font-family:monospace;">' + s.ref + '</strong><br><small style="color:#999;">' + s.date + '</small></td>' +
-        '<td>' + (s.expediteur||'—') + '<br><small style="color:#888;">' + (s.tel_exp||'') + '</small><br><small style="color:#aaa;">' + (s.email_exp||'') + '</small></td>' +
-        '<td>' + (s.recepteur||'—') + '<br><small style="color:#888;">' + (s.tel_rec||'') + '</small></td>' +
-        '<td>' + (s.destination||'—') + '</td>' +
-        '<td style="font-size:.8rem;">' + (s.modeDepot||'—') + '</td>' +
-        '<td style="font-size:.8rem;">' + (s.modePaiement||'—') + '</td>' +
-        '<td style="font-size:.78rem;">' + (s.adresse ? '<strong>' + s.adresse + '</strong><br>' + (s.dateColl||'') + ' ' + (s.creneau||'') : (s.modeDepot && s.modeDepot.includes('sentiel') ? '🏢 En bureau' : '—')) + '</td>' +
-        '<td style="font-size:.75rem;line-height:1.8;">' + (function(){
-          var links = [];
-          if (s.piece_identite) s.piece_identite.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">🪪 Pièce ID '+(i+1)+'</a>'); });
-          if (s.photos_colis) s.photos_colis.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">📦 Photo '+(i+1)+'</a>'); });
-          if (s.capture_paiement) s.capture_paiement.split('\n').forEach(function(u,i){ if(u) links.push('<a href="'+u+'" target="_blank" style="color:#E87722;display:block;">💳 Paiement '+(i+1)+'</a>'); });
-          return links.length ? links.join('') : '<span style="color:#aaa;">—</span>';
-        })() + '</td>' +
-        '<td><span class="badge ' + cls + '">' + s.statut + '</span></td>' +
-        '<td style="white-space:nowrap;">' +
-        '<button class="notif-btn adm-statut-btn" data-i="' + i + '" style="font-size:.72rem;margin-bottom:4px;display:block;width:100%;">🔄 Statut</button>' +
-        '<button class="notif-btn adm-email-btn" data-i="' + i + '" style="font-size:.72rem;background:var(--sky);display:block;width:100%;">📧 Email</button>' +
-        '</td>' +
-        '</tr>';
-    }).join('');
-    // Attach click handlers via event delegation
-    tbody.querySelectorAll('.adm-statut-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() { cycleStatut(parseInt(this.getAttribute('data-i'))); });
-    });
-    tbody.querySelectorAll('.adm-email-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idx = parseInt(this.getAttribute('data-i'));
-        var s = _submissions[idx];
-        if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
-      });
-    });
-    // Also update dashboard KPIs
+    if (kpiDem) kpiDem.textContent = realColis.length;
+    if (kpiAtt) kpiAtt.textContent = realColis.filter(function(s){return s.statut==='En attente';}).length;
+    // Délègue le rendu à _renderColis (respecte l'onglet actif + compteurs)
+    if (typeof _renderColis === 'function') _renderColis();
+    // Mise à jour dashboard
     if (typeof refreshDashboard === 'function') refreshDashboard();
   }
   function cycleStatut(i) {
@@ -1198,6 +1175,29 @@ function doAdminLogin() {
   }
 
   /* ═══ COLIS FILTER ═══ */
+  // Onglet statut actif dans la page Colis
+  var _activeStatutTab = '';
+
+  function setStatutTab(btn, statut) {
+    _activeStatutTab = statut;
+    document.querySelectorAll('.statut-tab').forEach(function(t){ t.classList.remove('active'); });
+    btn.classList.add('active');
+    _renderColis();
+  }
+
+  function _updateStatutCounts(realColis) {
+    var counts = {'':0,'En attente':0,'En transit':0,'Arrivé':0,'Livré':0};
+    realColis.forEach(function(s){
+      counts['']++;
+      if (counts[s.statut] !== undefined) counts[s.statut]++;
+    });
+    var ids = {'':'scount-all','En attente':'scount-attente','En transit':'scount-transit','Arrivé':'scount-arrive','Livré':'scount-livre'};
+    Object.keys(ids).forEach(function(k){
+      var el = document.getElementById(ids[k]);
+      if (el) el.textContent = counts[k] || '0';
+    });
+  }
+
   function filterColis() {
     var tbody = document.getElementById('admin-submissions-tbody');
     if (!tbody) return;
@@ -1217,14 +1217,19 @@ function doAdminLogin() {
 
   function _renderColis() {
     var q = (document.getElementById('search-colis')||{value:''}).value.toLowerCase();
-    var st = (document.getElementById('filter-statut')||{value:''}).value;
+    var st = _activeStatutTab; // utilise l'onglet actif
     var tbody = document.getElementById('admin-submissions-tbody');
     if (!tbody) return;
     // Exclure les notifications et parrains — ils ont leurs propres onglets
     var EXCLUDED = ['notification','parrain'];
-    var filtered = _submissions.filter(function(s,i) {
+    // D'abord calculer tous les vrais colis pour les compteurs
+    var allReal = _submissions.filter(function(s) {
       if (EXCLUDED.indexOf((s.statut||'').toLowerCase()) !== -1) return false;
       if ((s.ref||'').toUpperCase().indexOf('NOTIF-') === 0) return false;
+      return true;
+    });
+    _updateStatutCounts(allReal);
+    var filtered = allReal.filter(function(s) {
       var matchQ = !q || (s.ref||'').toLowerCase().includes(q) || (s.expediteur||'').toLowerCase().includes(q) || (s.destination||'').toLowerCase().includes(q);
       var matchS = !st || s.statut === st;
       return matchQ && matchS;
@@ -2886,14 +2891,22 @@ function doLogout() {
       <div class="adm-page" id="adm-colis">
         <div class="adm-page-title">&#128230; Colis en cours</div>
         <div class="adm-page-sub">Gestion et suivi de toutes les demandes d'expédition</div>
-        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-          <input class="adm-input" id="search-colis" placeholder="&#128269; Rechercher ref, nom, destination..." oninput="filterColis()" style="max-width:270px;flex:1;">
-          <select class="adm-input" id="filter-statut" onchange="filterColis()" style="max-width:155px;">
-            <option value="">Tous les statuts</option>
-            <option>En attente</option><option>En transit</option><option>Arrivé</option><option>Livré</option>
-          </select>
+
+        <!-- Sous-onglets statut -->
+        <div style="display:flex;gap:0;border-bottom:2px solid #e0e6ef;margin-bottom:16px;overflow-x:auto;">
+          <button class="statut-tab active" data-statut="" onclick="setStatutTab(this,'')">📋 Tous <span class="statut-count" id="scount-all"></span></button>
+          <button class="statut-tab" data-statut="En attente" onclick="setStatutTab(this,'En attente')">⏳ En attente <span class="statut-count" id="scount-attente"></span></button>
+          <button class="statut-tab" data-statut="En transit" onclick="setStatutTab(this,'En transit')">🚢 En transit <span class="statut-count" id="scount-transit"></span></button>
+          <button class="statut-tab" data-statut="Arrivé" onclick="setStatutTab(this,'Arrivé')">📍 Arrivé <span class="statut-count" id="scount-arrive"></span></button>
+          <button class="statut-tab" data-statut="Livré" onclick="setStatutTab(this,'Livré')">✅ Livré <span class="statut-count" id="scount-livre"></span></button>
+        </div>
+
+        <!-- Barre de recherche -->
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+          <input class="adm-input" id="search-colis" placeholder="&#128269; Rechercher ref, nom, destination..." oninput="filterColis()" style="max-width:300px;flex:1;">
           <button class="adm-btn-danger" onclick="if(confirm('Vider TOUTES les demandes ?')){_submissions=[];try{localStorage.removeItem('gcc_submissions');}catch(e){}refreshAdminTable();showToast('&#128465;','Données effacées');}">&#128465; Vider</button>
         </div>
+
         <div class="admin-table-wrap">
           <table class="adm-tbl" id="admin-submissions-tbl">
             <thead><tr>
