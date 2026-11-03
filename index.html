@@ -2308,8 +2308,11 @@ function doLogout() {
         var flyerHtml = '';
         if (docObj && docObj.dataUrl) {
           if (docObj.type && docObj.type.startsWith('image/')) {
-            flyerHtml = '<a href="'+docObj.dataUrl+'" target="_blank" title="Cliquer pour agrandir" style="display:block;margin-top:10px;cursor:zoom-in;"><img src="'+docObj.dataUrl+'" alt="flyer" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.2);display:block;"></a>'
-              + '<div style="font-size:.7rem;color:#90caf9;text-align:center;margin-top:4px;opacity:.8;">Cliquer pour agrandir</div>';
+            var escapedUrl = docObj.dataUrl.replace(/'/g, "\\'");
+            flyerHtml = '<div style="margin-top:10px;cursor:zoom-in;" onclick="showFlyerPopup([\'' + escapedUrl + '\'])" title="Cliquer pour agrandir">'
+              + '<img src="'+docObj.dataUrl+'" alt="flyer" style="width:100%;border-radius:8px;border:1px solid rgba(255,255,255,.2);display:block;">'
+              + '<div style="font-size:.7rem;color:#90caf9;text-align:center;margin-top:4px;opacity:.8;">🔍 Cliquer pour agrandir</div>'
+              + '</div>';
           } else {
             flyerHtml = '<div style="margin-top:6px;"><a href="'+docObj.dataUrl+'" style="font-size:.75rem;color:#90caf9;">📄 Voir le document</a></div>';
           }
@@ -2318,14 +2321,17 @@ function doLogout() {
           + JSON.stringify(a.dest||'') + ',' + JSON.stringify(dateStr) + ',' + JSON.stringify(a.id||'') + ')">'
           + '🔔 Me notifier</button>';
         return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);">'
-          + '<div style="display:flex;align-items:center;gap:10px;">'
+          + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">'
+          + '<div style="display:flex;align-items:center;gap:10px;flex:1;">'
           + '<span style="font-size:1.3rem;">' + icon + '</span>'
           + '<div style="flex:1;">'
           + '<div style="font-weight:700;color:#fff;font-size:.88rem;">' + (a.dest||'Destination') + '</div>'
           + '<div style="font-size:.75rem;color:#90caf9;">' + dateStr + (a.heure?' · '+a.heure:'') + (a.note?' · '+a.note:'') + '</div>'
-          + '</div></div>'
-          + flyerHtml
+          + '</div>'
+          + '</div>'
           + notifBtn
+          + '</div>'
+          + flyerHtml
           + '</div>';
       }).join('');
       if (countEl) countEl.textContent = rows.length + ' départ'+(rows.length>1?'s':'')+' programmé'+(rows.length>1?'s':'');
