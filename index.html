@@ -2129,11 +2129,11 @@ function doAdminLogin() {
     if (status) status.textContent = '⏳ Upload en cours...';
     fetch(SUPA_URL + '/storage/v1/object/gcc-files/' + path, {
       method: 'POST',
-      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type || 'image/jpeg'},
+      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'true'},
       body: file
     })
     .then(function(r) {
-      if (!r.ok) throw new Error('Upload échoué');
+      if (!r.ok) return r.text().then(function(t){ throw new Error('Upload échoué: ' + t); });
       var publicUrl = SUPA_URL + '/storage/v1/object/public/gcc-files/' + path;
       // DELETE d'abord (si ligne existe), puis INSERT propre
       return fetch(SUPA_URL + '/rest/v1/gcc_flyers?slot=eq.' + slot, {
