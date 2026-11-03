@@ -2085,11 +2085,25 @@ function doAdminLogin() {
         _flyerUrls[f.slot] = f.url;
         _renderFlyerPreview(f.slot, f.url);
       });
-      // Afficher le popup public si au moins 1 flyer actif
+      // Afficher les flyers en permanent sur la page publique
       var actifs = rows.filter(function(f){ return f.actif && f.url; });
-      if (actifs.length > 0 && !_isAdmin) showFlyerPopup(actifs.map(function(f){return f.url;}));
+      if (!_isAdmin) _renderPublicFlyers(actifs);
     })
     .catch(function(){});
+  }
+
+  function _renderPublicFlyers(actifs) {
+    var section = document.getElementById('flyers-section');
+    var container = document.getElementById('flyers-public-container');
+    if (!section || !container) return;
+    if (actifs.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    container.innerHTML = actifs.map(function(f) {
+      return '<div style="flex:1;min-width:280px;max-width:560px;">'
+        + '<img src="' + f.url + '" style="width:100%;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.35);object-fit:contain;cursor:pointer;" '
+        + 'onclick="showFlyerPopup([\'' + f.url + '\'])" title="Cliquer pour agrandir">'
+        + '</div>';
+    }).join('');
   }
 
   function previewFlyer(slot) {
@@ -2177,8 +2191,6 @@ function doAdminLogin() {
   /* ─── POPUP FLYERS (visiteurs) ─── */
   function showFlyerPopup(urls) {
     if (!urls || urls.length === 0) return;
-    // Ne montrer qu'une seule fois par session
-    try { if (sessionStorage.getItem('gcc_flyer_shown')) return; } catch(e) {}
     var idx = 0;
     var dots = urls.map(function(_, i){ return '<button onclick="flyerGoto(' + i + ')" id="fdot-' + i + '" style="width:10px;height:10px;border-radius:50%;border:none;background:' + (i===0?'var(--orange)':'rgba(255,255,255,.5)') + ';cursor:pointer;padding:0;transition:background .2s;"></button>'; }).join('');
     var slides = urls.map(function(u, i){ return '<div id="fslide-' + i + '" style="display:' + (i===0?'block':'none') + ';text-align:center;"><img src="' + u + '" style="max-width:100%;max-height:72vh;border-radius:8px;object-fit:contain;"></div>'; }).join('');
@@ -2197,7 +2209,6 @@ function doAdminLogin() {
     popup.addEventListener('click', function(e){ if(e.target===popup) closeFlyerPopup(); });
     window._flyerUrls = urls;
     window._flyerIdx = 0;
-    try { sessionStorage.setItem('gcc_flyer_shown','1'); } catch(e) {}
   }
   function flyerGoto(i) {
     var urls = window._flyerUrls || [];
@@ -2529,6 +2540,14 @@ function doLogout() {
     </div>
   </div>
 </section>
+
+<!-- ░░ FLYERS PROMOTIONNELS ░░ -->
+<div id="flyers-section" style="display:none;background:var(--navy);padding:40px 8vw;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:.75rem;font-weight:700;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:6px;">Promotions &amp; Annonces</div>
+  </div>
+  <div id="flyers-public-container" style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;"></div>
+</div>
 
 <!-- STATS -->
 <div class="stats-bar">
