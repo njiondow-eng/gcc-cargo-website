@@ -2391,6 +2391,7 @@ function doLogout() {
     loadHeroAnnonces();
     loadHeroTarifs();
     loadDestTarifs();  // Charger les tarifs par destination pour les badges héro
+    loadFlyers();      // Afficher les flyers/promotions aux visiteurs publics
     // Restore admin session if still active
     try {
       if (localStorage.getItem('gcc_admin_session') === '1') {
