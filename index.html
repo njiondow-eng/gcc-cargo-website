@@ -2141,10 +2141,13 @@ function doAdminLogin() {
         headers: {
           'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY,
           'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates'
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
         },
         body: JSON.stringify({slot: slot, url: publicUrl, actif: true})
-      }).then(function(){ return publicUrl; });
+      }).then(function(r2) {
+        if (!r2.ok) return r2.text().then(function(t){ throw new Error('DB: ' + t); });
+        return publicUrl;
+      });
     })
     .then(function(url) {
       _flyerUrls[slot] = url;
