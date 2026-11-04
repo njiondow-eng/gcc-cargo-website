@@ -2815,8 +2815,8 @@ function doLogout() {
           <option>Autre</option>
         </select>
       </div>
-      <div class="fg"><label data-fr="Poids estimé (KG)" data-en="Estimated weight (KG)">Poids estimé (KG)</label><input type="number" placeholder="Ex : 10" min="1"></div>
-      <div class="fg"><label data-fr="Valeur déclarée (₱)" data-en="Declared value (₱)">Valeur déclarée (₱)</label><input type="number" placeholder="Ex : 5000" min="0"></div>
+      <div class="fg"><label data-fr="Poids estimé (KG)" data-en="Estimated weight (KG)">Poids estimé (KG)</label><input type="number" placeholder="Ex : 10.5" min="0.1" step="0.1" id="poidsEstime"></div>
+      <div class="fg"><label data-fr="Valeur déclarée (₱)" data-en="Declared value (₱)">Valeur déclarée (₱)</label><input type="number" placeholder="Ex : 5000.00" min="0" step="0.01" id="valeurDeclaree"></div>
       <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..."></textarea></div>
       <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
 
@@ -3627,21 +3627,28 @@ function doLogout() {
 <div class="toast" id="toast"><strong id="toast-title"></strong><span id="toast-msg"></span></div>
 
 <!-- MODALE CONFIRMATION SOUMISSION -->
-<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(11,31,58,.82);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;padding:36px 32px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;">
-    <div style="font-size:3.5rem;margin-bottom:12px;">✅</div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.7rem;color:#0B1F3A;margin-bottom:6px;">Demande envoyée !</h2>
-    <p style="font-size:1rem;color:#E87722;font-weight:700;margin-bottom:4px;" id="confirmRef">Référence : —</p>
-    <p style="font-size:.92rem;color:#444;line-height:1.65;margin-bottom:28px;">
-      Votre demande a bien été enregistrée.<br>
-      Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le paiement.
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(11,31,58,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;padding:40px 32px 32px;text-align:center;box-shadow:0 32px 100px rgba(0,0,0,.45);position:relative;animation:confirmPop .35s cubic-bezier(.34,1.56,.64,1) both;">
+    <style>@keyframes confirmPop{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:none}}</style>
+    <!-- Icône succès -->
+    <div style="width:72px;height:72px;background:linear-gradient(135deg,#4CAF50,#2e7d32);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 24px rgba(76,175,80,.35);">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:#0B1F3A;margin-bottom:4px;" data-fr="Demande envoyée !" data-en="Request Submitted!">Demande envoyée !</h2>
+    <p style="font-size:.88rem;color:#888;margin-bottom:16px;" data-fr="Votre dossier a été enregistré avec succès" data-en="Your file has been successfully registered">Votre dossier a été enregistré avec succès</p>
+    <div style="background:#fff8f0;border:2px solid #E87722;border-radius:12px;padding:12px 16px;margin-bottom:20px;display:inline-block;">
+      <p style="font-size:.8rem;color:#888;margin:0 0 2px;" data-fr="Numéro de référence" data-en="Reference number">Numéro de référence</p>
+      <p style="font-size:1.2rem;color:#E87722;font-weight:900;margin:0;letter-spacing:.5px;" id="confirmRef">—</p>
+    </div>
+    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:20px;" data-fr="Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le mode de paiement." data-en="Our team will contact you within <strong>24 to 48 hours</strong> to confirm the details of your shipment and the payment method.">
+      Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le mode de paiement.
     </p>
-    <div style="background:#f0f6ff;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:.84rem;color:#0B1F3A;line-height:1.7;text-align:left;">
-      📞 <strong>+63 968 313 5356</strong> · +63 915 385 7604<br>
+    <div style="background:#f0f6ff;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:.82rem;color:#0B1F3A;line-height:1.9;text-align:left;">
+      📞 <strong>+63 968 313 5356</strong> &nbsp;·&nbsp; +63 915 385 7604<br>
       📧 <strong>gomerjavan45@gmail.com</strong><br>
       📍 Trimar Building, Multinational Ave, Parañaque
     </div>
-    <button onclick="document.getElementById('confirmModal').style.display='none'" style="background:#E87722;color:#fff;border:none;border-radius:10px;padding:14px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;">OK, j'ai compris →</button>
+    <button onclick="document.getElementById('confirmModal').style.display='none'" style="background:linear-gradient(135deg,#E87722,#d4601a);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;box-shadow:0 4px 16px rgba(232,119,34,.4);" data-fr="OK, j'ai compris →" data-en="Got it →">OK, j'ai compris →</button>
   </div>
 </div>
 
