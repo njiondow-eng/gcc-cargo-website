@@ -840,6 +840,7 @@ function doAdminLogin() {
 
     if (!_nomExp)   _errs.push('Nom expéditeur');
     if (!_telExp)   _errs.push('Tél expéditeur');
+    if (!_emailExp) _errs.push('Email expéditeur');
     if (!_nomRec)   _errs.push('Nom destinataire');
     if (!_telRec)   _errs.push('Tél destinataire');
     if (!_depot)  { showToast('⚠️ Mode de dépôt manquant', 'Veuillez choisir comment vous déposerez votre colis.'); if(_depotEl){_depotEl.style.border='2px solid #e53935';setTimeout(function(){_depotEl.style.border='';},4000);_depotEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
@@ -2691,7 +2692,7 @@ function doLogout() {
     <div class="form-grid">
       <div class="fg"><label data-fr="Prénom &amp; Nom (expéditeur) <span class='req'>*</span>" data-en="First &amp; Last Name (sender) <span class='req'>*</span>">Prénom &amp; Nom (expéditeur) <span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
       <div class="fg"><label data-fr="Téléphone / WhatsApp <span class='req'>*</span>" data-en="Phone / WhatsApp <span class='req'>*</span>">Téléphone / WhatsApp <span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input id="emailExp" type="email" placeholder="votre@email.com"></div>
+      <div class="fg"><label data-fr="Email expéditeur <span class='req'>*</span>" data-en="Sender email <span class='req'>*</span>">Email expéditeur <span class="req">*</span></label><input id="emailExp" type="email" placeholder="votre@email.com" required></div>
       <div class="fg full"><label data-fr="Adresse du client (Philippines) <span class='req'>*</span>" data-en="Client address (Philippines) <span class='req'>*</span>">Adresse du client (Philippines) <span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select id="selectDestination">
