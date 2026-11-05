@@ -829,6 +829,8 @@ function doAdminLogin() {
     var _poids    = _poidsEl ? _poidsEl.value.trim() : '';
     var _valeurEl = document.getElementById('valeurDeclaree');
     var _valeur   = _valeurEl ? _valeurEl.value.trim() : '';
+    var _descEl   = document.getElementById('descContenu');
+    var _desc     = _descEl ? _descEl.value.trim() : '';
     var _destEl   = document.getElementById('selectDestination');
     var _dest     = _destEl ? _destEl.value.trim() : '';
     var _chk      = document.getElementById('consentCheck');
@@ -849,6 +851,7 @@ function doAdminLogin() {
     if (!_telRec)   _errs.push('Tél destinataire');
     if (!_poids)  { showToast('⚖️ Poids manquant', 'Veuillez indiquer le poids estimé du colis.'); if(_poidsEl){_poidsEl.style.border='2px solid #e53935';setTimeout(function(){_poidsEl.style.border='';},4000);_poidsEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_valeur) { showToast('💰 Valeur déclarée manquante', 'Veuillez indiquer la valeur déclarée du colis.'); if(_valeurEl){_valeurEl.style.border='2px solid #e53935';setTimeout(function(){_valeurEl.style.border='';},4000);_valeurEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
+    if (!_desc)   { showToast('📝 Description manquante', 'Veuillez décrire le contenu de votre colis.'); if(_descEl){_descEl.style.border='2px solid #e53935';setTimeout(function(){_descEl.style.border='';},4000);_descEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_depot)  { showToast('⚠️ Mode de dépôt manquant', 'Veuillez choisir comment vous déposerez votre colis.'); if(_depotEl){_depotEl.style.border='2px solid #e53935';setTimeout(function(){_depotEl.style.border='';},4000);_depotEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
 
@@ -2873,7 +2876,7 @@ function doLogout() {
       </div>
       <div class="fg"><label data-fr="Poids estimé (KG) <span class='req'>*</span>" data-en="Estimated weight (KG) <span class='req'>*</span>">Poids estimé (KG) <span class="req">*</span></label><input type="number" placeholder="Ex : 10.5" min="0.1" step="0.1" id="poidsEstime" required></div>
       <div class="fg"><label data-fr="Valeur déclarée (₱) <span class='req'>*</span>" data-en="Declared value (₱) <span class='req'>*</span>">Valeur déclarée (₱) <span class="req">*</span></label><input type="number" placeholder="Ex : 5000.00" min="0" step="0.01" id="valeurDeclaree" required></div>
-      <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..."></textarea></div>
+      <div class="fg full"><label data-fr="Description du contenu <span class='req'>*</span>" data-en="Content description <span class='req'>*</span>">Description du contenu <span class="req">*</span></label><textarea id="descContenu" rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..." required></textarea></div>
       <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
 
       <!-- UPLOADS OBLIGATOIRES -->
