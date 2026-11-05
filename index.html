@@ -835,10 +835,14 @@ function doAdminLogin() {
     var _hasColis  = _colisFile && _colisFile.files && _colisFile.files.length > 0;
 
     var _errs = [];
+    var _depotEl  = document.getElementById('modeDepot');
+    var _depot    = _depotEl ? _depotEl.value.trim() : '';
+
     if (!_nomExp)   _errs.push('Nom expéditeur');
     if (!_telExp)   _errs.push('Tél expéditeur');
     if (!_nomRec)   _errs.push('Nom destinataire');
     if (!_telRec)   _errs.push('Tél destinataire');
+    if (!_depot)  { showToast('⚠️ Mode de dépôt manquant', 'Veuillez choisir comment vous déposerez votre colis.'); if(_depotEl){_depotEl.style.border='2px solid #e53935';setTimeout(function(){_depotEl.style.border='';},4000);_depotEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
 
     // Blocage si pièces jointes manquantes
@@ -2729,7 +2733,7 @@ function doLogout() {
       <div class="fg"><label data-fr="Téléphone récepteur <span class='req'>*</span>" data-en="Recipient phone <span class='req'>*</span>">Téléphone récepteur <span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
-        <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
+        <label data-fr="Mode de dépôt du colis <span class='req'>*</span>" data-en="Package drop-off mode <span class='req'>*</span>">Mode de dépôt du colis <span class="req">*</span></label>
         <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
           <option value="" data-fr="— Choisir le mode de dépôt —" data-en="— Choose drop-off mode —">— Choisir le mode de dépôt —</option>
           <option value="presentiel" data-fr="🏢 En présentiel — je dépose moi-même aux bureaux GCC" data-en="🏢 In person — I drop off at GCC offices">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
@@ -2740,7 +2744,7 @@ function doLogout() {
 
       <!-- Mode d'expédition (Air/Sea) -->
       <div class="fg" id="fieldModeEnvoi">
-        <label data-fr="Mode d'expédition" data-en="Shipping mode">Mode d'expédition</label>
+        <label data-fr="Mode d'expédition <span class='req'>*</span>" data-en="Shipping mode <span class='req'>*</span>">Mode d'expédition <span class="req">*</span></label>
         <select id="selectModeEnvoi">
           <option>✈ Air Shipping</option>
           <option>🚢 Sea Shipping</option>
@@ -2847,7 +2851,7 @@ function doLogout() {
         </div>
       </div>
 
-      <div class="fg"><label data-fr="Type de contenu" data-en="Content type">Type de contenu</label>
+      <div class="fg"><label data-fr="Type de contenu <span class='req'>*</span>" data-en="Content type <span class='req'>*</span>">Type de contenu <span class="req">*</span></label>
         <select id="selectTypeContenu">
           <option>Marchandises générales</option>
           <option>Électronique</option>
