@@ -210,6 +210,9 @@ nav{
 .fg{display:flex;flex-direction:column;gap:6px;}
 .fg.full{grid-column:1/-1;}
 .fg label{font-size:.83rem;font-weight:600;color:var(--ice);}
+.req{color:#ff5252;font-weight:900;margin-left:3px;font-size:.9rem;}
+.required-note{font-size:.78rem;color:rgba(255,255,255,.55);margin:0 0 18px;padding:8px 12px;border-left:3px solid #ff5252;background:rgba(255,82,82,.08);border-radius:0 6px 6px 0;}
+.required-note .req{font-size:.85rem;}
 .fg input,.fg select,.fg textarea{
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);
   color:var(--white);padding:12px 15px;border-radius:6px;
@@ -2680,11 +2683,12 @@ function doLogout() {
   <h2 class="section-title" style="color:var(--white);" data-fr="Envoyer un colis" data-en="Ship a package">Envoyer un colis</h2>
   <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
+    <p class="required-note" data-fr="Les champs marqués d'un <span class='req'>*</span> sont obligatoires." data-en="Fields marked with <span class='req'>*</span> are required.">Les champs marqués d'un <span class="req">*</span> sont obligatoires.</p>
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)</label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
+      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)<span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp<span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
       <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input id="emailExp" type="email" placeholder="votre@email.com"></div>
-      <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)</label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
+      <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)<span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select id="selectDestination">
           <optgroup label="🇵🇭 Philippines → Afrique">
@@ -2721,8 +2725,8 @@ function doLogout() {
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur</label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur</label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur<span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
+      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur<span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
@@ -2863,7 +2867,7 @@ function doLogout() {
 
       <!-- UPLOADS OBLIGATOIRES -->
       <div class="fg full">
-        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span style="background:#e53935;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:middle;letter-spacing:.3px;" data-fr="OBLIGATOIRE" data-en="REQUIRED">OBLIGATOIRE</span></label>
+        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale)<span class="req">*</span></label>
         <div class="upload-zone" id="zone-idFile" onclick="document.getElementById('idFile').click()">
           <div class="uz-icon">🪪</div>
           <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
@@ -2872,7 +2876,7 @@ function doLogout() {
         </div>
       </div>
       <div class="fg full">
-        <label data-fr="📷 Photos du colis (1 à 5 photos claires)" data-en="📷 Package photos (1 to 5 clear photos)">📷 Photos du colis (1 à 5 photos claires) <span style="background:#e53935;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:middle;letter-spacing:.3px;" data-fr="OBLIGATOIRE" data-en="REQUIRED">OBLIGATOIRE</span></label>
+        <label data-fr="📷 Photos du colis (1 à 5 photos claires)" data-en="📷 Package photos (1 to 5 clear photos)">📷 Photos du colis (1 à 5 photos claires)<span class="req">*</span></label>
         <div class="upload-zone" id="zone-colisFiles" onclick="document.getElementById('colisFiles').click()">
           <div class="uz-icon">📦</div>
           <p data-fr="Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small>" data-en="Upload clear photos of your package (all sides)<br><small>JPG, PNG — max 10 MB total — 5 files max</small>">Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small></p>
