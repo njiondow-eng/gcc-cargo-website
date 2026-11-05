@@ -825,13 +825,54 @@ function doAdminLogin() {
     var _destEl   = document.getElementById('selectDestination');
     var _dest     = _destEl ? _destEl.value.trim() : '';
     var _chk      = document.getElementById('consentCheck');
+    // Pièces jointes obligatoires
+    var _idFile    = document.getElementById('idFile');
+    var _colisFile = document.getElementById('colisFiles');
+    var _hasId     = _idFile    && _idFile.files    && _idFile.files.length > 0;
+    var _hasColis  = _colisFile && _colisFile.files && _colisFile.files.length > 0;
+
     var _errs = [];
     if (!_nomExp)   _errs.push('Nom expéditeur');
     if (!_telExp)   _errs.push('Tél expéditeur');
     if (!_nomRec)   _errs.push('Nom destinataire');
     if (!_telRec)   _errs.push('Tél destinataire');
     if (!_chk||!_chk.checked) _errs.push('Acceptation conditions');
+
+    // Blocage si pièces jointes manquantes
+    if (!_hasId && !_hasColis) {
+      showToast('📎 Documents manquants', 'La pièce d\'identité et les photos du colis sont obligatoires.');
+      _highlightMissingUpload('idFile');
+      setTimeout(function(){ _highlightMissingUpload('colisFiles'); }, 300);
+      return;
+    }
+    if (!_hasId) {
+      showToast('🪪 Pièce d\'identité manquante', 'Veuillez charger votre pièce d\'identité (passeport, permis ou carte nationale).');
+      _highlightMissingUpload('idFile');
+      return;
+    }
+    if (!_hasColis) {
+      showToast('📷 Photos du colis manquantes', 'Veuillez charger au moins une photo de votre colis.');
+      _highlightMissingUpload('colisFiles');
+      return;
+    }
+
     if (_errs.length) { showToast('⚠️ Champs manquants', _errs.join(' • ')); return; }
+
+    // Fonction interne pour mettre en évidence la zone d'upload manquante
+    function _highlightMissingUpload(inputId) {
+      var zoneId = 'zone-' + inputId;
+      var zone = document.getElementById(zoneId);
+      if (!zone) {
+        var inp = document.getElementById(inputId);
+        if (inp) { var p = inp.parentNode; if (p && p.classList && p.classList.contains('upload-zone')) zone = p; }
+      }
+      if (zone) {
+        zone.style.border = '2.5px solid #e53935';
+        zone.style.background = 'rgba(229,57,53,.07)';
+        zone.scrollIntoView({ behavior:'smooth', block:'center' });
+        setTimeout(function(){ zone.style.border = ''; zone.style.background = ''; }, 4500);
+      }
+    }
     var now = new Date();
     var ref = 'GCC-' + now.getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
     var depotSel = document.getElementById('modeDepot');
@@ -2820,23 +2861,23 @@ function doLogout() {
       <div class="fg full"><label data-fr="Description du contenu" data-en="Content description">Description du contenu</label><textarea rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..."></textarea></div>
       <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
 
-      <!-- UPLOADS -->
+      <!-- UPLOADS OBLIGATOIRES -->
       <div class="fg full">
-        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale)</label>
-        <div class="upload-zone" onclick="document.getElementById('idFile').click()">
+        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span style="background:#e53935;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:middle;letter-spacing:.3px;" data-fr="OBLIGATOIRE" data-en="REQUIRED">OBLIGATOIRE</span></label>
+        <div class="upload-zone" id="zone-idFile" onclick="document.getElementById('idFile').click()">
           <div class="uz-icon">🪪</div>
           <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
           <div class="uz-name" id="id-name"></div>
-          <input id="idFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'id-name')">
+          <input id="idFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'id-name');document.getElementById('zone-idFile').style.border='';document.getElementById('zone-idFile').style.background='';">
         </div>
       </div>
       <div class="fg full">
-        <label data-fr="📷 Photos du colis (1 à 5 photos claires)" data-en="📷 Package photos (1 to 5 clear photos)">📷 Photos du colis (1 à 5 photos claires)</label>
-        <div class="upload-zone" onclick="document.getElementById('colisFiles').click()">
+        <label data-fr="📷 Photos du colis (1 à 5 photos claires)" data-en="📷 Package photos (1 to 5 clear photos)">📷 Photos du colis (1 à 5 photos claires) <span style="background:#e53935;color:#fff;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;vertical-align:middle;letter-spacing:.3px;" data-fr="OBLIGATOIRE" data-en="REQUIRED">OBLIGATOIRE</span></label>
+        <div class="upload-zone" id="zone-colisFiles" onclick="document.getElementById('colisFiles').click()">
           <div class="uz-icon">📦</div>
           <p data-fr="Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small>" data-en="Upload clear photos of your package (all sides)<br><small>JPG, PNG — max 10 MB total — 5 files max</small>">Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small></p>
           <div class="uz-name" id="colis-names"></div>
-          <input id="colisFiles" type="file" accept=".jpg,.jpeg,.png" multiple style="display:none" onchange="showFileNames(this,'colis-names')">
+          <input id="colisFiles" type="file" accept=".jpg,.jpeg,.png" multiple style="display:none" onchange="showFileNames(this,'colis-names');document.getElementById('zone-colisFiles').style.border='';document.getElementById('zone-colisFiles').style.background='';">
         </div>
       </div>
 
