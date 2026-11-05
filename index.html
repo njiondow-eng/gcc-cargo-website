@@ -2685,10 +2685,10 @@ function doLogout() {
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
     <p class="required-note" data-fr="Les champs marqués d'un <span class='req'>*</span> sont obligatoires." data-en="Fields marked with <span class='req'>*</span> are required.">Les champs marqués d'un <span class="req">*</span> sont obligatoires.</p>
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom & Nom (expéditeur)" data-en="First & Last Name (sender)">Prénom & Nom (expéditeur)<span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp<span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
+      <div class="fg"><label data-fr="Prénom &amp; Nom (expéditeur) <span class='req'>*</span>" data-en="First &amp; Last Name (sender) <span class='req'>*</span>">Prénom &amp; Nom (expéditeur) <span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Téléphone / WhatsApp <span class='req'>*</span>" data-en="Phone / WhatsApp <span class='req'>*</span>">Téléphone / WhatsApp <span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
       <div class="fg"><label data-fr="Email expéditeur" data-en="Sender email">Email expéditeur</label><input id="emailExp" type="email" placeholder="votre@email.com"></div>
-      <div class="fg full"><label data-fr="Adresse du client (Philippines)" data-en="Client address (Philippines)">Adresse du client (Philippines)<span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
+      <div class="fg full"><label data-fr="Adresse du client (Philippines) <span class='req'>*</span>" data-en="Client address (Philippines) <span class='req'>*</span>">Adresse du client (Philippines) <span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
       <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
         <select id="selectDestination">
           <optgroup label="🇵🇭 Philippines → Afrique">
@@ -2725,8 +2725,8 @@ function doLogout() {
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur" data-en="Recipient name">Nom du récepteur<span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur" data-en="Recipient phone">Téléphone récepteur<span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <div class="fg"><label data-fr="Nom du récepteur <span class='req'>*</span>" data-en="Recipient name <span class='req'>*</span>">Nom du récepteur <span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
+      <div class="fg"><label data-fr="Téléphone récepteur <span class='req'>*</span>" data-en="Recipient phone <span class='req'>*</span>">Téléphone récepteur <span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis" data-en="Package drop-off mode">Mode de dépôt du colis</label>
@@ -2867,7 +2867,7 @@ function doLogout() {
 
       <!-- UPLOADS OBLIGATOIRES -->
       <div class="fg full">
-        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale)" data-en="🪪 Valid ID (passport, driver's license, national ID)">🪪 Pièce d'identité valide (passeport, permis, carte nationale)<span class="req">*</span></label>
+        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class='req'>*</span>" data-en="🪪 Valid ID (passport, driver's license, national ID) <span class='req'>*</span>">🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class="req">*</span></label>
         <div class="upload-zone" id="zone-idFile" onclick="document.getElementById('idFile').click()">
           <div class="uz-icon">🪪</div>
           <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
@@ -2876,7 +2876,7 @@ function doLogout() {
         </div>
       </div>
       <div class="fg full">
-        <label data-fr="📷 Photos du colis (1 à 5 photos claires)" data-en="📷 Package photos (1 to 5 clear photos)">📷 Photos du colis (1 à 5 photos claires)<span class="req">*</span></label>
+        <label data-fr="📷 Photos du colis (1 à 5 photos claires) <span class='req'>*</span>" data-en="📷 Package photos (1 to 5 clear photos) <span class='req'>*</span>">📷 Photos du colis (1 à 5 photos claires) <span class="req">*</span></label>
         <div class="upload-zone" id="zone-colisFiles" onclick="document.getElementById('colisFiles').click()">
           <div class="uz-icon">📦</div>
           <p data-fr="Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small>" data-en="Upload clear photos of your package (all sides)<br><small>JPG, PNG — max 10 MB total — 5 files max</small>">Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small></p>
@@ -3693,7 +3693,7 @@ function doLogout() {
       📧 <strong>gomerjavan45@gmail.com</strong><br>
       📍 Trimar Building, Multinational Ave, Parañaque
     </div>
-    <button onclick="document.getElementById('confirmModal').style.display='none'" style="background:linear-gradient(135deg,#E87722,#d4601a);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;box-shadow:0 4px 16px rgba(232,119,34,.4);" data-fr="OK, j'ai compris →" data-en="Got it →">OK, j'ai compris →</button>
+    <button onclick="document.getElementById('confirmModal').style.display='none';window.scrollTo({top:0,behavior:'smooth'});" style="background:linear-gradient(135deg,#E87722,#d4601a);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;box-shadow:0 4px 16px rgba(232,119,34,.4);" data-fr="OK, j'ai compris →" data-en="Got it →">OK, j'ai compris →</button>
   </div>
 </div>
 
