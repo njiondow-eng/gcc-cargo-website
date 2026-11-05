@@ -556,7 +556,9 @@ function setLang(l) {
   try { localStorage.setItem('gcc_lang', l); } catch(e) {}
   document.documentElement.lang = l;
   document.querySelectorAll('[data-fr]').forEach(function(el) {
-    var val = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+    var val = l === 'en' ? el.getAttribute('data-en')
+            : l === 'tl' ? (el.getAttribute('data-tl') || el.getAttribute('data-fr'))
+            : el.getAttribute('data-fr');
     if (!val) return;
     var tag = el.tagName.toUpperCase();
     if (tag === 'INPUT' || tag === 'TEXTAREA') {
@@ -568,7 +570,7 @@ function setLang(l) {
     }
   });
   document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.textContent.trim() === l.toUpperCase());
+    b.classList.toggle('active', b.dataset.lang === l);
   });
 }
 
@@ -2532,16 +2534,16 @@ function doLogout() {
     </div>
   </div>
   <ul class="nav-links">
-    <li><a href="#destinations" data-fr="Destinations" data-en="Destinations">Destinations</a></li>
-    <li><a href="#services" data-fr="Services" data-en="Services">Services</a></li>
-    <li><a href="#envoyer" data-fr="Envoyer" data-en="Ship">Envoyer</a></li>
-    <li><a href="#tracking" data-fr="Tracking" data-en="Tracking">Tracking</a></li>
-    <li><a href="#parrainage" data-fr="Parrainage" data-en="Referral">Parrainage</a></li>
-    <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
+    <li><a href="#destinations" data-fr="Destinations" data-en="Destinations" data-tl="Mga Destinasyon">Destinations</a></li>
+    <li><a href="#services" data-fr="Services" data-en="Services" data-tl="Mga Serbisyo">Services</a></li>
+    <li><a href="#envoyer" data-fr="Envoyer" data-en="Ship" data-tl="Magpadala">Envoyer</a></li>
+    <li><a href="#tracking" data-fr="Tracking" data-en="Tracking" data-tl="Subaybayan">Tracking</a></li>
+    <li><a href="#parrainage" data-fr="Parrainage" data-en="Referral" data-tl="Referral">Parrainage</a></li>
+    <li><a href="#contact" data-fr="Contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a></li>
   </ul>
-  <div class="nav-actions"><div class="lang-switcher"><button class="lang-btn active" onclick="setLang('fr')">FR</button><button class="lang-btn" onclick="setLang('en')">EN</button></div>
+  <div class="nav-actions"><div class="lang-switcher"><button class="lang-btn active" data-lang="fr" onclick="setLang('fr')">FR</button><button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button><button class="lang-btn" data-lang="tl" onclick="setLang('tl')">TL</button></div>
     <button class="btn-admin" onclick="openAdminLogin()" style="display:none;">🔐 Admin</button>
-    <a href="#envoyer" class="btn-nav-cta" data-fr="Envoyer un colis" data-en="Ship a package">Envoyer un colis</a>
+    <a href="#envoyer" class="btn-nav-cta" data-fr="Envoyer un colis" data-en="Ship a package" data-tl="Magpadala ng Pakete">Envoyer un colis</a>
     <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
   </div>
 </nav>
@@ -2568,11 +2570,11 @@ function doLogout() {
       <span class="hero-badge">✈ CARGO INTERNATIONAL</span>
       <span class="hero-since">Depuis 2020</span>
     </div>
-    <h1 data-fr="Safe Cargo<br><span class='accent'>Strong Connections</span><br>Global Delivery" data-en="Safe Cargo<br><span class='accent'>Strong Connections</span><br>Global Delivery">Safe Cargo<br><span class="accent">Strong Connections</span><br>Global Delivery</h1>
-    <p class="hero-desc" data-fr="Votre partenaire de confiance pour l'envoi de colis entre les Philippines et l'Afrique. Transport aérien, maritime, sourcing et partenariat — rapidité, fiabilité, sécurité." data-en="Your trusted partner for shipping packages between the Philippines and Africa. Air freight, sea freight, sourcing and partnerships — speed, reliability, security.">Votre partenaire de confiance pour l'envoi de colis entre les Philippines et l'Afrique. Transport aérien, maritime, sourcing et partenariat — rapidité, fiabilité, sécurité.</p>
+    <h1 data-fr="Safe Cargo<br><span class='accent'>Strong Connections</span><br>Global Delivery" data-en="Safe Cargo<br><span class='accent'>Strong Connections</span><br>Global Delivery" data-tl="Ligtas na Kargamento<br><span class='accent'>Matibay na Koneksyon</span><br>Pandaigdigang Pagpapadala">Safe Cargo<br><span class="accent">Strong Connections</span><br>Global Delivery</h1>
+    <p class="hero-desc" data-fr="Votre partenaire de confiance pour l'envoi de colis entre les Philippines et l'Afrique. Transport aérien, maritime, sourcing et partenariat — rapidité, fiabilité, sécurité." data-en="Your trusted partner for shipping packages between the Philippines and Africa. Air freight, sea freight, sourcing and partnerships — speed, reliability, security." data-tl="Ang iyong mapagkakatiwalaang kasosyo sa pagpapadala ng mga pakete sa pagitan ng Pilipinas at Africa. Air freight, sea freight, sourcing at pakikipagtulungan — bilis, pagiging maaasahan, seguridad.">Votre partenaire de confiance pour l'envoi de colis entre les Philippines et l'Afrique. Transport aérien, maritime, sourcing et partenariat — rapidité, fiabilité, sécurité.</p>
     <div class="hero-btns">
-      <a href="#envoyer" class="btn-primary" data-fr="Envoyer un colis →" data-en="Ship a package →">Envoyer un colis →</a>
-      <a href="#tracking" class="btn-outline" data-fr="Suivre mon colis" data-en="Track my package">Suivre mon colis</a>
+      <a href="#envoyer" class="btn-primary" data-fr="Envoyer un colis →" data-en="Ship a package →" data-tl="Magpadala ng Pakete →">Envoyer un colis →</a>
+      <a href="#tracking" class="btn-outline" data-fr="Suivre mon colis" data-en="Track my package" data-tl="Subaybayan ang aking Pakete">Suivre mon colis</a>
     </div>
     <div class="route-pills" id="route-pills-container">
       <span class="rpill"><span class="rpill-name">🇵🇭 Manila</span></span>
@@ -2596,8 +2598,8 @@ function doLogout() {
       <div class="db-header">
         <div class="db-header-icon">✈</div>
         <div>
-          <div class="dh1" data-fr="PROCHAINS DÉPARTS" data-en="NEXT DEPARTURES">PROCHAINS DÉPARTS</div>
-          <div class="dh2" data-fr="Annonces & Arrivées" data-en="Announcements & Arrivals">Annonces & Arrivées</div>
+          <div class="dh1" data-fr="PROCHAINS DÉPARTS" data-en="NEXT DEPARTURES" data-tl="SUSUNOD NA MGA BIYAHE">PROCHAINS DÉPARTS</div>
+          <div class="dh2" data-fr="Annonces & Arrivées" data-en="Announcements & Arrivals" data-tl="Mga Anunsyo at Pagdating">Annonces & Arrivées</div>
         </div>
       </div>
       <div class="db-body" id="hero-departures-body">
@@ -2647,17 +2649,17 @@ function doLogout() {
 
 <!-- STATS -->
 <div class="stats-bar">
-  <div class="stat"><div class="stat-num">8</div><div class="stat-lbl" data-fr="Pays desservis" data-en="Countries served">Pays desservis</div></div>
-  <div class="stat"><div class="stat-num">Air+Sea</div><div class="stat-lbl" data-fr="Modes transport" data-en="Transport modes">Modes transport</div></div>
-  <div class="stat"><div class="stat-num">500+</div><div class="stat-lbl" data-fr="Clients satisfaits" data-en="Happy clients">Clients satisfaits</div></div>
-  <div class="stat"><div class="stat-num">D2D</div><div class="stat-lbl" data-fr="Door to Door" data-en="Door to Door">Door to Door</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-lbl" data-fr="Pays desservis" data-en="Countries served" data-tl="Mga Bansang Pinaglilingkuran">Pays desservis</div></div>
+  <div class="stat"><div class="stat-num">Air+Sea</div><div class="stat-lbl" data-fr="Modes transport" data-en="Transport modes" data-tl="Mga Paraan ng Transportasyon">Modes transport</div></div>
+  <div class="stat"><div class="stat-num">500+</div><div class="stat-lbl" data-fr="Clients satisfaits" data-en="Happy clients" data-tl="Mga Nasisiyahang Kliyente">Clients satisfaits</div></div>
+  <div class="stat"><div class="stat-num">D2D</div><div class="stat-lbl" data-fr="Door to Door" data-en="Door to Door" data-tl="Door to Door">Door to Door</div></div>
 </div>
 
 <!-- ░░ DESTINATIONS ░░ -->
 <section class="destinations" id="destinations">
-  <div class="section-eyebrow" data-fr="ZONES DE LIVRAISON" data-en="DELIVERY ZONES">ZONES DE LIVRAISON</div>
-  <h2 class="section-title" data-fr="Où nous livrons" data-en="Where we deliver">Où nous livrons</h2>
-  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves 12 countries in Central and West Africa from the Philippines via Manila's airports and ports.">GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
+  <div class="section-eyebrow" data-fr="ZONES DE LIVRAISON" data-en="DELIVERY ZONES" data-tl="MGA LUGAR NG PAGHAHATID">ZONES DE LIVRAISON</div>
+  <h2 class="section-title" data-fr="Où nous livrons" data-en="Where we deliver" data-tl="Kung Saan Kami Naghahatid">Où nous livrons</h2>
+  <p class="section-sub" data-fr="GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila." data-en="GCC CARGO HANDLING INC serves 12 countries in Central and West Africa from the Philippines via Manila's airports and ports." data-tl="Ang GCC CARGO HANDLING INC ay naglilingkod sa 12 bansa sa Gitnang at Kanlurang Africa mula sa Pilipinas sa pamamagitan ng mga paliparan at daungan ng Maynila.">GCC CARGO HANDLING INC dessert 12 pays d'Afrique centrale et de l'Ouest depuis les Philippines via les aéroports et ports de Manila.</p>
   <div class="dest-grid">
     <div class="dest-card"><div class="dest-flag"><img src="https://flagcdn.com/w80/cm.png" alt="Cameroun"></div><h3>Cameroun</h3><p>Yaoundé & Douala</p></div>
     <div class="dest-card"><div class="dest-flag"><img src="https://flagcdn.com/w80/cg.png" alt="Congo Brazzaville"></div><h3>Congo Brazzaville</h3><p>Brazzaville</p></div>
@@ -2676,34 +2678,34 @@ function doLogout() {
 
 <!-- ░░ SERVICES ░░ -->
 <section class="services" id="services">
-  <div class="section-eyebrow" data-fr="NOS SERVICES" data-en="OUR SERVICES">NOS SERVICES</div>
-  <h2 class="section-title" data-fr="Ce que nous proposons" data-en="What we offer">Ce que nous proposons</h2>
-  <p class="section-sub" data-fr="Du fret aérien au sourcing de produits, GCC CARGO couvre l'ensemble de la chaîne logistique entre les Philippines et l'Afrique." data-en="From air freight to product sourcing, GCC CARGO covers the entire logistics chain between the Philippines and Africa.">Du fret aérien au sourcing de produits, GCC CARGO couvre l'ensemble de la chaîne logistique entre les Philippines et l'Afrique.</p>
+  <div class="section-eyebrow" data-fr="NOS SERVICES" data-en="OUR SERVICES" data-tl="AMING MGA SERBISYO">NOS SERVICES</div>
+  <h2 class="section-title" data-fr="Ce que nous proposons" data-en="What we offer" data-tl="Ano ang Aming Inaalok">Ce que nous proposons</h2>
+  <p class="section-sub" data-fr="Du fret aérien au sourcing de produits, GCC CARGO couvre l'ensemble de la chaîne logistique entre les Philippines et l'Afrique." data-en="From air freight to product sourcing, GCC CARGO covers the entire logistics chain between the Philippines and Africa." data-tl="Mula sa air freight hanggang sa pagkuha ng produkto, sinasaklaw ng GCC CARGO ang buong logistikong kadena sa pagitan ng Pilipinas at Africa.">Du fret aérien au sourcing de produits, GCC CARGO couvre l'ensemble de la chaîne logistique entre les Philippines et l'Afrique.</p>
   <div class="services-grid">
-    <div class="svc-card"><div class="svc-icon">✈️</div><h3>Air Shipping</h3><p data-fr="Transport aérien rapide entre Manila et vos destinations africaines. Idéal pour les envois urgents et les marchandises à haute valeur." data-en="Fast air freight between Manila and your African destinations. Ideal for urgent shipments and high-value goods.">Transport aérien rapide entre Manila et vos destinations africaines. Idéal pour les envois urgents et les marchandises à haute valeur.</p></div>
-    <div class="svc-card"><div class="svc-icon">🚢</div><h3>Sea Shipping</h3><p data-fr="Fret maritime économique pour les envois en grande quantité. Solution idéale pour les commerçants et les entreprises." data-en="Economical sea freight for large volume shipments. The ideal solution for traders and businesses.">Fret maritime économique pour les envois en grande quantité. Solution idéale pour les commerçants et les entreprises.</p></div>
-    <div class="svc-card"><div class="svc-icon">🔍</div><h3>Sourcing</h3><p data-fr="Nous localisons et achetons pour vous les produits aux Philippines ou en Asie : électronique, textile, pièces détachées, cosmétiques." data-en="We locate and purchase products in the Philippines or Asia for you: electronics, textiles, spare parts, cosmetics.">Nous localisons et achetons pour vous les produits aux Philippines ou en Asie : électronique, textile, pièces détachées, cosmétiques.</p></div>
-    <div class="svc-card"><div class="svc-icon">🤝</div><h3>Partenariat</h3><p data-fr="Programme de partenariat commercial pour agents, revendeurs et opérateurs en Afrique souhaitant intégrer notre réseau." data-en="Commercial partnership program for agents, resellers and operators in Africa wishing to join our network.">Programme de partenariat commercial pour agents, revendeurs et opérateurs en Afrique souhaitant intégrer notre réseau.</p></div>
-    <div class="svc-card"><div class="svc-icon">📦</div><h3>Balikbayan Boxes</h3><p data-fr="Boîtes cadeaux pour la famille — vêtements, chaussures, produits alimentaires, objets personnels." data-en="Gift boxes for family — clothing, shoes, food products, personal items.">Boîtes cadeaux pour la famille — vêtements, chaussures, produits alimentaires, objets personnels.</p></div>
-    <div class="svc-card"><div class="svc-icon">🚪</div><h3>Door to Door</h3><p data-fr="Collecte à votre domicile aux Philippines et livraison directe chez le destinataire en Afrique." data-en="Pick-up from your home in the Philippines and direct delivery to the recipient in Africa.">Collecte à votre domicile aux Philippines et livraison directe chez le destinataire en Afrique.</p></div>
-    <div class="svc-card"><div class="svc-icon">🛃</div><h3>Dédouanement</h3><p data-fr="Accompagnement dans les démarches douanières pour assurer la conformité de vos envois à destination." data-en="Support with customs procedures to ensure the compliance of your shipments at destination.">Accompagnement dans les démarches douanières pour assurer la conformité de vos envois à destination.</p></div>
-    <div class="svc-card"><div class="svc-icon">📊</div><h3>Tracking en ligne</h3><p data-fr="Suivez l'acheminement de votre colis en temps réel grâce à notre système de tracking et aux notifications SMS/email." data-en="Track your package in real time with our tracking system and SMS/email notifications.">Suivez l'acheminement de votre colis en temps réel grâce à notre système de tracking et aux notifications SMS/email.</p></div>
+    <div class="svc-card"><div class="svc-icon">✈️</div><h3>Air Shipping</h3><p data-fr="Transport aérien rapide entre Manila et vos destinations africaines. Idéal pour les envois urgents et les marchandises à haute valeur." data-en="Fast air freight between Manila and your African destinations. Ideal for urgent shipments and high-value goods." data-tl="Mabilis na air transport mula Manila patungo sa iyong mga destinasyon sa Africa. Ideal para sa mga madaliang padala at mataas na halagang kalakal.">Transport aérien rapide entre Manila et vos destinations africaines. Idéal pour les envois urgents et les marchandises à haute valeur.</p></div>
+    <div class="svc-card"><div class="svc-icon">🚢</div><h3>Sea Shipping</h3><p data-fr="Fret maritime économique pour les envois en grande quantité. Solution idéale pour les commerçants et les entreprises." data-en="Economical sea freight for large volume shipments. The ideal solution for traders and businesses." data-tl="Matipid na sea freight para sa malalaking dami ng padala. Perpektong solusyon para sa mga mangangalakal at negosyo.">Fret maritime économique pour les envois en grande quantité. Solution idéale pour les commerçants et les entreprises.</p></div>
+    <div class="svc-card"><div class="svc-icon">🔍</div><h3>Sourcing</h3><p data-fr="Nous localisons et achetons pour vous les produits aux Philippines ou en Asie : électronique, textile, pièces détachées, cosmétiques." data-en="We locate and purchase products in the Philippines or Asia for you: electronics, textiles, spare parts, cosmetics." data-tl="Hinahanap at binibili namin para sa inyo ang mga produkto sa Pilipinas o Asia: electronics, tela, spare parts, kosmetiko.">Nous localisons et achetons pour vous les produits aux Philippines ou en Asie : électronique, textile, pièces détachées, cosmétiques.</p></div>
+    <div class="svc-card"><div class="svc-icon">🤝</div><h3>Partenariat</h3><p data-fr="Programme de partenariat commercial pour agents, revendeurs et opérateurs en Afrique souhaitant intégrer notre réseau." data-en="Commercial partnership program for agents, resellers and operators in Africa wishing to join our network." data-tl="Programang komersyal na pakikipagtulungan para sa mga ahente, reselyer at operator sa Africa na nais sumali sa aming network.">Programme de partenariat commercial pour agents, revendeurs et opérateurs en Afrique souhaitant intégrer notre réseau.</p></div>
+    <div class="svc-card"><div class="svc-icon">📦</div><h3>Balikbayan Boxes</h3><p data-fr="Boîtes cadeaux pour la famille — vêtements, chaussures, produits alimentaires, objets personnels." data-en="Gift boxes for family — clothing, shoes, food products, personal items." data-tl="Mga regalo para sa pamilya — damit, sapatos, pagkain, personal na gamit.">Boîtes cadeaux pour la famille — vêtements, chaussures, produits alimentaires, objets personnels.</p></div>
+    <div class="svc-card"><div class="svc-icon">🚪</div><h3>Door to Door</h3><p data-fr="Collecte à votre domicile aux Philippines et livraison directe chez le destinataire en Afrique." data-en="Pick-up from your home in the Philippines and direct delivery to the recipient in Africa." data-tl="Pagkuha sa inyong tahanan sa Pilipinas at direktang paghahatid sa tatanggap sa Africa.">Collecte à votre domicile aux Philippines et livraison directe chez le destinataire en Afrique.</p></div>
+    <div class="svc-card"><div class="svc-icon">🛃</div><h3>Dédouanement</h3><p data-fr="Accompagnement dans les démarches douanières pour assurer la conformité de vos envois à destination." data-en="Support with customs procedures to ensure the compliance of your shipments at destination." data-tl="Tulong sa mga customs na proseso upang matiyak ang pagsunod ng inyong mga padala sa destinasyon.">Accompagnement dans les démarches douanières pour assurer la conformité de vos envois à destination.</p></div>
+    <div class="svc-card"><div class="svc-icon">📊</div><h3>Tracking en ligne</h3><p data-fr="Suivez l'acheminement de votre colis en temps réel grâce à notre système de tracking et aux notifications SMS/email." data-en="Track your package in real time with our tracking system and SMS/email notifications." data-tl="Subaybayan ang inyong pakete sa real-time gamit ang aming sistema ng pagsubaybay at SMS/email na mga abiso.">Suivez l'acheminement de votre colis en temps réel grâce à notre système de tracking et aux notifications SMS/email.</p></div>
   </div>
 </section>
 
 <!-- ░░ SEND FORM ░░ -->
 <section class="send-section" id="envoyer">
-  <div class="section-eyebrow" data-fr="EXPÉDITION" data-en="SHIPMENT">EXPÉDITION</div>
-  <h2 class="section-title" style="color:var(--white);" data-fr="Envoyer un colis" data-en="Ship a package">Envoyer un colis</h2>
-  <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
+  <div class="section-eyebrow" data-fr="EXPÉDITION" data-en="SHIPMENT" data-tl="PAGPAPADALA">EXPÉDITION</div>
+  <h2 class="section-title" style="color:var(--white);" data-fr="Envoyer un colis" data-en="Ship a package" data-tl="Magpadala ng Pakete">Envoyer un colis</h2>
+  <p class="section-sub" data-fr="Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h." data-en="Fill in the form, upload your ID and package photos. Our team will contact you within 24 hours." data-tl="Punan ang form, i-upload ang inyong ID at mga larawan ng pakete. Tatawagan kayo ng aming koponan sa loob ng 24 oras.">Remplissez le formulaire, chargez votre pièce d'identité et les photos de votre colis. Notre équipe vous rappelle sous 24h.</p>
   <form class="form-wrap" onsubmit="handleShipSubmit(event)">
-    <p class="required-note" data-fr="Les champs marqués d'un <span class='req'>*</span> sont obligatoires." data-en="Fields marked with <span class='req'>*</span> are required.">Les champs marqués d'un <span class="req">*</span> sont obligatoires.</p>
+    <p class="required-note" data-fr="Les champs marqués d'un <span class='req'>*</span> sont obligatoires." data-en="Fields marked with <span class='req'>*</span> are required." data-tl="Ang mga patlang na may <span class='req'>*</span> ay kinakailangan.">Les champs marqués d'un <span class="req">*</span> sont obligatoires.</p>
     <div class="form-grid">
-      <div class="fg"><label data-fr="Prénom &amp; Nom (expéditeur) <span class='req'>*</span>" data-en="First &amp; Last Name (sender) <span class='req'>*</span>">Prénom &amp; Nom (expéditeur) <span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" placeholder="Ex : William Tabi" required></div>
-      <div class="fg"><label data-fr="Téléphone / WhatsApp <span class='req'>*</span>" data-en="Phone / WhatsApp <span class='req'>*</span>">Téléphone / WhatsApp <span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
-      <div class="fg"><label data-fr="Email expéditeur <span class='req'>*</span>" data-en="Sender email <span class='req'>*</span>">Email expéditeur <span class="req">*</span></label><input id="emailExp" type="email" placeholder="votre@email.com" required></div>
-      <div class="fg full"><label data-fr="Adresse du client (Philippines) <span class='req'>*</span>" data-en="Client address (Philippines) <span class='req'>*</span>">Adresse du client (Philippines) <span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
-      <div class="fg"><label data-fr="Destination" data-en="Destination">Destination</label>
+      <div class="fg"><label data-fr="Prénom &amp; Nom (expéditeur) <span class='req'>*</span>" data-en="First &amp; Last Name (sender) <span class='req'>*</span>" data-tl="Pangalan (nagpadala) <span class='req'>*</span>">Prénom &amp; Nom (expéditeur) <span class="req">*</span></label><input id="nomExp" type="text" data-fr="Ex : William Tabi" data-en="e.g. William Tabi" data-tl="Hal.: Juan Dela Cruz" placeholder="Ex : William Tabi" required></div>
+      <div class="fg"><label data-fr="Téléphone / WhatsApp <span class='req'>*</span>" data-en="Phone / WhatsApp <span class='req'>*</span>" data-tl="Telepono / WhatsApp <span class='req'>*</span>">Téléphone / WhatsApp <span class="req">*</span></label><input id="telExp" type="tel" placeholder="+63 968 313 5356" required></div>
+      <div class="fg"><label data-fr="Email expéditeur <span class='req'>*</span>" data-en="Sender email <span class='req'>*</span>" data-tl="Email ng nagpadala <span class='req'>*</span>">Email expéditeur <span class="req">*</span></label><input id="emailExp" type="email" placeholder="votre@email.com" required></div>
+      <div class="fg full"><label data-fr="Adresse du client (Philippines) <span class='req'>*</span>" data-en="Client address (Philippines) <span class='req'>*</span>" data-tl="Address ng kliyente (Pilipinas) <span class='req'>*</span>">Adresse du client (Philippines) <span class="req">*</span></label><input type="text" id="adresseClient" placeholder="Ex : Block 2 Lot 4, Lancaster, General Trias, Cavite" required></div>
+      <div class="fg"><label data-fr="Destination" data-en="Destination" data-tl="Destinasyon">Destination</label>
         <select id="selectDestination">
           <optgroup label="🇵🇭 Philippines → Afrique">
             <option>🇵🇭 Manille → 🇨🇲 Yaoundé</option>
@@ -2739,22 +2741,22 @@ function doLogout() {
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur <span class='req'>*</span>" data-en="Recipient name <span class='req'>*</span>">Nom du récepteur <span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur <span class='req'>*</span>" data-en="Recipient phone <span class='req'>*</span>">Téléphone récepteur <span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <div class="fg"><label data-fr="Nom du récepteur <span class='req'>*</span>" data-en="Recipient name <span class='req'>*</span>">Nom du récepteur <span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" data-tl="Hal.: Maria Santos" placeholder="Ex : Marie Mbeu" required></div>
+      <div class="fg"><label data-fr="Téléphone récepteur <span class='req'>*</span>" data-en="Recipient phone <span class='req'>*</span>" data-tl="Telepono ng tatanggap <span class='req'>*</span>">Téléphone récepteur <span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
-        <label data-fr="Mode de dépôt du colis <span class='req'>*</span>" data-en="Package drop-off mode <span class='req'>*</span>">Mode de dépôt du colis <span class="req">*</span></label>
+        <label data-fr="Mode de dépôt du colis <span class='req'>*</span>" data-en="Package drop-off mode <span class='req'>*</span>" data-tl="Paraan ng pagdeposito ng pakete <span class='req'>*</span>">Mode de dépôt du colis <span class="req">*</span></label>
         <select id="modeDepot" onchange="handleModeDepot(this.value)" style="font-size:.95rem;padding:12px;">
-          <option value="" data-fr="— Choisir le mode de dépôt —" data-en="— Choose drop-off mode —">— Choisir le mode de dépôt —</option>
-          <option value="presentiel" data-fr="🏢 En présentiel — je dépose moi-même aux bureaux GCC" data-en="🏢 In person — I drop off at GCC offices">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
-          <option value="lalamove" data-fr="🛵 Lalamove — collecte à mon domicile / adresse" data-en="🛵 Lalamove — pickup from my home / address">🛵 Lalamove — collecte à mon domicile / adresse</option>
-          <option value="ecommerce" data-fr="🛍️ Shopee / Lazada (livraison aux locaux GCC)" data-en="🛍️ Shopee / Lazada (delivered to GCC premises)">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
+          <option value="" data-fr="— Choisir le mode de dépôt —" data-en="— Choose drop-off mode —" data-tl="— Piliin ang paraan ng deposito —">— Choisir le mode de dépôt —</option>
+          <option value="presentiel" data-fr="🏢 En présentiel — je dépose moi-même aux bureaux GCC" data-en="🏢 In person — I drop off at GCC offices" data-tl="🏢 Personal — ididiposito ko mismo sa opisina ng GCC">🏢 En présentiel — je dépose moi-même aux bureaux GCC</option>
+          <option value="lalamove" data-fr="🛵 Lalamove — collecte à mon domicile / adresse" data-en="🛵 Lalamove — pickup from my home / address" data-tl="🛵 Lalamove — koleksyon sa aking tahanan / address">🛵 Lalamove — collecte à mon domicile / adresse</option>
+          <option value="ecommerce" data-fr="🛍️ Shopee / Lazada (livraison aux locaux GCC)" data-en="🛍️ Shopee / Lazada (delivered to GCC premises)" data-tl="🛍️ Shopee / Lazada (paghahatid sa opisina ng GCC)">🛍️ Shopee / Lazada (livraison aux locaux GCC)</option>
         </select>
       </div>
 
       <!-- Mode d'expédition (Air/Sea) -->
       <div class="fg" id="fieldModeEnvoi">
-        <label data-fr="Mode d'expédition <span class='req'>*</span>" data-en="Shipping mode <span class='req'>*</span>">Mode d'expédition <span class="req">*</span></label>
+        <label data-fr="Mode d'expédition <span class='req'>*</span>" data-en="Shipping mode <span class='req'>*</span>" data-tl="Paraan ng pagpapadala <span class='req'>*</span>">Mode d'expédition <span class="req">*</span></label>
         <select id="selectModeEnvoi">
           <option>✈ Air Shipping</option>
           <option>🚢 Sea Shipping</option>
@@ -2764,32 +2766,32 @@ function doLogout() {
       <!-- ═══ SECTION LALAMOVE (masquée par défaut) ═══ -->
       <div class="fg full" id="sectionLalamove" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff8f0,#fff3e6);border:1.5px solid var(--orange);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;" data-fr="🛵 INFORMATIONS LALAMOVE" data-en="🛵 LALAMOVE INFORMATION">🛵 INFORMATIONS LALAMOVE</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--orange);letter-spacing:.06em;margin-bottom:14px;" data-fr="🛵 INFORMATIONS LALAMOVE" data-en="🛵 LALAMOVE INFORMATION" data-tl="🛵 IMPORMASYON SA LALAMOVE">🛵 INFORMATIONS LALAMOVE</div>
           <div class="form-grid" style="gap:14px;">
             <div class="fg full">
-              <label data-fr="Adresse de collecte (Philippines)" data-en="Pickup address (Philippines)">Adresse de collecte (Philippines)</label>
-              <input type="text" id="adresseLalamove" data-fr="Ex : 123 Naga Rd, Parañaque, Metro Manila" data-en="E.g.: 123 Naga Rd, Parañaque, Metro Manila" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
+              <label data-fr="Adresse de collecte (Philippines)" data-en="Pickup address (Philippines)" data-tl="Address ng koleksyon (Pilipinas)">Adresse de collecte (Philippines)</label>
+              <input type="text" id="adresseLalamove" data-fr="Ex : 123 Naga Rd, Parañaque, Metro Manila" data-en="E.g.: 123 Naga Rd, Parañaque, Metro Manila" data-tl="Hal.: 123 Naga Rd, Parañaque, Metro Manila" placeholder="Ex : 123 Naga Rd, Parañaque, Metro Manila" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label data-fr="Date souhaitée de collecte" data-en="Preferred pickup date">Date souhaitée de collecte</label>
+              <label data-fr="Date souhaitée de collecte" data-en="Preferred pickup date" data-tl="Gustong petsa ng koleksyon">Date souhaitée de collecte</label>
               <input type="date" id="dateLalamove" style="font-size:.9rem;">
             </div>
             <div class="fg">
-              <label data-fr="Créneau horaire préféré" data-en="Preferred time slot">Créneau horaire préféré</label>
+              <label data-fr="Créneau horaire préféré" data-en="Preferred time slot" data-tl="Gustong oras">Créneau horaire préféré</label>
               <select id="creneauLalamove" style="font-size:.9rem;">
-                <option data-fr="Matin (8h – 12h)" data-en="Morning (8 AM – 12 PM)">Matin (8h – 12h)</option>
-                <option data-fr="Après-midi (12h – 17h)" data-en="Afternoon (12 PM – 5 PM)">Après-midi (12h – 17h)</option>
-                <option data-fr="Soir (17h – 20h)" data-en="Evening (5 PM – 8 PM)">Soir (17h – 20h)</option>
+                <option data-fr="Matin (8h – 12h)" data-en="Morning (8 AM – 12 PM)" data-tl="Umaga (8:00 – 12:00)">Matin (8h – 12h)</option>
+                <option data-fr="Après-midi (12h – 17h)" data-en="Afternoon (12 PM – 5 PM)" data-tl="Hapon (12:00 – 17:00)">Après-midi (12h – 17h)</option>
+                <option data-fr="Soir (17h – 20h)" data-en="Evening (5 PM – 8 PM)" data-tl="Gabi (17:00 – 20:00)">Soir (17h – 20h)</option>
               </select>
             </div>
           </div>
 
           <!-- PAIEMENT -->
           <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(232,119,34,.25);">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;" data-fr="💳 MODE DE PAIEMENT" data-en="💳 PAYMENT METHOD">💳 MODE DE PAIEMENT</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;color:var(--orange);letter-spacing:.06em;margin-bottom:12px;" data-fr="💳 MODE DE PAIEMENT" data-en="💳 PAYMENT METHOD" data-tl="💳 PARAAN NG PAGBABAYAD">💳 MODE DE PAIEMENT</div>
             <div class="form-grid" style="gap:14px;">
               <div class="fg full">
-                <label data-fr="Méthode de paiement" data-en="Payment method">Méthode de paiement</label>
+                <label data-fr="Méthode de paiement" data-en="Payment method" data-tl="Paraan ng pagbabayad">Méthode de paiement</label>
                 <select id="modePaiement" onchange="handleModePaiement(this.value)" style="font-size:.9rem;">
                   <option value="transfer">🏦 Bank Transfer (BPI, BDO, Metrobank…)</option>
                   <option value="gcash">📱 GCash / Maya</option>
@@ -2802,10 +2804,10 @@ function doLogout() {
               <div class="fg full" id="infoPaiement" style="background:#f0f6ff;border-radius:8px;padding:12px 14px;font-size:.82rem;color:var(--navy);line-height:1.7;"></div>
               <!-- Upload capture de paiement -->
               <div class="fg full" id="sectionCapturePaiement">
-                <label data-fr="📸 Capture d'écran du paiement / dépôt" data-en="📸 Payment / deposit screenshot">📸 Capture d'écran du paiement / dépôt</label>
+                <label data-fr="📸 Capture d'écran du paiement / dépôt" data-en="📸 Payment / deposit screenshot" data-tl="📸 Screenshot ng bayad / deposito">📸 Capture d'écran du paiement / dépôt</label>
                 <div class="upload-zone" onclick="document.getElementById('captureFile').click()" style="padding:16px;">
                   <div class="uz-icon" style="font-size:1.6rem;">📸</div>
-                  <p data-fr="Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Upload your transfer or deposit screenshot<br><small>JPG, PNG or PDF — max 5 MB</small>">Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
+                  <p data-fr="Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Upload your transfer or deposit screenshot<br><small>JPG, PNG or PDF — max 5 MB</small>" data-tl="Mag-upload ng screenshot ng inyong bayad o deposito<br><small>JPG, PNG o PDF — max 5 MB</small>">Charger la capture d'écran de votre virement ou dépôt<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
                   <div class="uz-name" id="capture-name"></div>
                   <input id="captureFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'capture-name')">
                 </div>
@@ -2818,16 +2820,16 @@ function doLogout() {
       <!-- ═══ INFO PRESENTIEL ═══ -->
       <div class="fg full" id="sectionPresentiel" style="display:none;">
         <div style="background:linear-gradient(135deg,#f0f6ff,#e8f0fb);border:1.5px solid var(--sky);border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;" data-fr="🏢 DÉPÔT EN PRÉSENTIEL" data-en="🏢 DROP-OFF IN PERSON">🏢 DÉPÔT EN PRÉSENTIEL</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;" data-fr="Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement." data-en="Bring your parcel directly to our office. Our team checks, weighs and issues your invoice on the spot. You pay and receive your receipt immediately.">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:var(--sky);letter-spacing:.06em;margin-bottom:10px;" data-fr="🏢 DÉPÔT EN PRÉSENTIEL" data-en="🏢 DROP-OFF IN PERSON" data-tl="🏢 PERSONAL NA DEPOSITO">🏢 DÉPÔT EN PRÉSENTIEL</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:10px;" data-fr="Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement." data-en="Bring your parcel directly to our office. Our team checks, weighs and issues your invoice on the spot. You pay and receive your receipt immediately." data-tl="Dalhin ang inyong pakete direkta sa aming opisina. Susuriin, timbangin, at bibigyan kayo ng invoice sa lugar. Magbabayad kayo at makakatanggap ng resibo kaagad.">
             Apportez votre colis directement à nos bureaux. Notre équipe le contrôle, pèse et établit votre facture sur place. Vous payez et recevez votre reçu immédiatement.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 <span data-fr="Horaires : Lun–Sam, 9h00 – 18h00" data-en="Hours: Mon–Sat, 9:00 AM – 6:00 PM">Horaires : Lun–Sam, 9h00 – 18h00</span><br>
+            🕗 <span data-fr="Horaires : Lun–Sam, 9h00 – 18h00" data-en="Hours: Mon–Sat, 9:00 AM – 6:00 PM" data-tl="Oras: Lun–Sab, 9:00 – 18:00">Horaires : Lun–Sam, 9h00 – 18h00</span><br>
             📞 +63 968 313 5356 / +63 915 385 7604
           </div>
-          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash/Maya · Bank Transfer">
+          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash/Maya · Bank Transfer" data-tl="💳 Tinatanggap na pagbabayad: Cash (₱) · GCash/Maya · Bank Transfer">
             💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer
           </p>
         </div>
@@ -2835,17 +2837,17 @@ function doLogout() {
       <!-- ═══ INFO SHOPEE/LAZADA ═══ -->
       <div class="fg full" id="sectionEcommerce" style="display:none;">
         <div style="background:linear-gradient(135deg,#fff5f0,#ffeee6);border:1.5px solid #e74c3c;border-radius:12px;padding:20px 22px;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;" data-fr="🛍️ COMMANDE SHOPEE / LAZADA" data-en="🛍️ SHOPEE / LAZADA ORDER">🛍️ COMMANDE SHOPEE / LAZADA</div>
-          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;" data-fr="Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition." data-en="Your online order will be delivered <strong>directly to our premises</strong> by the platform courier (Shopee, Lazada, etc.). GCC CARGO receives, checks, weighs and prepares it for shipment.">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;color:#c0392b;letter-spacing:.06em;margin-bottom:10px;" data-fr="🛍️ COMMANDE SHOPEE / LAZADA" data-en="🛍️ SHOPEE / LAZADA ORDER" data-tl="🛍️ ORDER SA SHOPEE / LAZADA">🛍️ COMMANDE SHOPEE / LAZADA</div>
+          <p style="font-size:.88rem;color:var(--navy);line-height:1.65;margin-bottom:12px;" data-fr="Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition." data-en="Your online order will be delivered <strong>directly to our premises</strong> by the platform courier (Shopee, Lazada, etc.). GCC CARGO receives, checks, weighs and prepares it for shipment." data-tl="Ang inyong online na order ay maihahatid <strong>direkta sa aming opisina</strong> ng courier ng platform (Shopee, Lazada, atb.). Tatanggapin, susuriin, timbangin, at ihahanda ng GCC CARGO para sa pagpapadala.">
             Votre colis commandé en ligne sera livré <strong>directement dans nos locaux</strong> par le livreur de la plateforme (Shopee, Lazada, etc.). GCC CARGO le réceptionne, contrôle, pèse et prépare l'expédition.
           </p>
           <div style="background:white;border-radius:8px;padding:12px 14px;font-size:.83rem;line-height:1.8;color:var(--navy);">
             📍 <strong>Trimar Building, Multinational Ave, Parañaque, Metro Manila</strong><br>
-            🕗 <span data-fr="Livraisons acceptées : Lun–Sam, 9h00 – 17h00" data-en="Deliveries accepted: Mon–Sat, 9:00 AM – 5:00 PM">Livraisons acceptées : Lun–Sam, 9h00 – 17h00</span><br>
+            🕗 <span data-fr="Livraisons acceptées : Lun–Sam, 9h00 – 17h00" data-en="Deliveries accepted: Mon–Sat, 9:00 AM – 5:00 PM" data-tl="Tinatanggap ang mga delivery: Lun–Sab, 9:00 – 17:00">Livraisons acceptées : Lun–Sam, 9h00 – 17h00</span><br>
             📞 +63 968 313 5356
           </div>
           <!-- Avertissement responsabilité -->
-          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;" data-fr="⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires." data-en="⚠️ <strong>CLIENT RESPONSIBILITY:</strong> By choosing this mode, you acknowledge that you are <strong>solely and entirely responsible</strong> for the contents of the ordered parcel, its legal and customs compliance. GCC CARGO HANDLING INC cannot be held responsible for the content, condition or legality of the parcel delivered by the platform. Any illegal or non-compliant content exposes the client to legal proceedings.">
+          <div style="background:#fff0ee;border-left:4px solid #e74c3c;border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;font-size:.8rem;color:#7b241c;line-height:1.65;" data-fr="⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires." data-en="⚠️ <strong>CLIENT RESPONSIBILITY:</strong> By choosing this mode, you acknowledge that you are <strong>solely and entirely responsible</strong> for the contents of the ordered parcel, its legal and customs compliance. GCC CARGO HANDLING INC cannot be held responsible for the content, condition or legality of the parcel delivered by the platform. Any illegal or non-compliant content exposes the client to legal proceedings." data-tl="⚠️ <strong>RESPONSIBILIDAD NG KLIYENTE:</strong> Sa pagpili ng paraang ito, kinikilala ninyong kayo ang <strong>nag-iisang at ganap na responsable</strong> sa nilalaman ng inyong order, sa legal at customs na pagsunod nito. Ang GCC CARGO HANDLING INC ay hindi maaaring managot sa nilalaman, kondisyon, o legalidad ng pakete na inihatid ng platform. Anumang ilegal o hindi sumusunod na nilalaman ay maaaring magbunga ng legal na prosekusyon.">
             ⚠️ <strong>RESPONSABILITÉ DU CLIENT :</strong> En choisissant ce mode, vous reconnaissez être <strong>seul et entièrement responsable</strong> du contenu du colis commandé, de sa conformité légale et douanière. GCC CARGO HANDLING INC ne saurait être tenu responsable du contenu, de l'état ou de la légalité du colis livré par la plateforme. Tout contenu illicite ou non conforme expose le client à des poursuites judiciaires.
           </div>
           <!-- Upload capture paiement -->
@@ -2861,7 +2863,7 @@ function doLogout() {
         </div>
       </div>
 
-      <div class="fg"><label data-fr="Type de contenu <span class='req'>*</span>" data-en="Content type <span class='req'>*</span>">Type de contenu <span class="req">*</span></label>
+      <div class="fg"><label data-fr="Type de contenu <span class='req'>*</span>" data-en="Content type <span class='req'>*</span>" data-tl="Uri ng nilalaman <span class='req'>*</span>">Type de contenu <span class="req">*</span></label>
         <select id="selectTypeContenu">
           <option>Marchandises générales</option>
           <option>Électronique</option>
@@ -2874,26 +2876,26 @@ function doLogout() {
           <option>Autre</option>
         </select>
       </div>
-      <div class="fg"><label data-fr="Poids estimé (KG) <span class='req'>*</span>" data-en="Estimated weight (KG) <span class='req'>*</span>">Poids estimé (KG) <span class="req">*</span></label><input type="number" placeholder="Ex : 10.5" min="0.1" step="0.1" id="poidsEstime" required></div>
-      <div class="fg"><label data-fr="Valeur déclarée (₱) <span class='req'>*</span>" data-en="Declared value (₱) <span class='req'>*</span>">Valeur déclarée (₱) <span class="req">*</span></label><input type="number" placeholder="Ex : 5000.00" min="0" step="0.01" id="valeurDeclaree" required></div>
-      <div class="fg full"><label data-fr="Description du contenu <span class='req'>*</span>" data-en="Content description <span class='req'>*</span>">Description du contenu <span class="req">*</span></label><textarea id="descContenu" rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." placeholder="Décrivez précisément le contenu de votre colis..." required></textarea></div>
-      <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
+      <div class="fg"><label data-fr="Poids estimé (KG) <span class='req'>*</span>" data-en="Estimated weight (KG) <span class='req'>*</span>" data-tl="Tinatayang timbang (KG) <span class='req'>*</span>">Poids estimé (KG) <span class="req">*</span></label><input type="number" placeholder="Ex : 10.5" min="0.1" step="0.1" id="poidsEstime" required></div>
+      <div class="fg"><label data-fr="Valeur déclarée (₱) <span class='req'>*</span>" data-en="Declared value (₱) <span class='req'>*</span>" data-tl="Idineklara na halaga (₱) <span class='req'>*</span>">Valeur déclarée (₱) <span class="req">*</span></label><input type="number" placeholder="Ex : 5000.00" min="0" step="0.01" id="valeurDeclaree" required></div>
+      <div class="fg full"><label data-fr="Description du contenu <span class='req'>*</span>" data-en="Content description <span class='req'>*</span>" data-tl="Paglalarawan ng nilalaman <span class='req'>*</span>">Description du contenu <span class="req">*</span></label><textarea id="descContenu" rows="3" data-fr="Décrivez précisément le contenu de votre colis..." data-en="Describe the contents of your package in detail..." data-tl="Ilarawan nang maayos ang nilalaman ng inyong pakete..." placeholder="Décrivez précisément le contenu de votre colis..." required></textarea></div>
+      <div class="fg full"><label data-fr="Code de parrainage (optionnel)" data-en="Referral code (optional)" data-tl="Referral code (opsyonal)">Code de parrainage (optionnel)</label><input type="text" data-fr="Ex : GCC-REF-0042" data-en="e.g. GCC-REF-0042" data-tl="Hal.: GCC-REF-0042" placeholder="Ex : GCC-REF-0042"></div>
 
       <!-- UPLOADS OBLIGATOIRES -->
       <div class="fg full">
-        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class='req'>*</span>" data-en="🪪 Valid ID (passport, driver's license, national ID) <span class='req'>*</span>">🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class="req">*</span></label>
+        <label data-fr="🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class='req'>*</span>" data-en="🪪 Valid ID (passport, driver's license, national ID) <span class='req'>*</span>" data-tl="🪪 Wastong ID (pasaporte, lisensya, national ID) <span class='req'>*</span>">🪪 Pièce d'identité valide (passeport, permis, carte nationale) <span class="req">*</span></label>
         <div class="upload-zone" id="zone-idFile" onclick="document.getElementById('idFile').click()">
           <div class="uz-icon">🪪</div>
-          <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
+          <p data-fr="Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small>" data-en="Click to upload your ID<br><small>JPG, PNG or PDF — max 5 MB</small>" data-tl="I-click para mag-upload ng inyong ID<br><small>JPG, PNG o PDF — max 5 MB</small>">Cliquer pour charger votre pièce d'identité<br><small>JPG, PNG ou PDF — max 5 MB</small></p>
           <div class="uz-name" id="id-name"></div>
           <input id="idFile" type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this,'id-name');document.getElementById('zone-idFile').style.border='';document.getElementById('zone-idFile').style.background='';">
         </div>
       </div>
       <div class="fg full">
-        <label data-fr="📷 Photos du colis (1 à 5 photos claires) <span class='req'>*</span>" data-en="📷 Package photos (1 to 5 clear photos) <span class='req'>*</span>">📷 Photos du colis (1 à 5 photos claires) <span class="req">*</span></label>
+        <label data-fr="📷 Photos du colis (1 à 5 photos claires) <span class='req'>*</span>" data-en="📷 Package photos (1 to 5 clear photos) <span class='req'>*</span>" data-tl="📷 Mga larawan ng pakete (1 hanggang 5 malinaw na larawan) <span class='req'>*</span>">📷 Photos du colis (1 à 5 photos claires) <span class="req">*</span></label>
         <div class="upload-zone" id="zone-colisFiles" onclick="document.getElementById('colisFiles').click()">
           <div class="uz-icon">📦</div>
-          <p data-fr="Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small>" data-en="Upload clear photos of your package (all sides)<br><small>JPG, PNG — max 10 MB total — 5 files max</small>">Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small></p>
+          <p data-fr="Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small>" data-en="Upload clear photos of your package (all sides)<br><small>JPG, PNG — max 10 MB total — 5 files max</small>" data-tl="Mag-upload ng malinaw na mga larawan ng pakete (lahat ng panig)<br><small>JPG, PNG — max 10 MB total — max 5 file</small>">Charger des photos claires de votre colis (tous les côtés)<br><small>JPG, PNG — max 10 MB total — 5 fichiers max</small></p>
           <div class="uz-name" id="colis-names"></div>
           <input id="colisFiles" type="file" accept=".jpg,.jpeg,.png" multiple style="display:none" onchange="showFileNames(this,'colis-names');document.getElementById('zone-colisFiles').style.border='';document.getElementById('zone-colisFiles').style.background='';">
         </div>
@@ -2901,7 +2903,7 @@ function doLogout() {
 
       <!-- PROTOCOL + CONSENT -->
       <div class="fg full">
-        <label data-fr="📄 Protocole d'accord — Lisez entièrement avant de cocher" data-en="📄 Terms Agreement — Read in full before checking">📄 Protocole d'accord — Lisez entièrement avant de cocher</label>
+        <label data-fr="📄 Protocole d'accord — Lisez entièrement avant de cocher" data-en="📄 Terms Agreement — Read in full before checking" data-tl="📄 Kasunduan — Basahin nang buo bago mag-tsek">📄 Protocole d'accord — Lisez entièrement avant de cocher</label>
         <div class="protocol-consent">
           <div class="proto-scroll" id="proto-text">
             <div style="text-align:center;margin-bottom:16px;">
@@ -2919,10 +2921,10 @@ function doLogout() {
             <h4>4. COMMANDES VIA PLATEFORMES E-COMMERCE (Lazada, Shopee, etc.)</h4>
             <p>Lorsqu'un client passe commande via Lazada, Shopee ou toute autre plateforme e-commerce, le colis est livré <strong>directement dans les locaux de GCC CARGO HANDLING INC</strong> par le livreur de la plateforme. Dans ce cas, <strong>GCC CARGO HANDLING INC décline toute responsabilité</strong> quant au contenu du colis, à son état à réception, à sa conformité et à sa légalité. Le client qui passe commande est <strong>seul et entièrement responsable</strong> du contenu de ce colis et de sa conformité à la réglementation douanière des pays de destination. Le client reconnaît expressément qu'il s'expose à des poursuites judiciaires en cas de contenu illicite, dangereux ou non conforme. GCC CARGO HANDLING INC se réserve le droit de refuser tout colis dont le contenu paraît suspect ou non déclaré.</p>
 
-            <h4 data-fr="2. OBLIGATIONS DU CLIENT" data-en="2. CLIENT OBLIGATIONS">2. OBLIGATIONS DU CLIENT</h4>
+            <h4 data-fr="2. OBLIGATIONS DU CLIENT" data-en="2. CLIENT OBLIGATIONS" data-tl="2. MGA OBLIGASYON NG KLIYENTE">2. OBLIGATIONS DU CLIENT</h4>
             <p>Le client s'engage à : (a) fournir une déclaration exacte et complète du contenu et de la valeur des marchandises ; (b) présenter une pièce d'identité valide lors de l'enregistrement ; (c) s'assurer que les articles sont conformes aux législations du pays d'origine (Philippines) et du pays de destination ; (d) emballer correctement les colis pour éviter tout dommage pendant le transport.</p>
 
-            <h4 data-fr="3. RESPONSABILITÉ DE GCC CARGO" data-en="3. GCC CARGO LIABILITY">3. RESPONSABILITÉ DE GCC CARGO</h4>
+            <h4 data-fr="3. RESPONSABILITÉ DE GCC CARGO" data-en="3. GCC CARGO LIABILITY" data-tl="3. RESPONSIBILIDAD NG GCC CARGO">3. RESPONSABILITÉ DE GCC CARGO</h4>
             <p>GCC CARGO s'engage à acheminer les colis dans les meilleurs délais conformément au schedule communiqué. En cas de perte totale du colis prouvée et imputable à GCC CARGO, une indemnisation maximale de <strong>80% de la valeur déclarée</strong> sera versée au client sur présentation de justificatifs d'achat. GCC CARGO décline toute responsabilité en cas de retard ou perte résultant de causes extérieures : catastrophe naturelle, décision douanière, grève, guerre ou tout cas de force majeure.</p>
 
             <h4>4. SAISIE DOUANIÈRE</h4>
@@ -2951,31 +2953,31 @@ function doLogout() {
           </div>
           <div class="consent-row">
             <input type="checkbox" id="consentCheck" onchange="toggleSubmit()">
-            <label for="consentCheck" data-fr="J'ai lu et j'accepte entièrement le Protocole d'Accord de GCC CARGO HANDLING INC. Je confirme que mon colis ne contient aucun article illicite ou interdit. J'accepte les conditions de responsabilité, de paiement et les clauses douanières." data-en="I have read and fully accept the GCC CARGO HANDLING INC Terms Agreement. I confirm my package contains no illegal or prohibited items. I accept the liability, payment and customs conditions.">J'ai lu et j'accepte entièrement le Protocole d'Accord de GCC CARGO HANDLING INC. Je confirme que mon colis ne contient aucun article illicite ou interdit. J'accepte les conditions de responsabilité, de paiement et les clauses douanières.</label>
+            <label for="consentCheck" data-fr="J'ai lu et j'accepte entièrement le Protocole d'Accord de GCC CARGO HANDLING INC. Je confirme que mon colis ne contient aucun article illicite ou interdit. J'accepte les conditions de responsabilité, de paiement et les clauses douanières." data-en="I have read and fully accept the GCC CARGO HANDLING INC Terms Agreement. I confirm my package contains no illegal or prohibited items. I accept the liability, payment and customs conditions." data-tl="Nabasa at ganap kong tinatanggap ang Kasunduan ng GCC CARGO HANDLING INC. Kinukumpirma ko na ang aking pakete ay hindi naglalaman ng anumang ilegal o ipinagbabawal na aytem. Tinatanggap ko ang mga kondisyon ng responsibilidad, pagbabayad, at mga customs na probisyon.">J'ai lu et j'accepte entièrement le Protocole d'Accord de GCC CARGO HANDLING INC. Je confirme que mon colis ne contient aucun article illicite ou interdit. J'accepte les conditions de responsabilité, de paiement et les clauses douanières.</label>
           </div>
         </div>
       </div>
     </div>
-    <button type="submit" class="btn-submit" id="submitBtn" disabled data-fr="Soumettre ma demande d'expédition →" data-en="Submit my shipping request →">Soumettre ma demande d'expédition →</button>
+    <button type="submit" class="btn-submit" id="submitBtn" disabled data-fr="Soumettre ma demande d'expédition →" data-en="Submit my shipping request →" data-tl="Isumite ang aking kahilingan sa pagpapadala →">Soumettre ma demande d'expédition →</button>
   </form>
 </section>
 
 <!-- ░░ TRACKING ░░ -->
 <section class="tracking" id="tracking">
   <div class="track-inner">
-    <div class="section-eyebrow" style="text-align:center;" data-fr="SUIVI DE COLIS" data-en="PACKAGE TRACKING">SUIVI DE COLIS</div>
-    <h2 class="section-title" style="text-align:center;" data-fr="Où est mon colis ?" data-en="Where is my package?">Où est mon colis ?</h2>
-    <p style="color:var(--slate);text-align:center;" data-fr="Entrez le numéro de tracking reçu par email ou SMS après votre expédition." data-en="Enter the tracking number received by email or SMS after your shipment.">Entrez le numéro de tracking reçu par email ou SMS après votre expédition.</p>
+    <div class="section-eyebrow" style="text-align:center;" data-fr="SUIVI DE COLIS" data-en="PACKAGE TRACKING" data-tl="PAGSUBAYBAY NG PAKETE">SUIVI DE COLIS</div>
+    <h2 class="section-title" style="text-align:center;" data-fr="Où est mon colis ?" data-en="Where is my package?" data-tl="Nasaan ang aking Pakete?">Où est mon colis ?</h2>
+    <p style="color:var(--slate);text-align:center;" data-fr="Entrez le numéro de tracking reçu par email ou SMS après votre expédition." data-en="Enter the tracking number received by email or SMS after your shipment." data-tl="Ilagay ang tracking number na natanggap sa pamamagitan ng email o SMS pagkatapos ng inyong padala.">Entrez le numéro de tracking reçu par email ou SMS après votre expédition.</p>
     <div class="track-form">
       <input class="track-input" type="text" id="trackInput" placeholder="Ex : GCC-2026-00123">
-      <button class="btn-track" onclick="doTrack()" data-fr="Suivre →" data-en="Track →">Suivre →</button>
+      <button class="btn-track" onclick="doTrack()" data-fr="Suivre →" data-en="Track →" data-tl="Subaybayan →">Suivre →</button>
     </div>
     <div class="track-result" id="trackResult">
       <div style="font-weight:700;color:var(--navy);margin-bottom:16px;font-size:1rem;">📦 Colis <span id="trackNum">GCC-2026-00123</span></div>
-      <div class="track-step"><div class="ts-dot ts-done">✓</div><div class="ts-text"><h4 data-fr="Colis enregistré" data-en="Package registered">Colis enregistré</h4><p data-fr="Reçu par GCC CARGO — Manila, Philippines" data-en="Received by GCC CARGO — Manila, Philippines">Reçu par GCC CARGO — Manila, Philippines</p></div></div>
-      <div class="track-step"><div class="ts-dot ts-done">✓</div><div class="ts-text"><h4 data-fr="En transit" data-en="In transit">En transit</h4><p data-fr="Vol en cours vers la destination" data-en="Flight in progress to destination">Vol en cours vers la destination</p></div></div>
-      <div class="track-step"><div class="ts-dot ts-active">!</div><div class="ts-text"><h4 style="color:var(--orange);" data-fr="Arrivé à destination" data-en="Arrived at destination">Arrivé à destination</h4><p data-fr="Colis disponible — notification SMS envoyée au destinataire" data-en="Package available — SMS notification sent to recipient">Colis disponible — notification SMS envoyée au destinataire</p></div></div>
-      <div class="track-step"><div class="ts-dot ts-pending">○</div><div class="ts-text"><h4 style="color:var(--slate);" data-fr="Livré" data-en="Delivered">Livré</h4><p data-fr="En attente de retrait ou livraison finale" data-en="Awaiting pickup or final delivery">En attente de retrait ou livraison finale</p></div></div>
+      <div class="track-step"><div class="ts-dot ts-done">✓</div><div class="ts-text"><h4 data-fr="Colis enregistré" data-en="Package registered">Colis enregistré</h4><p data-fr="Reçu par GCC CARGO — Manila, Philippines" data-en="Received by GCC CARGO — Manila, Philippines" data-tl="Natanggap ng GCC CARGO — Manila, Pilipinas">Reçu par GCC CARGO — Manila, Philippines</p></div></div>
+      <div class="track-step"><div class="ts-dot ts-done">✓</div><div class="ts-text"><h4 data-fr="En transit" data-en="In transit">En transit</h4><p data-fr="Vol en cours vers la destination" data-en="Flight in progress to destination" data-tl="Nasa biyahe patungong destinasyon">Vol en cours vers la destination</p></div></div>
+      <div class="track-step"><div class="ts-dot ts-active">!</div><div class="ts-text"><h4 style="color:var(--orange);" data-fr="Arrivé à destination" data-en="Arrived at destination">Arrivé à destination</h4><p data-fr="Colis disponible — notification SMS envoyée au destinataire" data-en="Package available — SMS notification sent to recipient" data-tl="Available na ang pakete — SMS abiso na naipadala sa tatanggap">Colis disponible — notification SMS envoyée au destinataire</p></div></div>
+      <div class="track-step"><div class="ts-dot ts-pending">○</div><div class="ts-text"><h4 style="color:var(--slate);" data-fr="Livré" data-en="Delivered">Livré</h4><p data-fr="En attente de retrait ou livraison finale" data-en="Awaiting pickup or final delivery" data-tl="Naghihintay ng pagkuha o panghuling paghahatid">En attente de retrait ou livraison finale</p></div></div>
     </div>
   </div>
 </section>
@@ -2985,24 +2987,24 @@ function doLogout() {
   <div class="ref-visual">
     <div style="font-size:2.5rem;margin-bottom:10px;">💰</div>
     <div class="ref-pct">3–10%</div>
-    <p data-fr="de commission sur chaque client référé" data-en="commission on each referred client">de commission sur chaque client référé</p>
+    <p data-fr="de commission sur chaque client référé" data-en="commission on each referred client" data-tl="komisyon sa bawat kliyenteng irereferral">de commission sur chaque client référé</p>
     <div class="ref-example" id="ref-example-block">
       Exemple : 1 client référé<br>
       × 50 kg × <span id="ref-ex-tarif">₱1 200</span>/kg = <span id="ref-ex-total">₱60 000</span><br>
       Commission 5% = <span id="ref-ex-comm">₱3 000</span><br>
       <strong id="ref-ex-split">🎁 50% en réduction kg + 50% cash</strong>
     </div>
-    <button onclick="openParrainModal()" class="btn-primary" style="margin-top:22px;display:inline-block;border:none;cursor:pointer;" data-fr="🤝 Devenir parrain →" data-en="🤝 Become a referrer →">🤝 Devenir parrain →</button>
+    <button onclick="openParrainModal()" class="btn-primary" style="margin-top:22px;display:inline-block;border:none;cursor:pointer;" data-fr="🤝 Devenir parrain →" data-en="🤝 Become a referrer →" data-tl="🤝 Maging Referrer →">🤝 Devenir parrain →</button>
   </div>
   <div>
-    <div class="section-eyebrow" data-fr="PROGRAMME DE PARRAINAGE" data-en="REFERRAL PROGRAM">PROGRAMME DE PARRAINAGE</div>
-    <h2 class="section-title" data-fr="Gagnez en partageant GCC CARGO" data-en="Earn by sharing GCC CARGO">Gagnez en partageant GCC CARGO</h2>
-    <p class="section-sub" data-fr="Partagez votre lien unique sur TikTok, Instagram, WhatsApp ou Facebook. Chaque client envoyé vous rapporte une commission automatique." data-en="Share your unique link on TikTok, Instagram, WhatsApp or Facebook. Every client you send earns you an automatic commission.">Partagez votre lien unique sur TikTok, Instagram, WhatsApp ou Facebook. Chaque client envoyé vous rapporte une commission automatique.</p>
+    <div class="section-eyebrow" data-fr="PROGRAMME DE PARRAINAGE" data-en="REFERRAL PROGRAM" data-tl="PROGRAMA NG REFERRAL">PROGRAMME DE PARRAINAGE</div>
+    <h2 class="section-title" data-fr="Gagnez en partageant GCC CARGO" data-en="Earn by sharing GCC CARGO" data-tl="Kumita sa pamamagitan ng pagbabahagi ng GCC CARGO">Gagnez en partageant GCC CARGO</h2>
+    <p class="section-sub" data-fr="Partagez votre lien unique sur TikTok, Instagram, WhatsApp ou Facebook. Chaque client envoyé vous rapporte une commission automatique." data-en="Share your unique link on TikTok, Instagram, WhatsApp or Facebook. Every client you send earns you an automatic commission." data-tl="Ibahagi ang inyong natatanging link sa TikTok, Instagram, WhatsApp o Facebook. Bawat kliyenteng ipinapadala ay nagbibigay ng awtomatikong komisyon.">Partagez votre lien unique sur TikTok, Instagram, WhatsApp ou Facebook. Chaque client envoyé vous rapporte une commission automatique.</p>
     <div class="ref-steps">
-      <div class="ref-step"><div class="rs-num">1</div><div class="rs-body"><h4 data-fr="Créez votre compte client" data-en="Create your client account">Créez votre compte client</h4><p data-fr="Inscrivez-vous sur notre site. Un code de parrainage unique vous est attribué (ex : GCC-REF-0042)." data-en="Register on our site. A unique referral code is assigned to you (e.g. GCC-REF-0042).">Inscrivez-vous sur notre site. Un code de parrainage unique vous est attribué (ex : GCC-REF-0042).</p></div></div>
-      <div class="ref-step"><div class="rs-num">2</div><div class="rs-body"><h4 data-fr="Partagez sur vos réseaux" data-en="Share on your networks">Partagez sur vos réseaux</h4><p data-fr="Postez sur TikTok, Instagram, WhatsApp. Chaque partage est une opportunité de revenus passifs." data-en="Post on TikTok, Instagram, WhatsApp. Every share is a passive income opportunity.">Postez sur TikTok, Instagram, WhatsApp. Chaque partage est une opportunité de revenus passifs.</p></div></div>
-      <div class="ref-step"><div class="rs-num">3</div><div class="rs-body"><h4 data-fr="Un ami envoie un colis" data-en="A friend ships a package">Un ami envoie un colis</h4><p data-fr="Il utilise votre code lors de sa commande. La commission est calculée automatiquement sur le montant total." data-en="They use your code when ordering. The commission is calculated automatically on the total amount.">Il utilise votre code lors de sa commande. La commission est calculée automatiquement sur le montant total.</p></div></div>
-      <div class="ref-step"><div class="rs-num">4</div><div class="rs-body"><h4 data-fr="Recevez votre paiement" data-en="Receive your payment">Recevez votre paiement</h4><p data-fr="3% à 10% versés mensuellement via GCash ou virement. Plus vous référez, plus le taux augmente." data-en="3% to 10% paid monthly via GCash or bank transfer. The more you refer, the higher the rate.">3% à 10% versés mensuellement via GCash ou virement. Plus vous référez, plus le taux augmente.</p></div></div>
+      <div class="ref-step"><div class="rs-num">1</div><div class="rs-body"><h4 data-fr="Créez votre compte client" data-en="Create your client account">Créez votre compte client</h4><p data-fr="Inscrivez-vous sur notre site. Un code de parrainage unique vous est attribué (ex : GCC-REF-0042)." data-en="Register on our site. A unique referral code is assigned to you (e.g. GCC-REF-0042)." data-tl="Mag-sign up sa aming website. Bibigyan kayo ng natatanging referral code (hal.: GCC-REF-0042).">Inscrivez-vous sur notre site. Un code de parrainage unique vous est attribué (ex : GCC-REF-0042).</p></div></div>
+      <div class="ref-step"><div class="rs-num">2</div><div class="rs-body"><h4 data-fr="Partagez sur vos réseaux" data-en="Share on your networks">Partagez sur vos réseaux</h4><p data-fr="Postez sur TikTok, Instagram, WhatsApp. Chaque partage est une opportunité de revenus passifs." data-en="Post on TikTok, Instagram, WhatsApp. Every share is a passive income opportunity." data-tl="Mag-post sa TikTok, Instagram, WhatsApp. Bawat pagbabahagi ay isang pagkakataon para sa passive na kita.">Postez sur TikTok, Instagram, WhatsApp. Chaque partage est une opportunité de revenus passifs.</p></div></div>
+      <div class="ref-step"><div class="rs-num">3</div><div class="rs-body"><h4 data-fr="Un ami envoie un colis" data-en="A friend ships a package">Un ami envoie un colis</h4><p data-fr="Il utilise votre code lors de sa commande. La commission est calculée automatiquement sur le montant total." data-en="They use your code when ordering. The commission is calculated automatically on the total amount." data-tl="Gagamitin niya ang inyong code sa panahon ng kanyang order. Awtomatikong kakalkulahin ang komisyon batay sa kabuuang halaga.">Il utilise votre code lors de sa commande. La commission est calculée automatiquement sur le montant total.</p></div></div>
+      <div class="ref-step"><div class="rs-num">4</div><div class="rs-body"><h4 data-fr="Recevez votre paiement" data-en="Receive your payment">Recevez votre paiement</h4><p data-fr="3% à 10% versés mensuellement via GCash ou virement. Plus vous référez, plus le taux augmente." data-en="3% to 10% paid monthly via GCash or bank transfer. The more you refer, the higher the rate." data-tl="3% hanggang 10% na binabayaran buwanang-buwanan sa pamamagitan ng GCash o bank transfer. Mas maraming irereferral, mas mataas ang rate.">3% à 10% versés mensuellement via GCash ou virement. Plus vous référez, plus le taux augmente.</p></div></div>
     </div>
   </div>
 </section>
@@ -3010,12 +3012,12 @@ function doLogout() {
 <!-- ░░ CONTACT ░░ -->
 <section class="contact" id="contact">
   <div class="contact-info">
-    <div class="section-eyebrow" data-fr="NOUS TROUVER" data-en="FIND US">NOUS TROUVER</div>
-    <h2 class="section-title" data-fr="Contact & Bureaux" data-en="Contact & Offices">Contact & Bureaux</h2>
-    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4 data-fr="Bureau Principal — Philippines" data-en="Main Office — Philippines">Bureau Principal — Philippines</h4><p>F2V3+377 Trimar Building, Multinational Ave<br>Parañaque, 1709 Metro Manila, Philippines</p></div></div>
-    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4 data-fr="Agence — Cameroun (GOCACO.SARL)" data-en="Agency — Cameroon (GOCACO.SARL)">Agence — Cameroun (GOCACO.SARL)</h4><p>Après commissariat 2ème, Maria Goretti<br>Yaoundé, Cameroun</p></div></div>
-    <div class="ci-item"><div class="ci-icon">📞</div><div class="ci-body"><h4 data-fr="Téléphones" data-en="Phones">Téléphones</h4><p>🇵🇭 +63 968 313 5356<br>🇵🇭 +63 915 385 7604<br>🇨🇲 +237 6 53 62 22 70</p></div></div>
-    <div class="ci-item"><div class="ci-icon">✉️</div><div class="ci-body"><h4 data-fr="Email" data-en="Email">Email</h4><a href="mailto:gomerjavan45@gmail.com">gomerjavan45@gmail.com</a></div></div>
+    <div class="section-eyebrow" data-fr="NOUS TROUVER" data-en="FIND US" data-tl="HANAPIN KAMI">NOUS TROUVER</div>
+    <h2 class="section-title" data-fr="Contact & Bureaux" data-en="Contact & Offices" data-tl="Makipag-ugnayan at Opisina">Contact & Bureaux</h2>
+    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4 data-fr="Bureau Principal — Philippines" data-en="Main Office — Philippines" data-tl="Pangunahing Opisina — Pilipinas">Bureau Principal — Philippines</h4><p>F2V3+377 Trimar Building, Multinational Ave<br>Parañaque, 1709 Metro Manila, Philippines</p></div></div>
+    <div class="ci-item"><div class="ci-icon">📍</div><div class="ci-body"><h4 data-fr="Agence — Cameroun (GOCACO.SARL)" data-en="Agency — Cameroon (GOCACO.SARL)" data-tl="Ahensya — Cameroun (GOCACO.SARL)">Agence — Cameroun (GOCACO.SARL)</h4><p>Après commissariat 2ème, Maria Goretti<br>Yaoundé, Cameroun</p></div></div>
+    <div class="ci-item"><div class="ci-icon">📞</div><div class="ci-body"><h4 data-fr="Téléphones" data-en="Phones" data-tl="Mga Telepono">Téléphones</h4><p>🇵🇭 +63 968 313 5356<br>🇵🇭 +63 915 385 7604<br>🇨🇲 +237 6 53 62 22 70</p></div></div>
+    <div class="ci-item"><div class="ci-icon">✉️</div><div class="ci-body"><h4 data-fr="Email" data-en="Email" data-tl="Email">Email</h4><a href="mailto:gomerjavan45@gmail.com">gomerjavan45@gmail.com</a></div></div>
     <div class="social-row">
       <a class="s-btn s-tiktok" href="#">♪ TikTok</a>
       <a class="s-btn s-insta" href="#">📷 Instagram</a>
@@ -3023,12 +3025,12 @@ function doLogout() {
     </div>
   </div>
   <div class="contact-form">
-    <h3 data-fr="Envoyer un message" data-en="Send a message">Envoyer un message</h3>
-    <div class="cf-field"><label data-fr="Votre nom" data-en="Your name">Votre nom</label><input type="text" data-fr="William Tabi" data-en="William Tabi" placeholder="William Tabi"></div>
-    <div class="cf-field"><label data-fr="Email ou WhatsApp" data-en="Email or WhatsApp">Email ou WhatsApp</label><input type="text" data-fr="votre@email.com ou +63 968..." data-en="your@email.com or +63 968..." placeholder="votre@email.com ou +63 968..."></div>
-    <div class="cf-field"><label data-fr="Sujet" data-en="Subject">Sujet</label><input type="text" data-fr="Renseignement tarif, partenariat..." data-en="Rate inquiry, partnership..." placeholder="Renseignement tarif, partenariat..."></div>
-    <div class="cf-field"><label data-fr="Message" data-en="Message">Message</label><textarea rows="4" data-fr="Votre message..." data-en="Your message..." placeholder="Votre message..."></textarea></div>
-    <button class="btn-send" data-fr="Envoyer le message →" data-en="Send message →" onclick="showToast('✉️ Message envoyé','Notre équipe vous répondra sous 24h. Merci !')">Envoyer le message →</button>
+    <h3 data-fr="Envoyer un message" data-en="Send a message" data-tl="Magpadala ng Mensahe">Envoyer un message</h3>
+    <div class="cf-field"><label data-fr="Votre nom" data-en="Your name">Votre nom</label><input type="text" data-fr="William Tabi" data-en="William Tabi" data-tl="William Tabi" placeholder="William Tabi"></div>
+    <div class="cf-field"><label data-fr="Email ou WhatsApp" data-en="Email or WhatsApp">Email ou WhatsApp</label><input type="text" data-fr="votre@email.com ou +63 968..." data-en="your@email.com or +63 968..." data-tl="inyong@email.com o +63 968..." placeholder="votre@email.com ou +63 968..."></div>
+    <div class="cf-field"><label data-fr="Sujet" data-en="Subject">Sujet</label><input type="text" data-fr="Renseignement tarif, partenariat..." data-en="Rate inquiry, partnership..." data-tl="Impormasyon sa presyo, pakikipagtulungan..." placeholder="Renseignement tarif, partenariat..."></div>
+    <div class="cf-field"><label data-fr="Message" data-en="Message">Message</label><textarea rows="4" data-fr="Votre message..." data-en="Your message..." data-tl="Ang inyong mensahe..." placeholder="Votre message..."></textarea></div>
+    <button class="btn-send" data-fr="Envoyer le message →" data-en="Send message →" data-tl="Ipadala ang Mensahe →" onclick="showToast('✉️ Message envoyé','Notre équipe vous répondra sous 24h. Merci !')">Envoyer le message →</button>
   </div>
 </section>
 
@@ -3040,27 +3042,27 @@ function doLogout() {
       <p>Safe Cargo · Strong Connections · Global Delivery.<br>Manila 🇵🇭 → Afrique 🌍 | Air & Sea | Sourcing | Partenariat</p>
     </div>
     <div class="footer-col">
-      <h4 data-fr="Services" data-en="Services">Services</h4>
+      <h4 data-fr="Services" data-en="Services" data-tl="Mga Serbisyo">Services</h4>
       <ul>
-        <li><a href="#services" data-fr="Air Shipping" data-en="Air Shipping">Air Shipping</a></li>
-        <li><a href="#services" data-fr="Sea Shipping" data-en="Sea Shipping">Sea Shipping</a></li>
-        <li><a href="#services" data-fr="Sourcing" data-en="Sourcing">Sourcing</a></li>
-        <li><a href="#services" data-fr="Partenariat" data-en="Partnership">Partenariat</a></li>
-        <li><a href="#services" data-fr="Door to Door" data-en="Door to Door">Door to Door</a></li>
+        <li><a href="#services" data-fr="Air Shipping" data-en="Air Shipping" data-tl="Air Shipping">Air Shipping</a></li>
+        <li><a href="#services" data-fr="Sea Shipping" data-en="Sea Shipping" data-tl="Sea Shipping">Sea Shipping</a></li>
+        <li><a href="#services" data-fr="Sourcing" data-en="Sourcing" data-tl="Sourcing">Sourcing</a></li>
+        <li><a href="#services" data-fr="Partenariat" data-en="Partnership" data-tl="Pakikipagtulungan">Partenariat</a></li>
+        <li><a href="#services" data-fr="Door to Door" data-en="Door to Door" data-tl="Door to Door">Door to Door</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4 data-fr="Navigation" data-en="Navigation">Navigation</h4>
+      <h4 data-fr="Navigation" data-en="Navigation" data-tl="Navigasyon">Navigation</h4>
       <ul>
-        <li><a href="#destinations" data-fr="Destinations" data-en="Destinations">Destinations</a></li>
-        <li><a href="#envoyer" data-fr="Envoyer un colis" data-en="Send a package">Envoyer un colis</a></li>
-        <li><a href="#tracking" data-fr="Tracking" data-en="Tracking">Tracking</a></li>
-        <li><a href="#parrainage" data-fr="Parrainage" data-en="Referral">Parrainage</a></li>
-        <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
+        <li><a href="#destinations" data-fr="Destinations" data-en="Destinations" data-tl="Mga Destinasyon">Destinations</a></li>
+        <li><a href="#envoyer" data-fr="Envoyer un colis" data-en="Send a package" data-tl="Magpadala ng Pakete">Envoyer un colis</a></li>
+        <li><a href="#tracking" data-fr="Tracking" data-en="Tracking" data-tl="Subaybayan">Tracking</a></li>
+        <li><a href="#parrainage" data-fr="Parrainage" data-en="Referral" data-tl="Referral">Parrainage</a></li>
+        <li><a href="#contact" data-fr="Contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a></li>
       </ul>
     </div>
     <div class="footer-col">
-      <h4 data-fr="Contact" data-en="Contact">Contact</h4>
+      <h4 data-fr="Contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</h4>
       <ul>
         <li><a href="tel:+639683135356">+63 968 313 5356</a></li>
         <li><a href="tel:+639153857604">+63 915 385 7604</a></li>
@@ -3071,8 +3073,8 @@ function doLogout() {
     </div>
   </div>
   <div class="footer-bottom">
-    <p data-fr="© 2026 GCC CARGO HANDLING INC — All rights reserved" data-en="© 2026 GCC CARGO HANDLING INC — All rights reserved">© 2026 GCC CARGO HANDLING INC — All rights reserved</p>
-    <p data-fr="Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines" data-en="Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines">Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines</p>
+    <p data-fr="© 2026 GCC CARGO HANDLING INC — All rights reserved" data-en="© 2026 GCC CARGO HANDLING INC — All rights reserved" data-tl="© 2026 GCC CARGO HANDLING INC — Lahat ng karapatan ay nakalaan">© 2026 GCC CARGO HANDLING INC — All rights reserved</p>
+    <p data-fr="Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines" data-en="Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines" data-tl="Trimar Building, Multinational Ave, Parañaque, Metro Manila, Pilipinas">Trimar Building, Multinational Ave, Parañaque, Metro Manila, Philippines</p>
   </div>
 </footer>
 
@@ -3693,13 +3695,13 @@ function doLogout() {
     <div style="width:72px;height:72px;background:linear-gradient(135deg,#4CAF50,#2e7d32);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 24px rgba(76,175,80,.35);">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:#0B1F3A;margin-bottom:4px;" data-fr="Demande envoyée !" data-en="Request Submitted!">Demande envoyée !</h2>
-    <p style="font-size:.88rem;color:#888;margin-bottom:16px;" data-fr="Votre dossier a été enregistré avec succès" data-en="Your file has been successfully registered">Votre dossier a été enregistré avec succès</p>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.9rem;color:#0B1F3A;margin-bottom:4px;" data-fr="Demande envoyée !" data-en="Request Submitted!" data-tl="Naipadala na ang Kahilingan!">Demande envoyée !</h2>
+    <p style="font-size:.88rem;color:#888;margin-bottom:16px;" data-fr="Votre dossier a été enregistré avec succès" data-en="Your file has been successfully registered" data-tl="Matagumpay na naitala ang inyong file">Votre dossier a été enregistré avec succès</p>
     <div style="background:#fff8f0;border:2px solid #E87722;border-radius:12px;padding:12px 16px;margin-bottom:20px;display:inline-block;">
-      <p style="font-size:.8rem;color:#888;margin:0 0 2px;" data-fr="Numéro de référence" data-en="Reference number">Numéro de référence</p>
+      <p style="font-size:.8rem;color:#888;margin:0 0 2px;" data-fr="Numéro de référence" data-en="Reference number" data-tl="Numero ng sanggunian">Numéro de référence</p>
       <p style="font-size:1.2rem;color:#E87722;font-weight:900;margin:0;letter-spacing:.5px;" id="confirmRef">—</p>
     </div>
-    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:20px;" data-fr="Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le mode de paiement." data-en="Our team will contact you within <strong>24 to 48 hours</strong> to confirm the details of your shipment and the payment method.">
+    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:20px;" data-fr="Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le mode de paiement." data-en="Our team will contact you within <strong>24 to 48 hours</strong> to confirm the details of your shipment and the payment method." data-tl="Makikipag-ugnayan sa inyo ang aming koponan sa loob ng <strong>24 hanggang 48 oras</strong> upang kumpirmahin ang mga detalye ng inyong padala at paraan ng pagbabayad.">
       Notre équipe vous contactera dans un délai de <strong>24 à 48h</strong> pour confirmer les détails de votre expédition et le mode de paiement.
     </p>
     <div style="background:#f0f6ff;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:.82rem;color:#0B1F3A;line-height:1.9;text-align:left;">
@@ -3707,7 +3709,7 @@ function doLogout() {
       📧 <strong>gomerjavan45@gmail.com</strong><br>
       📍 Trimar Building, Multinational Ave, Parañaque
     </div>
-    <button onclick="document.getElementById('confirmModal').style.display='none';window.scrollTo({top:0,behavior:'smooth'});" style="background:linear-gradient(135deg,#E87722,#d4601a);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;box-shadow:0 4px 16px rgba(232,119,34,.4);" data-fr="OK, j'ai compris →" data-en="Got it →">OK, j'ai compris →</button>
+    <button onclick="document.getElementById('confirmModal').style.display='none';window.scrollTo({top:0,behavior:'smooth'});" style="background:linear-gradient(135deg,#E87722,#d4601a);color:#fff;border:none;border-radius:12px;padding:15px 36px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;letter-spacing:.3px;box-shadow:0 4px 16px rgba(232,119,34,.4);" data-fr="OK, j'ai compris →" data-en="Got it →" data-tl="OK, naiintindihan ko →">OK, j'ai compris →</button>
   </div>
 </div>
 
