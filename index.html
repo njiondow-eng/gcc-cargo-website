@@ -797,6 +797,7 @@ function doAdminLogin() {
             piece_identite: d.piece_identite || '',
             photos_colis: d.photos_colis || '',
             capture_paiement: d.capture_paiement || '',
+            photo_emballage: d.photo_emballage || '',
             statut: r.statut || 'En attente'
           };
         });
@@ -1081,6 +1082,21 @@ function doAdminLogin() {
     html += '<input type="file" id="edit-capture-file" accept="image/*,.pdf" style="margin-top:4px;font-size:.78rem;width:100%;">'
       + '</div>';
 
+    // Photo emballage GCC
+    var hasEmballage = !!(s.photo_emballage && s.photo_emballage.trim());
+    html += '<div style="margin-top:12px;">'
+      + '<label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">📦 Photo colis emballé (GCC)</label>';
+    if (hasEmballage) {
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      s.photo_emballage.trim().split('\n').forEach(function(url, i) {
+        html += '<a href="' + url + '" target="_blank" style="font-size:.75rem;background:#ede7f6;color:#4527a0;border:1px solid #b39ddb;padding:3px 9px;border-radius:5px;text-decoration:none;">📦 Photo emballage ' + (i+1) + '</a>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:.73rem;color:#888;">Remplacer :</div>';
+    }
+    html += '<input type="file" id="edit-emballage-file" accept="image/*" multiple style="margin-top:4px;font-size:.78rem;width:100%;">'
+      + '</div>';
+
     html += '</div>'; // fin section pièces jointes
 
     document.getElementById('edit-modal-ref').textContent = s.ref || '—';
@@ -1126,14 +1142,17 @@ function doAdminLogin() {
     Promise.all([
       uploadEditFile('edit-id-file', 'id'),
       uploadEditFile('edit-colis-files', 'colis'),
-      uploadEditFile('edit-capture-file', 'paiement')
+      uploadEditFile('edit-capture-file', 'paiement'),
+      uploadEditFile('edit-emballage-file', 'emballage')
     ]).then(function(results) {
-      var idUrls      = results[0];
-      var colisUrls   = results[1];
-      var captureUrls = results[2];
-      if (idUrls.length)      { updates.piece_identite  = idUrls.join('\n');   s.piece_identite  = updates.piece_identite; }
-      if (colisUrls.length)   { updates.photos_colis    = colisUrls.join('\n'); s.photos_colis    = updates.photos_colis; }
-      if (captureUrls.length) { updates.capture_paiement= captureUrls.join('\n'); s.capture_paiement= updates.capture_paiement; }
+      var idUrls        = results[0];
+      var colisUrls     = results[1];
+      var captureUrls   = results[2];
+      var emballageUrls = results[3];
+      if (idUrls.length)        { updates.piece_identite   = idUrls.join('\n');       s.piece_identite   = updates.piece_identite; }
+      if (colisUrls.length)     { updates.photos_colis     = colisUrls.join('\n');    s.photos_colis     = updates.photos_colis; }
+      if (captureUrls.length)   { updates.capture_paiement = captureUrls.join('\n');  s.capture_paiement = updates.capture_paiement; }
+      if (emballageUrls.length) { updates.photo_emballage  = emballageUrls.join('\n'); s.photo_emballage  = updates.photo_emballage; }
 
       if (s.id) {
         fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
@@ -3846,10 +3865,59 @@ function toggleSubmit(){
 function doTrack(){
   const v=document.getElementById('trackInput').value.trim();
   if(!v){showToast(tr('trackReq'), tr('trackReqMsg'));return;}
-  document.getElementById('trackNum').textContent=v;
-  document.getElementById('trackResult').style.display='block';
-  document.getElementById('trackResult').scrollIntoView({behavior:'smooth',block:'nearest'});
-  setTimeout(()=>showToast(tr('notif'), tr('colisMsg')),800);
+
+  // Cherche dans les soumissions locales d'abord
+  var found = null;
+  for(var i=0;i<_submissions.length;i++){
+    if(_submissions[i].ref && _submissions[i].ref.trim().toUpperCase() === v.toUpperCase()){
+      found = _submissions[i]; break;
+    }
+  }
+
+  function renderTrack(sub){
+    document.getElementById('trackNum').textContent = v.toUpperCase();
+    // Photo emballage GCC
+    var photoBlock = document.getElementById('track-emballage-block');
+    if(!photoBlock){
+      photoBlock = document.createElement('div');
+      photoBlock.id = 'track-emballage-block';
+      photoBlock.style.cssText = 'margin-top:18px;padding:14px;background:var(--navy,#0b1f3a);border-radius:10px;display:none;';
+      document.getElementById('trackResult').appendChild(photoBlock);
+    }
+    if(sub && sub.photo_emballage && sub.photo_emballage.trim()){
+      var urls = sub.photo_emballage.trim().split('\n').filter(Boolean);
+      var imgHtml = '<div style="font-size:.82rem;font-weight:700;color:#fff;margin-bottom:10px;">📦 Photo du colis emballé par GCC</div>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+      urls.forEach(function(url,i){
+        imgHtml += '<a href="'+url+'" target="_blank" style="display:block;border-radius:8px;overflow:hidden;border:2px solid #b39ddb;">'
+          + '<img src="'+url+'" alt="Emballage '+(i+1)+'" style="max-width:200px;max-height:160px;object-fit:cover;display:block;">'
+          + '</a>';
+      });
+      imgHtml += '</div>';
+      photoBlock.innerHTML = imgHtml;
+      photoBlock.style.display = 'block';
+    } else {
+      photoBlock.style.display = 'none';
+    }
+    document.getElementById('trackResult').style.display='block';
+    document.getElementById('trackResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+    setTimeout(()=>showToast(tr('notif'), tr('colisMsg')),800);
+  }
+
+  if(found){ renderTrack(found); return; }
+
+  // Sinon interroge Supabase directement
+  var _sUrl = 'https://voxgdylvevwfpomamhjo.supabase.co';
+  var _sKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZveGdkeWx2ZXZ3ZnBvbWFtaGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3NDkzMjcsImV4cCI6MjEwODMyNTMyN30.yXR3WFsSUBnQ9O6XpXAYdKspRf29Mq33EZBlebWnU8U';
+  fetch(_sUrl + '/rest/v1/gcc_demandes?ref=eq.'+encodeURIComponent(v.toUpperCase())+'&select=ref,photo_emballage,statut', {
+    headers: {'apikey':_sKey,'Authorization':'Bearer '+_sKey}
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      var sub = (rows && rows.length) ? { ref: rows[0].ref, photo_emballage: rows[0].photo_emballage||'', statut: rows[0].statut||'' } : null;
+      renderTrack(sub);
+    })
+    .catch(function(){ renderTrack(null); });
 }
 
 // Toast
