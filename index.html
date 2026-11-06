@@ -1031,6 +1031,58 @@ function doAdminLogin() {
       html += '<div class="parrain-field"><label>' + labels[f] + '</label>'
         + '<input type="text" id="edit-field-' + f + '" value="' + ((s[f]||'').toString().replace(/"/g,'&quot;')) + '"></div>';
     });
+
+    // ── Section pièces jointes ──
+    html += '<div style="margin-top:18px;border-top:1px solid #e8ecf0;padding-top:16px;">'
+      + '<div style="font-size:.82rem;font-weight:700;color:#0b1f3a;margin-bottom:12px;">📎 Pièces jointes</div>';
+
+    // Pièce d'identité
+    var hasId = !!(s.piece_identite && s.piece_identite.trim());
+    html += '<div style="margin-bottom:12px;">'
+      + '<label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">🪪 Pièce d\'identité</label>';
+    if (hasId) {
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      s.piece_identite.trim().split('\n').forEach(function(url, i) {
+        html += '<a href="' + url + '" target="_blank" style="font-size:.75rem;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;padding:3px 9px;border-radius:5px;text-decoration:none;">📄 Voir ID ' + (i+1) + '</a>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:.73rem;color:#888;">Remplacer :</div>';
+    }
+    html += '<input type="file" id="edit-id-file" accept="image/*,.pdf" style="margin-top:4px;font-size:.78rem;width:100%;">'
+      + '</div>';
+
+    // Photos colis
+    var hasColis = !!(s.photos_colis && s.photos_colis.trim());
+    html += '<div>'
+      + '<label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">📷 Photos du colis</label>';
+    if (hasColis) {
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      s.photos_colis.trim().split('\n').forEach(function(url, i) {
+        html += '<a href="' + url + '" target="_blank" style="font-size:.75rem;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:3px 9px;border-radius:5px;text-decoration:none;">🖼 Photo ' + (i+1) + '</a>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:.73rem;color:#888;">Ajouter / remplacer :</div>';
+    }
+    html += '<input type="file" id="edit-colis-files" accept="image/*" multiple style="margin-top:4px;font-size:.78rem;width:100%;">'
+      + '</div>';
+
+    // Capture paiement
+    var hasCapture = !!(s.capture_paiement && s.capture_paiement.trim());
+    html += '<div style="margin-top:12px;">'
+      + '<label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px;">📸 Capture paiement</label>';
+    if (hasCapture) {
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+      s.capture_paiement.trim().split('\n').forEach(function(url, i) {
+        html += '<a href="' + url + '" target="_blank" style="font-size:.75rem;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;padding:3px 9px;border-radius:5px;text-decoration:none;">💳 Capture ' + (i+1) + '</a>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:.73rem;color:#888;">Remplacer :</div>';
+    }
+    html += '<input type="file" id="edit-capture-file" accept="image/*,.pdf" style="margin-top:4px;font-size:.78rem;width:100%;">'
+      + '</div>';
+
+    html += '</div>'; // fin section pièces jointes
+
     document.getElementById('edit-modal-ref').textContent = s.ref || '—';
     document.getElementById('edit-modal-fields').innerHTML = html;
     document.getElementById('edit-modal').classList.add('open');
@@ -1051,31 +1103,64 @@ function doAdminLogin() {
     });
     var btn = document.getElementById('edit-save-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
-    if (s.id) {
-      fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
-        method: 'PATCH',
-        headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body: JSON.stringify(updates)
-      }).then(function(r) {
-        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
-        if (r.ok) {
-          showToast('✅', 'Demande ' + s.ref + ' mise à jour');
-          closeEditModal();
-          refreshAdminTable();
-        } else {
-          showToast('⚠️', 'Erreur HTTP ' + r.status);
-        }
-      }).catch(function() {
-        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
-        showToast('⚠️', 'Erreur réseau');
+
+    // ── Upload des nouvelles pièces jointes ──
+    var ref = s.ref || ('ADM-' + Date.now());
+    function uploadEditFile(inputId, prefix) {
+      var inp = document.getElementById(inputId);
+      if (!inp || !inp.files || inp.files.length === 0) return Promise.resolve([]);
+      var promises = Array.from(inp.files).map(function(file, idx) {
+        var ext = file.name.split('.').pop();
+        var path = ref + '/' + prefix + '_adm_' + idx + '.' + ext;
+        return fetch(SUPA_URL + '/storage/v1/object/gcc-files/' + path, {
+          method: 'POST',
+          headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type||'application/octet-stream'},
+          body: file
+        })
+        .then(function(r){ return r.ok ? (SUPA_URL + '/storage/v1/object/public/gcc-files/' + path) : null; })
+        .catch(function(){ return null; });
       });
-    } else {
-      // Pas d'ID Supabase — mise à jour locale seulement
-      try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(e){}
-      showToast('✅', 'Demande mise à jour (local)');
-      closeEditModal();
-      refreshAdminTable();
+      return Promise.all(promises).then(function(urls){ return urls.filter(Boolean); });
     }
+
+    Promise.all([
+      uploadEditFile('edit-id-file', 'id'),
+      uploadEditFile('edit-colis-files', 'colis'),
+      uploadEditFile('edit-capture-file', 'paiement')
+    ]).then(function(results) {
+      var idUrls      = results[0];
+      var colisUrls   = results[1];
+      var captureUrls = results[2];
+      if (idUrls.length)      { updates.piece_identite  = idUrls.join('\n');   s.piece_identite  = updates.piece_identite; }
+      if (colisUrls.length)   { updates.photos_colis    = colisUrls.join('\n'); s.photos_colis    = updates.photos_colis; }
+      if (captureUrls.length) { updates.capture_paiement= captureUrls.join('\n'); s.capture_paiement= updates.capture_paiement; }
+
+      if (s.id) {
+        fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
+          method: 'PATCH',
+          headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body: JSON.stringify(updates)
+        }).then(function(r) {
+          if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+          if (r.ok) {
+            showToast('✅', 'Demande ' + s.ref + ' mise à jour');
+            closeEditModal();
+            refreshAdminTable();
+          } else {
+            showToast('⚠️', 'Erreur HTTP ' + r.status);
+          }
+        }).catch(function() {
+          if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+          showToast('⚠️', 'Erreur réseau');
+        });
+      } else {
+        try { localStorage.setItem('gcc_submissions', JSON.stringify(_submissions.slice(0,200))); } catch(e){}
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+        showToast('✅', 'Demande mise à jour (local)');
+        closeEditModal();
+        refreshAdminTable();
+      }
+    });
   }
   document.addEventListener('click', function(e) {
     var m = document.getElementById('edit-modal');
