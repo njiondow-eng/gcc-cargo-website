@@ -209,6 +209,15 @@ nav{
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .fg{display:flex;flex-direction:column;gap:6px;}
 .fg.full{grid-column:1/-1;}
+/* Multi-destinataires */
+.recipient-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 12px;}
+.recipient-row input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--white);padding:9px 12px;border-radius:5px;font-size:.88rem;font-family:'Barlow',sans-serif;width:100%;}
+.recipient-row input::placeholder{color:rgba(255,255,255,.4);}
+.recipient-row input:focus{outline:none;border-color:var(--orange);}
+.recipient-num{font-size:.72rem;font-weight:700;color:var(--orange);white-space:nowrap;text-align:center;min-width:28px;}
+.btn-remove-recipient{background:rgba(229,57,53,.2);border:1px solid rgba(229,57,53,.4);color:#ff5252;border-radius:5px;width:30px;height:30px;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.btn-remove-recipient:hover{background:rgba(229,57,53,.4);}
+@media(max-width:600px){.recipient-row{grid-template-columns:1fr 1fr;}.recipient-row input:last-of-type{grid-column:1/-1;}}
 .fg label{font-size:.83rem;font-weight:600;color:var(--ice);}
 .req{color:#ff5252;font-weight:900;margin-left:3px;font-size:.9rem;}
 .required-note{font-size:.78rem;color:rgba(255,255,255,.55);margin:0 0 18px;padding:8px 12px;border-left:3px solid #ff5252;background:rgba(255,82,82,.08);border-radius:0 6px 6px 0;}
@@ -745,6 +754,7 @@ function doAdminLogin() {
       date: entry.date,
       tel_exp: entry.tel_exp, email_exp: entry.email_exp,
       recepteur: entry.recepteur, tel_rec: entry.tel_rec,
+      destinataires: entry.destinataires || [],
       mode: entry.mode, mode_depot: entry.modeDepot,
       mode_envoi: entry.modeEnvoi,
       paiement: entry.paiement, mode_paiement: entry.modePaiement,
@@ -781,6 +791,7 @@ function doAdminLogin() {
             email_exp: d.email_exp || '',
             recepteur: d.recepteur || '',
             tel_rec: d.tel_rec || '',
+            destinataires: Array.isArray(d.destinataires) ? d.destinataires : [],
             destinataire: d.recepteur || '',
             tel_dest: d.tel_rec || '',
             destination: r.destination || d.destination || '',
@@ -813,6 +824,43 @@ function doAdminLogin() {
     });
   }
 
+  // ─── MULTI-DESTINATAIRES ─────────────────────────────────────────────────
+  var _recipientCount = 0;
+  function addRecipient(nomVal, telVal, villeVal) {
+    _recipientCount++;
+    var idx = _recipientCount;
+    var container = document.getElementById('recipients-container');
+    if (!container) return;
+    var row = document.createElement('div');
+    row.className = 'recipient-row';
+    row.id = 'recipient-row-' + idx;
+    row.innerHTML =
+      '<span class="recipient-num">#' + idx + '</span>'
+      + '<input type="text" id="rec-nom-' + idx + '" placeholder="Nom complet" value="' + (nomVal||'') + '" autocomplete="off">'
+      + '<input type="tel" id="rec-tel-' + idx + '" placeholder="+237 6XX XXX XXX" value="' + (telVal||'') + '">'
+      + '<input type="text" id="rec-ville-' + idx + '" placeholder="Ville / Quartier" value="' + (villeVal||'') + '">'
+      + (idx > 1 ? '<button type="button" class="btn-remove-recipient" onclick="removeRecipient(' + idx + ')" title="Supprimer">✕</button>' : '<span style="width:30px;"></span>');
+    container.appendChild(row);
+  }
+  function removeRecipient(idx) {
+    var row = document.getElementById('recipient-row-' + idx);
+    if (row) row.remove();
+  }
+  function getRecipients() {
+    var rows = document.querySelectorAll('.recipient-row');
+    var list = [];
+    rows.forEach(function(row) {
+      var id = row.id.replace('recipient-row-', '');
+      var nom   = (document.getElementById('rec-nom-'   + id) || {value:''}).value.trim();
+      var tel   = (document.getElementById('rec-tel-'   + id) || {value:''}).value.trim();
+      var ville = (document.getElementById('rec-ville-' + id) || {value:''}).value.trim();
+      if (nom || tel) list.push({ nom: nom, tel: tel, ville: ville });
+    });
+    return list;
+  }
+  // Initialiser avec 1 destinataire au chargement
+  document.addEventListener('DOMContentLoaded', function() { if (_recipientCount === 0) addRecipient(); });
+
   // ─── FORM SUBMIT: collect & store ────────────────────────────────────────
   var _submissions = [];
   try {
@@ -826,8 +874,9 @@ function doAdminLogin() {
     var _nomExp   = (document.getElementById('nomExp')||{value:''}).value.trim();
     var _telExp   = (document.getElementById('telExp')||{value:''}).value.trim();
     var _emailExp = (document.getElementById('emailExp')||{value:''}).value.trim();
-    var _nomRec   = (document.getElementById('nomRec')||{value:''}).value.trim();
-    var _telRec   = (document.getElementById('telRec')||{value:''}).value.trim();
+    var _recipients = getRecipients();
+    var _nomRec   = _recipients.length > 0 ? _recipients[0].nom : '';
+    var _telRec   = _recipients.length > 0 ? _recipients[0].tel : '';
     var _poidsEl  = document.getElementById('poidsEstime');
     var _poids    = _poidsEl ? _poidsEl.value.trim() : '';
     var _valeurEl = document.getElementById('valeurDeclaree');
@@ -850,8 +899,8 @@ function doAdminLogin() {
     if (!_nomExp)   _errs.push('Nom expéditeur');
     if (!_telExp)   _errs.push('Tél expéditeur');
     if (!_emailExp) _errs.push('Email expéditeur');
-    if (!_nomRec)   _errs.push('Nom destinataire');
-    if (!_telRec)   _errs.push('Tél destinataire');
+    if (_recipients.length === 0 || !_nomRec) _errs.push('Nom destinataire');
+    if (_recipients.length === 0 || !_telRec) _errs.push('Tél destinataire');
     if (!_poids)  { showToast('⚖️ Poids manquant', 'Veuillez indiquer le poids estimé du colis.'); if(_poidsEl){_poidsEl.style.border='2px solid #e53935';setTimeout(function(){_poidsEl.style.border='';},4000);_poidsEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_valeur) { showToast('💰 Valeur déclarée manquante', 'Veuillez indiquer la valeur déclarée du colis.'); if(_valeurEl){_valeurEl.style.border='2px solid #e53935';setTimeout(function(){_valeurEl.style.border='';},4000);_valeurEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     if (!_desc)   { showToast('📝 Description manquante', 'Veuillez décrire le contenu de votre colis.'); if(_descEl){_descEl.style.border='2px solid #e53935';setTimeout(function(){_descEl.style.border='';},4000);_descEl.scrollIntoView({behavior:'smooth',block:'center'});} return; }
@@ -906,6 +955,7 @@ function doAdminLogin() {
       email_exp:   _emailExp,
       recepteur:   _nomRec,
       tel_rec:     _telRec,
+      destinataires: _recipients,
       destination: destSel ? destSel.value : '',
       mode:        depotSel ? depotSel.value : '',
       modeDepot:   depotSel ? depotSel.options[depotSel.selectedIndex].text : '',
@@ -983,6 +1033,9 @@ function doAdminLogin() {
     });
 
     e.target.reset();
+    // Réinitialiser les destinataires
+    var _rContainer = document.getElementById('recipients-container');
+    if (_rContainer) { _rContainer.innerHTML = ''; _recipientCount = 0; addRecipient(); }
     handleModeDepot('');
   }
 
@@ -1020,10 +1073,9 @@ function doAdminLogin() {
   var _editIdx = null;
   function openEditModal(s) {
     _editIdx = _submissions.indexOf(s);
-    var fields = ['expediteur','tel_exp','email_exp','destinataire','tel_rec','destination','mode','paiement','adresseClient','poids','notes'];
+    var fields = ['expediteur','tel_exp','email_exp','destination','mode','paiement','adresseClient','poids','notes'];
     var labels = {
       expediteur:'Expéditeur', tel_exp:'Tél expéditeur', email_exp:'Email expéditeur',
-      destinataire:'Destinataire', tel_rec:'Tél destinataire',
       destination:'Destination', mode:'Mode dépôt', paiement:'Mode paiement',
       adresseClient:'Adresse', poids:'Poids (kg)', notes:'Notes'
     };
@@ -1032,6 +1084,24 @@ function doAdminLogin() {
       html += '<div class="parrain-field"><label>' + labels[f] + '</label>'
         + '<input type="text" id="edit-field-' + f + '" value="' + ((s[f]||'').toString().replace(/"/g,'&quot;')) + '"></div>';
     });
+
+    // ── Section destinataires ──
+    var editRecs = s.destinataires && s.destinataires.length ? s.destinataires : [{nom:s.destinataire||s.recepteur||'',tel:s.tel_rec||s.tel_dest||'',ville:''}];
+    html += '<div style="margin-top:16px;border-top:1px solid #e8ecf0;padding-top:14px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'
+      + '<span style="font-size:.82rem;font-weight:700;color:#0b1f3a;">👥 Destinataire(s)</span>'
+      + '<button type="button" onclick="addEditRecipient()" style="background:#e65100;color:#fff;border:none;border-radius:6px;padding:4px 11px;font-size:.78rem;cursor:pointer;">➕ Ajouter</button>'
+      + '</div>'
+      + '<div id="edit-recipients-list" style="display:flex;flex-direction:column;gap:8px;">';
+    editRecs.forEach(function(r, ri) {
+      html += '<div class="edit-rec-row" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:center;background:#f5f7fa;border-radius:7px;padding:8px 10px;">'
+        + '<input type="text" class="edit-rec-nom" placeholder="Nom complet" value="' + (r.nom||'').replace(/"/g,'&quot;') + '" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+        + '<input type="tel" class="edit-rec-tel" placeholder="+237 6XX" value="' + (r.tel||'').replace(/"/g,'&quot;') + '" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+        + '<input type="text" class="edit-rec-ville" placeholder="Ville/Quartier" value="' + (r.ville||'').replace(/"/g,'&quot;') + '" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+        + (ri > 0 ? '<button type="button" onclick="this.closest(\'.edit-rec-row\').remove()" style="background:rgba(229,57,53,.15);border:1px solid rgba(229,57,53,.3);color:#e53935;border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:.9rem;">✕</button>' : '<span></span>')
+        + '</div>';
+    });
+    html += '</div></div>';
 
     // ── Section pièces jointes ──
     html += '<div style="margin-top:18px;border-top:1px solid #e8ecf0;padding-top:16px;">'
@@ -1103,6 +1173,18 @@ function doAdminLogin() {
     document.getElementById('edit-modal-fields').innerHTML = html;
     document.getElementById('edit-modal').classList.add('open');
   }
+  function addEditRecipient() {
+    var list = document.getElementById('edit-recipients-list');
+    if (!list) return;
+    var row = document.createElement('div');
+    row.className = 'edit-rec-row';
+    row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:center;background:#f5f7fa;border-radius:7px;padding:8px 10px;';
+    row.innerHTML = '<input type="text" class="edit-rec-nom" placeholder="Nom complet" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+      + '<input type="tel" class="edit-rec-tel" placeholder="+237 6XX" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+      + '<input type="text" class="edit-rec-ville" placeholder="Ville/Quartier" style="border:1px solid #cdd5df;border-radius:5px;padding:7px 9px;font-size:.84rem;width:100%;">'
+      + '<button type="button" onclick="this.closest(\'.edit-rec-row\').remove()" style="background:rgba(229,57,53,.15);border:1px solid rgba(229,57,53,.3);color:#e53935;border-radius:5px;width:28px;height:28px;cursor:pointer;font-size:.9rem;">✕</button>';
+    list.appendChild(row);
+  }
   function closeEditModal() {
     document.getElementById('edit-modal').classList.remove('open');
     _editIdx = null;
@@ -1111,12 +1193,29 @@ function doAdminLogin() {
     if (_editIdx === null) return;
     var s = _submissions[_editIdx];
     if (!s) return;
-    var fields = ['expediteur','tel_exp','email_exp','destinataire','tel_rec','destination','mode','paiement','adresseClient','poids','notes'];
+    var fields = ['expediteur','tel_exp','email_exp','destination','mode','paiement','adresseClient','poids','notes'];
     var updates = {};
     fields.forEach(function(f) {
       var el = document.getElementById('edit-field-' + f);
       if (el) { updates[f] = el.value; s[f] = el.value; }
     });
+    // Collecter les destinataires édités
+    var editRecRows = document.querySelectorAll('#edit-recipients-list .edit-rec-row');
+    var editedRecs = [];
+    editRecRows.forEach(function(row) {
+      var nom   = (row.querySelector('.edit-rec-nom')   || {value:''}).value.trim();
+      var tel   = (row.querySelector('.edit-rec-tel')   || {value:''}).value.trim();
+      var ville = (row.querySelector('.edit-rec-ville') || {value:''}).value.trim();
+      if (nom || tel) editedRecs.push({ nom: nom, tel: tel, ville: ville });
+    });
+    if (editedRecs.length > 0) {
+      updates.data = Object.assign({}, (s.data || {}), { destinataires: editedRecs, recepteur: editedRecs[0].nom, tel_rec: editedRecs[0].tel });
+      s.destinataires = editedRecs;
+      s.destinataire  = editedRecs[0].nom;
+      s.recepteur     = editedRecs[0].nom;
+      s.tel_rec       = editedRecs[0].tel;
+      s.tel_dest      = editedRecs[0].tel;
+    }
     var btn = document.getElementById('edit-save-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
 
@@ -1415,7 +1514,15 @@ function doAdminLogin() {
       var pjHtml = pj.length ? pj.join('') : '<span style="color:#ccc;font-size:.72rem;">—</span>';
       return '<tr><td><strong style="color:var(--sky);font-size:.8rem;">' + (s.ref||'—') + '</strong></td>'
         + '<td>' + (s.expediteur||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_exp||'') + '</span></td>'
-        + '<td>' + (s.destinataire||s.recepteur||'—') + '<br><span style="font-size:.75rem;color:var(--slate);">' + (s.tel_rec||s.tel_dest||'') + '</span></td>'
+        + '<td>' + (function(){
+            var recs = s.destinataires && s.destinataires.length ? s.destinataires : [{nom:s.destinataire||s.recepteur||'—', tel:s.tel_rec||s.tel_dest||'', ville:''}];
+            return recs.map(function(r,ri){
+              return '<div style="'+(ri>0?'margin-top:4px;padding-top:4px;border-top:1px solid rgba(0,0,0,.1);':'')+'">'
+                + '<span style="font-weight:600;">' + (r.nom||'—') + '</span>'
+                + (r.ville ? '<span style="font-size:.72rem;color:var(--orange);margin-left:5px;">📍'+r.ville+'</span>' : '')
+                + '<br><span style="font-size:.75rem;color:var(--slate);">' + (r.tel||'') + '</span></div>';
+            }).join('');
+          })() + '</td>'
         + '<td style="font-size:.8rem;">' + (s.destination||'—').split('—')[0] + '</td>'
         + '<td style="font-size:.8rem;">' + ({presentiel:'Présentiel',lalamove:'Lalamove',ecommerce:'Shopee/Lazada'}[s.mode]||s.mode||'—') + '</td>'
         + '<td style="font-size:.8rem;">' + ({transfer:'Virement',cash:'Cash',westernunion:'Western Union',moneygram:'MoneyGram',remitly:'Remitly',wave:'Wave'}[s.paiement]||s.paiement||'—') + '</td>'
@@ -2845,8 +2952,16 @@ function doLogout() {
           </optgroup>
         </select>
       </div>
-      <div class="fg"><label data-fr="Nom du récepteur <span class='req'>*</span>" data-en="Recipient name <span class='req'>*</span>">Nom du récepteur <span class="req">*</span></label><input id="nomRec" type="text" data-fr="Ex : Marie Mbeu" data-en="e.g. Marie Mbeu" data-tl="Hal.: Maria Santos" placeholder="Ex : Marie Mbeu" required></div>
-      <div class="fg"><label data-fr="Téléphone récepteur <span class='req'>*</span>" data-en="Recipient phone <span class='req'>*</span>" data-tl="Telepono ng tatanggap <span class='req'>*</span>">Téléphone récepteur <span class="req">*</span></label><input id="telRec" type="tel" placeholder="+237 6XX XXX XXX" required></div>
+      <!-- MULTI-DESTINATAIRES -->
+      <div class="fg full" id="recipients-section">
+        <label style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <span data-fr="Destinataire(s) <span class='req'>*</span>" data-en="Recipient(s) <span class='req'>*</span>" data-tl="Tatanggap <span class='req'>*</span>">Destinataire(s) <span class="req">*</span></span>
+          <button type="button" onclick="addRecipient()" style="background:var(--orange);color:#fff;border:none;border-radius:7px;padding:5px 14px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;">
+            <span data-fr="➕ Ajouter un destinataire" data-en="➕ Add recipient" data-tl="➕ Magdagdag ng tatanggap">➕ Ajouter un destinataire</span>
+          </button>
+        </label>
+        <div id="recipients-container" style="display:flex;flex-direction:column;gap:10px;margin-top:10px;"></div>
+      </div>
       <!-- MODE DE DEPOT (conditionnel) -->
       <div class="fg full">
         <label data-fr="Mode de dépôt du colis <span class='req'>*</span>" data-en="Package drop-off mode <span class='req'>*</span>" data-tl="Paraan ng pagdeposito ng pakete <span class='req'>*</span>">Mode de dépôt du colis <span class="req">*</span></label>
