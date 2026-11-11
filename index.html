@@ -6,6 +6,8 @@
 <title>GCC CARGO HANDLING INC — Safe Cargo, Global Delivery</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init('xTeaUIuh4FJ4jttE5');</script>
 <style>
 /* ═══ TOKENS ═══ */
 :root{
@@ -1067,6 +1069,11 @@ function doAdminLogin() {
     }
     refreshAdminTable();
     showToast(tr('statusUp'), _submissions[i].ref + ' → ' + _submissions[i].statut);
+    // Envoyer notification email automatique
+    var s = _submissions[i];
+    if (s.email_exp && s.email_exp.trim()) {
+      sendEmailNotif(s.ref, s.expediteur || '', s.email_exp, s.statut, '');
+    }
   }
 
   // ─── MODAL ÉDITION DEMANDE ────────────────────────────────────────────
@@ -4052,22 +4059,21 @@ function showTab(name,btn){
   btn.classList.add('active');
 }
 function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
-  // Build a mailto link — opens the user's email client pre-filled
-  var subject = encodeURIComponent('[GCC CARGO] Mise à jour de votre colis — ' + ref);
-  var body = encodeURIComponent(
-    'Bonjour ' + (expediteurNom || 'Client') + ',\n\n' +
-    'Votre colis GCC CARGO ' + ref + ' a été mis à jour :\n' +
-    '▶ Nouveau statut : ' + statut + '\n' +
-    (note ? '📝 Note : ' + note + '\n' : '') +
-    '\nPour suivre votre colis en temps réel, rendez-vous sur notre site.\n\n' +
-    'Cordialement,\nL\'équipe GCC CARGO HANDLING INC\n' +
-    'Tél : +63 968 313 5356 | +63 915 385 7604\n' +
-    'Trimar Building, Multinational Ave, Parañaque, Metro Manila'
-  );
-  var to = emailExp || '';
-  var mailtoLink = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
-  window.open(mailtoLink, '_blank');
-  showToast(tr('emailReady'), tr('emailReadyMsg') + (expediteurNom || ref) + '.');
+  if (!emailExp || !emailExp.trim()) return;
+  var params = {
+    to_email:   emailExp.trim(),
+    expediteur: expediteurNom || 'Client',
+    ref:        ref || '',
+    statut:     statut || '',
+    note:       note || ''
+  };
+  emailjs.send('service_zeagk6m', 'template_e8cpjih', params)
+    .then(function() {
+      showToast('📧 Email envoyé', 'Notification envoyée à ' + (expediteurNom || ref) + '.');
+    })
+    .catch(function(err) {
+      console.warn('EmailJS error:', err);
+    });
 }
 
 function doUpdate(){
