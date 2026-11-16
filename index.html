@@ -1794,6 +1794,41 @@ function doAdminLogin() {
   }
 
   /* ═══ CLIENTS ═══ */
+  /* ═══ VIP clients ═══ */
+  var _vipClients = {};
+  try { _vipClients = JSON.parse(localStorage.getItem('gcc_vip_clients') || '{}'); } catch(e) { _vipClients = {}; }
+  var _cliTab = 'tous'; // 'tous' ou 'vip'
+
+  function saveVipClients() {
+    try { localStorage.setItem('gcc_vip_clients', JSON.stringify(_vipClients)); } catch(e) {}
+  }
+
+  function toggleVip(nomKey) {
+    if (_vipClients[nomKey]) {
+      delete _vipClients[nomKey];
+    } else {
+      _vipClients[nomKey] = true;
+    }
+    saveVipClients();
+    _renderClients();
+  }
+
+  function switchCliTab(tab) {
+    _cliTab = tab;
+    var btnTous = document.getElementById('cli-tab-tous');
+    var btnVip = document.getElementById('cli-tab-vip');
+    if (btnTous && btnVip) {
+      if (tab === 'tous') {
+        btnTous.style.background = 'var(--navy)'; btnTous.style.color = '#fff';
+        btnVip.style.background = '#fff'; btnVip.style.color = '#f5a623';
+      } else {
+        btnVip.style.background = '#f5a623'; btnVip.style.color = '#fff';
+        btnTous.style.background = '#fff'; btnTous.style.color = 'var(--navy)';
+      }
+    }
+    _renderClients();
+  }
+
   function refreshClients() {
     // Charger depuis Supabase si _submissions est vide
     if (_submissions.length === 0) {
@@ -1811,19 +1846,38 @@ function doAdminLogin() {
     });
     var clients = Object.values(clientMap);
     var tbody = document.getElementById('clients-tbody');
+    var vipEmpty = document.getElementById('cli-vip-empty');
     var setEl = function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
     setEl('cli-total', clients.length);
     setEl('cli-actifs', clients.filter(function(c){return c.envois.length>=2;}).length);
-    var topC = clients.sort(function(a,b){return b.envois.length-a.envois.length;})[0];
+    var topC = clients.slice().sort(function(a,b){return b.envois.length-a.envois.length;})[0];
     setEl('cli-top', topC ? topC.nom + ' (' + topC.envois.length + ')' : '—');
     setEl('cli-moy', clients.length ? (Math.round(_submissions.length/clients.length*10)/10).toString() : '0');
+    var vipCount = Object.keys(_vipClients).filter(function(k){return _vipClients[k];}).length;
+    setEl('cli-vip', vipCount);
     if (!tbody) return;
-    if (clients.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>'; return; }
+    // Filtrage selon onglet actif
     var sorted = clients.slice().sort(function(a,b){return b.envois.length-a.envois.length;});
+    if (_cliTab === 'vip') {
+      sorted = sorted.filter(function(c){ return !!_vipClients[c.nom]; });
+    }
+    if (vipEmpty) vipEmpty.style.display = (_cliTab === 'vip' && sorted.length === 0) ? 'block' : 'none';
+    if (sorted.length === 0 && _cliTab !== 'vip') {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>';
+      return;
+    }
+    if (sorted.length === 0) { tbody.innerHTML = ''; return; }
     tbody.innerHTML = sorted.map(function(c) {
       var last = _submissions.filter(function(s){return s.expediteur===c.nom;}).slice(-1)[0];
-      return '<tr><td><strong style="color:var(--navy);">' + c.nom + '</strong>'
-        + (c.envois.length >= 2 ? ' <span style="font-size:.68rem;background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:10px;">Fidèle</span>' : '')
+      var isVip = !!_vipClients[c.nom];
+      var nomSafe = c.nom.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      var vipBtn = '<button onclick="toggleVip(\'' + nomSafe + '\')" title="' + (isVip ? 'Retirer VIP' : 'Marquer VIP') + '" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:2px 4px;border-radius:6px;transition:transform .15s;" onmouseover="this.style.transform=\'scale(1.3)\'" onmouseout="this.style.transform=\'scale(1)\'">'
+        + (isVip ? '⭐' : '☆') + '</button>';
+      return '<tr style="' + (isVip ? 'background:linear-gradient(90deg,#fffbea 0%,#fff 100%);' : '') + '">'
+        + '<td style="text-align:center;">' + vipBtn + '</td>'
+        + '<td><strong style="color:var(--navy);">' + c.nom + '</strong>'
+        + (isVip ? ' <span style="font-size:.68rem;background:#fff3cd;color:#856404;padding:1px 6px;border-radius:10px;">VIP ⭐</span>' : '')
+        + (c.envois.length >= 2 && !isVip ? ' <span style="font-size:.68rem;background:#e8f5e9;color:#2e7d32;padding:1px 6px;border-radius:10px;">Fidèle</span>' : '')
         + '</td><td style="font-size:.83rem;">' + (c.tel||'—') + '</td>'
         + '<td style="font-size:.83rem;">' + (c.email||'—') + '</td>'
         + '<td><strong style="color:var(--sky);">' + c.envois.length + '</strong></td>'
@@ -3503,16 +3557,23 @@ function doLogout() {
           <div class="kpi sky"><div class="kpi-val" id="cli-total">0</div><div class="kpi-lbl">Clients uniques</div></div>
           <div class="kpi green"><div class="kpi-val" id="cli-actifs">0</div><div class="kpi-lbl">Actifs (&#8805;2 envois)</div></div>
           <div class="kpi gold"><div class="kpi-val" id="cli-top" style="font-size:1rem;">—</div><div class="kpi-lbl">Top client</div></div>
-          <div class="kpi"><div class="kpi-val" id="cli-moy">0</div><div class="kpi-lbl">Moy. envois/client</div></div>
+          <div class="kpi"><div class="kpi-val" id="cli-vip">0</div><div class="kpi-lbl">Clients VIP &#11088;</div></div>
         </div>
         <div class="adm-card">
-          <div class="adm-card-title">&#128203; Liste des expéditeurs</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div class="adm-card-title" style="margin:0;">&#128203; Liste des expéditeurs</div>
+            <div style="display:flex;gap:6px;">
+              <button id="cli-tab-tous" onclick="switchCliTab('tous')" style="padding:5px 14px;border-radius:20px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-size:.82rem;cursor:pointer;font-weight:600;">Tous</button>
+              <button id="cli-tab-vip" onclick="switchCliTab('vip')" style="padding:5px 14px;border-radius:20px;border:2px solid #f5a623;background:#fff;color:#f5a623;font-size:.82rem;cursor:pointer;font-weight:600;">&#11088; VIP</button>
+            </div>
+          </div>
           <div class="admin-table-wrap" style="padding:0;box-shadow:none;">
             <table class="adm-tbl">
-              <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th></tr></thead>
-              <tbody id="clients-tbody"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
+              <thead><tr><th>VIP</th><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th></tr></thead>
+              <tbody id="clients-tbody"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
             </table>
           </div>
+          <div id="cli-vip-empty" style="display:none;text-align:center;padding:30px;color:#aaa;font-size:.9rem;">&#11088; Aucun client VIP pour l'instant.<br><small>Cliquez sur &#11088; pour marquer un client comme VIP.</small></div>
         </div>
       </div>
 
