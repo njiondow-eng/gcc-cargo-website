@@ -4075,7 +4075,7 @@ function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
     note:       note || ''
   };
   console.log('EmailJS send:', params);
-  emailjs.send('service_zeagk6m', 'e8cpjih', params)
+  emailjs.send('service_zeagk6m', 'template_2a8sadf', params)
     .then(function(resp) {
       console.log('EmailJS success:', resp);
       showToast('📧 Email envoyé', 'Notification envoyée à ' + (expediteurNom || ref) + '.');
