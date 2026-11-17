@@ -1835,7 +1835,8 @@ function doAdminLogin() {
       supaGetAll(function(rows){ if(rows.length>0) _submissions=rows; _renderClients(); });
     } else { _renderClients(); }
   }
-  function _renderClients() {
+  /* ═══ RECHERCHE CLIENT & HISTORIQUE ═══ */
+  function _buildClientMap() {
     var clientMap = {};
     _submissions.forEach(function(s) {
       var nom = s.expediteur || 'Inconnu';
@@ -1844,6 +1845,124 @@ function doAdminLogin() {
       var dest = (s.destination||'').split('—')[0].trim();
       if (dest && !clientMap[nom].dests.includes(dest)) clientMap[nom].dests.push(dest);
     });
+    return clientMap;
+  }
+
+  function searchClient() {
+    var q = (document.getElementById('cli-search-input')||{value:''}).value.trim().toLowerCase();
+    var sug = document.getElementById('cli-search-suggestions');
+    if (!sug) return;
+    if (!q || q.length < 2) { sug.style.display = 'none'; return; }
+
+    // Chercher par nom, tel, email ET par référence de colis
+    var clientMap = _buildClientMap();
+    var matchedByRef = {};
+    _submissions.forEach(function(s) {
+      var ref = (s.ref||'').toLowerCase();
+      if (ref.indexOf(q) !== -1) {
+        var nom = s.expediteur || 'Inconnu';
+        matchedByRef[nom] = true;
+      }
+    });
+
+    var results = Object.values(clientMap).filter(function(c) {
+      return c.nom.toLowerCase().indexOf(q) !== -1
+          || (c.tel||'').toLowerCase().indexOf(q) !== -1
+          || (c.email||'').toLowerCase().indexOf(q) !== -1
+          || !!matchedByRef[c.nom];
+    }).slice(0, 8);
+
+    if (results.length === 0) {
+      sug.style.display = 'block';
+      sug.innerHTML = '<div style="padding:12px 16px;color:#aaa;font-size:.85rem;">Aucun résultat pour «&nbsp;' + q + '&nbsp;»</div>';
+      return;
+    }
+    sug.style.display = 'block';
+    sug.innerHTML = results.map(function(c) {
+      var isVip = !!_vipClients[c.nom];
+      var nomSafe = c.nom.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      return '<div onclick="showClientHistory(\'' + nomSafe + '\')" style="padding:10px 16px;cursor:pointer;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;" onmouseover="this.style.background=\'#f0f4ff\'" onmouseout="this.style.background=\'\'">'
+        + '<div><strong style="color:var(--navy);font-size:.88rem;">' + (isVip ? '⭐ ' : '') + c.nom + '</strong>'
+        + '<span style="font-size:.78rem;color:#888;margin-left:8px;">' + (c.tel||'') + (c.email ? '  ·  ' + c.email : '') + '</span></div>'
+        + '<span style="font-size:.78rem;background:var(--sky);color:#fff;padding:2px 8px;border-radius:10px;white-space:nowrap;">' + c.envois.length + ' envoi' + (c.envois.length>1?'s':'') + '</span>'
+        + '</div>';
+    }).join('');
+  }
+
+  function clearClientSearch() {
+    var inp = document.getElementById('cli-search-input');
+    if (inp) inp.value = '';
+    var sug = document.getElementById('cli-search-suggestions');
+    if (sug) { sug.style.display = 'none'; sug.innerHTML = ''; }
+    closeClientHistory();
+  }
+
+  function showClientHistory(nom) {
+    // Masquer les suggestions
+    var sug = document.getElementById('cli-search-suggestions');
+    if (sug) sug.style.display = 'none';
+
+    var panel = document.getElementById('cli-history-panel');
+    var subtitle = document.getElementById('cli-history-subtitle');
+    var infoDiv = document.getElementById('cli-history-info');
+    var tbody = document.getElementById('cli-history-tbody');
+    var emptyDiv = document.getElementById('cli-history-empty');
+    if (!panel || !tbody) return;
+
+    // Récupérer toutes les transactions du client
+    var txs = _submissions.filter(function(s){ return (s.expediteur||'Inconnu') === nom; });
+    txs.sort(function(a,b){
+      return new Date(b.date||b.created_at||0) - new Date(a.date||a.created_at||0);
+    });
+
+    // Info client
+    var cInfo = { tel:'', email:'' };
+    if (txs.length > 0) { cInfo.tel = txs[0].tel_exp||''; cInfo.email = txs[0].email_exp||''; }
+    var isVip = !!_vipClients[nom];
+
+    if (subtitle) subtitle.textContent = txs.length + ' transaction' + (txs.length>1?'s':'') + ' enregistrée' + (txs.length>1?'s':'');
+    if (infoDiv) infoDiv.innerHTML =
+      '<span>&#128100; <strong>' + nom + '</strong>' + (isVip ? ' &nbsp;<span style="font-size:.72rem;background:#fff3cd;color:#856404;padding:1px 7px;border-radius:10px;">VIP ⭐</span>' : '') + '</span>'
+      + (cInfo.tel ? '<span>📞 ' + cInfo.tel + '</span>' : '')
+      + (cInfo.email ? '<span>✉️ ' + cInfo.email + '</span>' : '');
+
+    if (txs.length === 0) {
+      tbody.innerHTML = '';
+      if (emptyDiv) emptyDiv.style.display = 'block';
+    } else {
+      if (emptyDiv) emptyDiv.style.display = 'none';
+      var statutColor = {
+        'En attente':'#f0ad4e','En transit':'#5bc0de','Arrivé':'#5cb85c','Livré':'#2e7d32'
+      };
+      tbody.innerHTML = txs.map(function(s) {
+        var dateStr = s.date || s.created_at || '';
+        if (dateStr) { try { dateStr = new Date(dateStr).toLocaleDateString('fr-FR'); } catch(e){} }
+        var statut = s.statut || 'En attente';
+        var col = statutColor[statut] || '#888';
+        return '<tr>'
+          + '<td><strong style="color:var(--sky);font-size:.85rem;">' + (s.ref||'—') + '</strong></td>'
+          + '<td style="font-size:.8rem;color:#666;">' + (dateStr||'—') + '</td>'
+          + '<td style="font-size:.8rem;">' + (s.destination||'—') + '</td>'
+          + '<td style="font-size:.8rem;">' + (s.mode||'—') + '</td>'
+          + '<td style="font-size:.8rem;">' + (s.poids ? s.poids+'kg' : '—') + '</td>'
+          + '<td><span style="font-size:.72rem;background:' + col + ';color:#fff;padding:2px 8px;border-radius:10px;white-space:nowrap;">' + statut + '</span></td>'
+          + '<td style="font-size:.8rem;">' + (s.paiement||'—') + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    panel.style.display = 'block';
+    // Scroll vers le panneau
+    setTimeout(function(){ panel.scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
+  }
+
+  function closeClientHistory() {
+    var panel = document.getElementById('cli-history-panel');
+    if (panel) panel.style.display = 'none';
+  }
+
+  function _renderClients() {
+    var clientMap = _buildClientMap();
     var clients = Object.values(clientMap);
     var tbody = document.getElementById('clients-tbody');
     var vipEmpty = document.getElementById('cli-vip-empty');
@@ -1863,7 +1982,7 @@ function doAdminLogin() {
     }
     if (vipEmpty) vipEmpty.style.display = (_cliTab === 'vip' && sorted.length === 0) ? 'block' : 'none';
     if (sorted.length === 0 && _cliTab !== 'vip') {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px;">Aucun client</td></tr>';
       return;
     }
     if (sorted.length === 0) { tbody.innerHTML = ''; return; }
@@ -1871,8 +1990,10 @@ function doAdminLogin() {
       var last = _submissions.filter(function(s){return s.expediteur===c.nom;}).slice(-1)[0];
       var isVip = !!_vipClients[c.nom];
       var nomSafe = c.nom.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      var nomSafeClick = c.nom.replace(/'/g, "\\'");
       var vipBtn = '<button onclick="toggleVip(\'' + nomSafe + '\')" title="' + (isVip ? 'Retirer VIP' : 'Marquer VIP') + '" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:2px 4px;border-radius:6px;transition:transform .15s;" onmouseover="this.style.transform=\'scale(1.3)\'" onmouseout="this.style.transform=\'scale(1)\'">'
         + (isVip ? '⭐' : '☆') + '</button>';
+      var histBtn = '<button onclick="showClientHistory(\'' + nomSafeClick + '\')" title="Voir historique" style="padding:3px 10px;border-radius:12px;border:1.5px solid var(--sky);background:#fff;color:var(--sky);font-size:.75rem;cursor:pointer;font-weight:600;">&#128197; Voir</button>';
       return '<tr style="' + (isVip ? 'background:linear-gradient(90deg,#fffbea 0%,#fff 100%);' : '') + '">'
         + '<td style="text-align:center;">' + vipBtn + '</td>'
         + '<td><strong style="color:var(--navy);">' + c.nom + '</strong>'
@@ -1882,7 +2003,8 @@ function doAdminLogin() {
         + '<td style="font-size:.83rem;">' + (c.email||'—') + '</td>'
         + '<td><strong style="color:var(--sky);">' + c.envois.length + '</strong></td>'
         + '<td style="font-size:.8rem;">' + (last ? (last.ref||'—') : '—') + '</td>'
-        + '<td style="font-size:.78rem;">' + c.dests.slice(0,3).join(', ') + '</td></tr>';
+        + '<td style="font-size:.78rem;">' + c.dests.slice(0,3).join(', ') + '</td>'
+        + '<td style="text-align:center;">' + histBtn + '</td></tr>';
     }).join('');
   }
 
@@ -3559,6 +3681,40 @@ function doLogout() {
           <div class="kpi gold"><div class="kpi-val" id="cli-top" style="font-size:1rem;">—</div><div class="kpi-lbl">Top client</div></div>
           <div class="kpi"><div class="kpi-val" id="cli-vip">0</div><div class="kpi-lbl">Clients VIP &#11088;</div></div>
         </div>
+
+        <!-- BARRE DE RECHERCHE CLIENT -->
+        <div class="adm-card" style="margin-bottom:16px;">
+          <div class="adm-card-title" style="margin-bottom:10px;">&#128269; Recherche client &amp; historique</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input id="cli-search-input" type="text" placeholder="Nom, téléphone, email ou N° de référence…" oninput="searchClient()" style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid #d0d7e3;border-radius:8px;font-size:.88rem;outline:none;" onfocus="this.style.borderColor='var(--sky)'" onblur="this.style.borderColor='#d0d7e3'">
+            <button onclick="clearClientSearch()" style="padding:9px 16px;border-radius:8px;border:1.5px solid #d0d7e3;background:#f5f7fa;color:#555;font-size:.85rem;cursor:pointer;">&#10005; Effacer</button>
+          </div>
+          <!-- Résultats de recherche rapide (suggestions) -->
+          <div id="cli-search-suggestions" style="display:none;margin-top:8px;border:1px solid #e0e6ef;border-radius:8px;overflow:hidden;"></div>
+        </div>
+
+        <!-- PANNEAU HISTORIQUE DU CLIENT SÉLECTIONNÉ -->
+        <div id="cli-history-panel" style="display:none;" class="adm-card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div class="adm-card-title" style="margin:0 0 2px 0;">&#128197; Historique des transactions</div>
+              <div id="cli-history-subtitle" style="font-size:.82rem;color:#666;"></div>
+            </div>
+            <button onclick="closeClientHistory()" style="padding:5px 14px;border-radius:20px;border:1.5px solid #ccc;background:#f5f7fa;color:#555;font-size:.82rem;cursor:pointer;">&#10005; Fermer</button>
+          </div>
+          <!-- Infos client -->
+          <div id="cli-history-info" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:#f0f4ff;border-radius:8px;font-size:.83rem;"></div>
+          <!-- Tableau des envois -->
+          <div class="admin-table-wrap" style="padding:0;box-shadow:none;">
+            <table class="adm-tbl">
+              <thead><tr><th>Référence</th><th>Date</th><th>Destination</th><th>Mode</th><th>Poids</th><th>Statut</th><th>Paiement</th></tr></thead>
+              <tbody id="cli-history-tbody"></tbody>
+            </table>
+          </div>
+          <div id="cli-history-empty" style="display:none;text-align:center;padding:20px;color:#aaa;font-size:.88rem;">Aucune transaction trouvée pour ce client.</div>
+        </div>
+
+        <!-- LISTE PRINCIPALE -->
         <div class="adm-card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
             <div class="adm-card-title" style="margin:0;">&#128203; Liste des expéditeurs</div>
@@ -3569,8 +3725,8 @@ function doLogout() {
           </div>
           <div class="admin-table-wrap" style="padding:0;box-shadow:none;">
             <table class="adm-tbl">
-              <thead><tr><th>VIP</th><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th></tr></thead>
-              <tbody id="clients-tbody"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
+              <thead><tr><th>VIP</th><th>Nom</th><th>Téléphone</th><th>Email</th><th>Nb envois</th><th>Dernière demande</th><th>Destinations</th><th>Historique</th></tr></thead>
+              <tbody id="clients-tbody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px;">Aucun client enregistré</td></tr></tbody>
             </table>
           </div>
           <div id="cli-vip-empty" style="display:none;text-align:center;padding:30px;color:#aaa;font-size:.9rem;">&#11088; Aucun client VIP pour l'instant.<br><small>Cliquez sur &#11088; pour marquer un client comme VIP.</small></div>
