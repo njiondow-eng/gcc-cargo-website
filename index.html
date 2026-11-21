@@ -810,7 +810,8 @@ function doAdminLogin() {
             photos_colis: d.photos_colis || '',
             capture_paiement: d.capture_paiement || '',
             photo_emballage: d.photo_emballage || '',
-            statut: r.statut || 'En attente'
+            statut: r.statut || 'En attente',
+            _rawData: d
           };
         });
         cb(mapped);
@@ -1275,10 +1276,17 @@ function doAdminLogin() {
         return;
       }
 
-      if (idUrls.length)        { updates.piece_identite   = idUrls.join('\n');       s.piece_identite   = updates.piece_identite; }
-      if (colisUrls.length)     { updates.photos_colis     = colisUrls.join('\n');    s.photos_colis     = updates.photos_colis; }
-      if (captureUrls.length)   { updates.capture_paiement = captureUrls.join('\n');  s.capture_paiement = updates.capture_paiement; }
-      if (emballageUrls.length) { updates.photo_emballage  = emballageUrls.join('\n'); s.photo_emballage  = updates.photo_emballage; }
+      // Les photos sont stockées dans la colonne JSONB "data" — il faut y écrire
+      var dataUpdates = {};
+      if (idUrls.length)        { dataUpdates.piece_identite   = idUrls.join('\n');       s.piece_identite   = dataUpdates.piece_identite; }
+      if (colisUrls.length)     { dataUpdates.photos_colis     = colisUrls.join('\n');    s.photos_colis     = dataUpdates.photos_colis; }
+      if (captureUrls.length)   { dataUpdates.capture_paiement = captureUrls.join('\n');  s.capture_paiement = dataUpdates.capture_paiement; }
+      if (emballageUrls.length) { dataUpdates.photo_emballage  = emballageUrls.join('\n'); s.photo_emballage  = dataUpdates.photo_emballage; }
+
+      // Fusionner dans updates.data pour le PATCH
+      if (Object.keys(dataUpdates).length > 0) {
+        updates.data = Object.assign({}, s._rawData || {}, updates.data || {}, dataUpdates);
+      }
 
       var nbFichiers = idUrls.length + colisUrls.length + captureUrls.length + emballageUrls.length;
       if (btn) btn.textContent = '💾 Sauvegarde données…';
