@@ -1200,13 +1200,39 @@ function doAdminLogin() {
     if (_editIdx === null) return;
     var s = _submissions[_editIdx];
     if (!s) return;
-    var fields = ['expediteur','tel_exp','email_exp','destination','mode','paiement','adresseClient','poids','notes'];
-    var updates = {};
-    fields.forEach(function(f) {
-      var el = document.getElementById('edit-field-' + f);
-      if (el) { updates[f] = el.value; s[f] = el.value; }
+
+    // Colonnes directes réelles dans Supabase : ref, statut, expediteur, destination, photo_emballage
+    // Tout le reste va dans la colonne JSONB "data"
+    // On part du data existant (_rawData) et on y fusionne les modifications
+    var newData = Object.assign({}, s._rawData || {});
+
+    // Champs éditables → tout dans data
+    var fieldMap = {
+      'expediteur':    'expediteur',    // aussi colonne directe
+      'destination':   'destination',   // aussi colonne directe
+      'tel_exp':       'tel_exp',
+      'email_exp':     'email_exp',
+      'mode':          'mode',
+      'paiement':      'paiement',
+      'adresseClient': 'adresse_client',
+      'poids':         'poids',
+      'notes':         'notes'
+    };
+    var directCols = {}; // colonnes racines réelles
+    Object.keys(fieldMap).forEach(function(inputKey) {
+      var el = document.getElementById('edit-field-' + inputKey);
+      if (el) {
+        var val = el.value;
+        s[inputKey] = val;
+        newData[fieldMap[inputKey]] = val;
+        // expediteur et destination existent aussi comme colonnes directes
+        if (inputKey === 'expediteur' || inputKey === 'destination') {
+          directCols[inputKey] = val;
+        }
+      }
     });
-    // Collecter les destinataires édités
+
+    // Destinataires édités → dans data
     var editRecRows = document.querySelectorAll('#edit-recipients-list .edit-rec-row');
     var editedRecs = [];
     editRecRows.forEach(function(row) {
@@ -1216,13 +1242,14 @@ function doAdminLogin() {
       if (nom || tel) editedRecs.push({ nom: nom, tel: tel, ville: ville });
     });
     if (editedRecs.length > 0) {
-      updates.data = Object.assign({}, (s.data || {}), { destinataires: editedRecs, recepteur: editedRecs[0].nom, tel_rec: editedRecs[0].tel });
+      newData.destinataires = editedRecs;
+      newData.recepteur = editedRecs[0].nom;
+      newData.tel_rec = editedRecs[0].tel;
       s.destinataires = editedRecs;
-      s.destinataire  = editedRecs[0].nom;
-      s.recepteur     = editedRecs[0].nom;
-      s.tel_rec       = editedRecs[0].tel;
-      s.tel_dest      = editedRecs[0].tel;
+      s.recepteur = editedRecs[0].nom;
+      s.tel_rec = editedRecs[0].tel;
     }
+
     var btn = document.getElementById('edit-save-btn');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Upload en cours…'; }
 
@@ -1268,7 +1295,7 @@ function doAdminLogin() {
       var emballageUrls = results[3];
 
       // Vérifier si un fichier a été sélectionné mais l'upload a échoué
-      var idInp  = document.getElementById('edit-id-file');
+      var idInp = document.getElementById('edit-id-file');
       var hadIdFile = idInp && idInp.files && idInp.files.length > 0;
       if (hadIdFile && idUrls.length === 0) {
         if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
@@ -1276,38 +1303,15 @@ function doAdminLogin() {
         return;
       }
 
-      // Les photos sont stockées à la fois dans les colonnes directes ET dans data (JSONB)
-      // Il faut mettre à jour les deux pour que ça persiste après rechargement
-      var dataUpdates = {};
-      if (idUrls.length) {
-        var idVal = idUrls.join('\n');
-        updates.piece_identite   = idVal;   // colonne directe
-        dataUpdates.piece_identite = idVal;  // dans data JSONB
-        s.piece_identite = idVal;
-      }
-      if (colisUrls.length) {
-        var colisVal = colisUrls.join('\n');
-        updates.photos_colis   = colisVal;
-        dataUpdates.photos_colis = colisVal;
-        s.photos_colis = colisVal;
-      }
-      if (captureUrls.length) {
-        var capVal = captureUrls.join('\n');
-        updates.capture_paiement   = capVal;
-        dataUpdates.capture_paiement = capVal;
-        s.capture_paiement = capVal;
-      }
-      if (emballageUrls.length) {
-        var embVal = emballageUrls.join('\n');
-        updates.photo_emballage   = embVal;
-        dataUpdates.photo_emballage = embVal;
-        s.photo_emballage = embVal;
-      }
+      // Photos → uniquement dans data (pas de colonnes directes sauf photo_emballage)
+      if (idUrls.length)        { newData.piece_identite   = idUrls.join('\n');       s.piece_identite   = newData.piece_identite; }
+      if (colisUrls.length)     { newData.photos_colis     = colisUrls.join('\n');    s.photos_colis     = newData.photos_colis; }
+      if (captureUrls.length)   { newData.capture_paiement = captureUrls.join('\n');  s.capture_paiement = newData.capture_paiement; }
+      if (emballageUrls.length) { newData.photo_emballage  = emballageUrls.join('\n'); s.photo_emballage  = newData.photo_emballage;
+                                  directCols.photo_emballage = newData.photo_emballage; } // colonne directe
 
-      // Fusionner aussi dans data JSONB (preserve les autres champs de data)
-      if (Object.keys(dataUpdates).length > 0) {
-        updates.data = Object.assign({}, s._rawData || {}, dataUpdates);
-      }
+      // PATCH final : colonnes directes + data complet
+      var patchBody = Object.assign({}, directCols, { data: newData });
 
       var nbFichiers = idUrls.length + colisUrls.length + captureUrls.length + emballageUrls.length;
       if (btn) btn.textContent = '💾 Sauvegarde données…';
@@ -1316,20 +1320,24 @@ function doAdminLogin() {
         fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
           method: 'PATCH',
           headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-          body: JSON.stringify(updates)
+          body: JSON.stringify(patchBody)
         }).then(function(r) {
           if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
           if (r.ok) {
+            // Mettre à jour _rawData en mémoire pour les prochaines éditions
+            s._rawData = newData;
             var msg = 'Demande ' + s.ref + ' mise à jour';
             if (nbFichiers > 0) msg += ' — ' + nbFichiers + ' fichier(s) uploadé(s)';
             showToast('✅', msg);
             closeEditModal();
             refreshAdminTable();
           } else {
-            showToast('⚠️', 'Erreur HTTP ' + r.status);
+            r.text().then(function(t){ console.error('PATCH error:', r.status, t); });
+            showToast('⚠️', 'Erreur sauvegarde HTTP ' + r.status);
           }
-        }).catch(function() {
+        }).catch(function(err) {
           if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+          console.error('PATCH fetch error:', err);
           showToast('⚠️', 'Erreur réseau');
         });
       } else {
