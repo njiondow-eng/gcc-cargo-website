@@ -1223,7 +1223,7 @@ function doAdminLogin() {
       s.tel_dest      = editedRecs[0].tel;
     }
     var btn = document.getElementById('edit-save-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Upload en cours…'; }
 
     // ── Upload des nouvelles pièces jointes ──
     var ref = s.ref || ('ADM-' + Date.now());
@@ -1232,14 +1232,25 @@ function doAdminLogin() {
       if (!inp || !inp.files || inp.files.length === 0) return Promise.resolve([]);
       var promises = Array.from(inp.files).map(function(file, idx) {
         var ext = file.name.split('.').pop();
-        var path = ref + '/' + prefix + '_adm_' + idx + '.' + ext;
+        var path = ref + '/' + prefix + '_adm_' + Date.now() + '_' + idx + '.' + ext;
         return fetch(SUPA_URL + '/storage/v1/object/gcc-files/' + path, {
           method: 'POST',
-          headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type||'application/octet-stream'},
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': file.type || 'application/octet-stream',
+            'x-upsert': 'true'
+          },
           body: file
         })
-        .then(function(r){ return r.ok ? (SUPA_URL + '/storage/v1/object/public/gcc-files/' + path) : null; })
-        .catch(function(){ return null; });
+        .then(function(r) {
+          if (r.ok) return SUPA_URL + '/storage/v1/object/public/gcc-files/' + path;
+          return r.json().then(function(e){
+            console.error('Upload admin error:', e);
+            return null;
+          }).catch(function(){ return null; });
+        })
+        .catch(function(err){ console.error('Upload admin fetch error:', err); return null; });
       });
       return Promise.all(promises).then(function(urls){ return urls.filter(Boolean); });
     }
@@ -1254,10 +1265,23 @@ function doAdminLogin() {
       var colisUrls     = results[1];
       var captureUrls   = results[2];
       var emballageUrls = results[3];
+
+      // Vérifier si un fichier a été sélectionné mais l'upload a échoué
+      var idInp  = document.getElementById('edit-id-file');
+      var hadIdFile = idInp && idInp.files && idInp.files.length > 0;
+      if (hadIdFile && idUrls.length === 0) {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
+        showToast('⚠️ Erreur upload', 'La pièce d\'identité n\'a pas pu être uploadée. Vérifiez la connexion et réessayez.');
+        return;
+      }
+
       if (idUrls.length)        { updates.piece_identite   = idUrls.join('\n');       s.piece_identite   = updates.piece_identite; }
       if (colisUrls.length)     { updates.photos_colis     = colisUrls.join('\n');    s.photos_colis     = updates.photos_colis; }
       if (captureUrls.length)   { updates.capture_paiement = captureUrls.join('\n');  s.capture_paiement = updates.capture_paiement; }
       if (emballageUrls.length) { updates.photo_emballage  = emballageUrls.join('\n'); s.photo_emballage  = updates.photo_emballage; }
+
+      var nbFichiers = idUrls.length + colisUrls.length + captureUrls.length + emballageUrls.length;
+      if (btn) btn.textContent = '💾 Sauvegarde données…';
 
       if (s.id) {
         fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id, {
@@ -1267,7 +1291,9 @@ function doAdminLogin() {
         }).then(function(r) {
           if (btn) { btn.disabled = false; btn.textContent = '💾 Sauvegarder'; }
           if (r.ok) {
-            showToast('✅', 'Demande ' + s.ref + ' mise à jour');
+            var msg = 'Demande ' + s.ref + ' mise à jour';
+            if (nbFichiers > 0) msg += ' — ' + nbFichiers + ' fichier(s) uploadé(s)';
+            showToast('✅', msg);
             closeEditModal();
             refreshAdminTable();
           } else {
