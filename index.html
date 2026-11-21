@@ -1200,11 +1200,31 @@ function doAdminLogin() {
     if (_editIdx === null) return;
     var s = _submissions[_editIdx];
     if (!s) return;
+    if (!s.id) { showToast('⚠️','Pas d\'ID Supabase pour cette demande'); return; }
 
+    var btn = document.getElementById('edit-save-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Chargement…'; }
+
+    // Lire le data actuel depuis Supabase pour ne pas l'écraser
+    fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + s.id + '&select=data', {
+      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows){
+      var currentData = (rows && rows[0] && rows[0].data) ? rows[0].data : {};
+      _doSaveEditModal(s, currentData, btn);
+    })
+    .catch(function(){
+      // Fallback: utiliser _rawData ou vide
+      _doSaveEditModal(s, s._rawData || {}, btn);
+    });
+  }
+
+  function _doSaveEditModal(s, currentData, btn) {
     // Colonnes directes réelles dans Supabase : ref, statut, expediteur, destination, photo_emballage
     // Tout le reste va dans la colonne JSONB "data"
-    // On part du data existant (_rawData) et on y fusionne les modifications
-    var newData = Object.assign({}, s._rawData || {});
+    // On part du data lu depuis Supabase et on y fusionne les modifications
+    var newData = Object.assign({}, currentData);
 
     // Champs éditables → tout dans data
     var fieldMap = {
@@ -1250,8 +1270,7 @@ function doAdminLogin() {
       s.tel_rec = editedRecs[0].tel;
     }
 
-    var btn = document.getElementById('edit-save-btn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Upload en cours…'; }
+    if (btn) { btn.textContent = '⏳ Upload en cours…'; }
 
     // ── Upload des nouvelles pièces jointes ──
     var ref = s.ref || ('ADM-' + Date.now());
