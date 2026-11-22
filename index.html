@@ -3497,7 +3497,7 @@ function doLogout() {
           </select>
           <span id="b-count" style="font-size:.82rem;color:var(--slate);font-weight:600;white-space:nowrap;"></span>
         </div>
-        <div id="b-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
+        <div id="b-grid" style="display:block;"></div>
         <div id="b-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--slate);">
           <div style="font-size:3rem;margin-bottom:12px;">🔍</div>
           <p style="font-weight:600;">Aucun produit trouvé</p>
@@ -3722,7 +3722,8 @@ function doLogout() {
     <div class="adm-tab" onclick="showAdmTab('parrainage',this)">&#129309; Parrainage</div>
     <div class="adm-tab" onclick="showAdmTab('notifs',this)">&#128276; Notifications</div>
     <div class="adm-tab" onclick="showAdmTab('flyers',this)">&#128444; Flyers</div>
-    <div class="adm-tab" onclick="showAdmTab('boutique-orders',this)">&#128722; Boutique</div>
+    <div class="adm-tab" onclick="showAdmTab('boutique-orders',this)">&#128722; Commandes</div>
+    <div class="adm-tab" onclick="showAdmTab('boutique-catalogue',this);admCatLoad()">&#128247; Catalogue</div>
     <div class="adm-tab" onclick="showAdmTab('parametres',this)">&#9881; Paramètres</div>
   </div>
   <main class="admin-main">
@@ -4185,6 +4186,81 @@ function doLogout() {
               <button onclick="document.getElementById('adm-bout-detail').style.display='none'" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;">✕</button>
             </div>
             <div id="adm-bout-detail-content" style="padding:22px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: CATALOGUE BOUTIQUE -->
+      <div class="adm-page" id="adm-boutique-catalogue" style="display:none;">
+        <div class="adm-page-title">&#128247; Catalogue Boutique</div>
+        <div class="adm-page-sub">Modifier les photos, descriptions et désactiver des produits</div>
+
+        <!-- Sous-onglets -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <button id="cat-tab-brands" onclick="catSubTab('brands')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-weight:700;font-size:.82rem;cursor:pointer;">&#127968; Photos Marques</button>
+          <button id="cat-tab-products" onclick="catSubTab('products')" style="padding:8px 18px;border-radius:20px;border:2px solid #dde;background:#fff;color:var(--navy);font-weight:700;font-size:.82rem;cursor:pointer;">&#128230; Produits</button>
+        </div>
+
+        <!-- SOUS-ONGLET : PHOTOS MARQUES -->
+        <div id="cat-brands-panel">
+          <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:#e65100;">
+            💡 Cliquez sur une marque pour télécharger une meilleure photo. Elle remplacera l'image actuelle dans la boutique.
+          </div>
+          <div id="cat-brands-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"></div>
+        </div>
+
+        <!-- SOUS-ONGLET : PRODUITS -->
+        <div id="cat-products-panel" style="display:none;">
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+            <select id="cat-brand-filter" onchange="catFilterProducts()" style="padding:9px 14px;border:2px solid #e8eaf0;border-radius:10px;font-size:.85rem;flex:1;min-width:200px;">
+              <option value="">Toutes les marques</option>
+            </select>
+            <input id="cat-prod-search" type="text" placeholder="🔍 Rechercher produit…" oninput="catFilterProducts()" style="padding:9px 14px;border:2px solid #e8eaf0;border-radius:10px;font-size:.85rem;flex:1;min-width:200px;">
+          </div>
+          <div class="admin-table-wrap">
+            <table style="width:100%;border-collapse:collapse;">
+              <thead>
+                <tr style="background:#f4f6fb;">
+                  <th style="padding:10px 12px;text-align:left;font-size:.78rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Marque</th>
+                  <th style="padding:10px 12px;text-align:left;font-size:.78rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Produit</th>
+                  <th style="padding:10px 12px;text-align:left;font-size:.78rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Prix</th>
+                  <th style="padding:10px 12px;text-align:left;font-size:.78rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Description</th>
+                  <th style="padding:10px 12px;text-align:center;font-size:.78rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Visible</th>
+                  <th style="padding:10px 12px;font-size:.78rem;border-bottom:2px solid #e8eaf0;"></th>
+                </tr>
+              </thead>
+              <tbody id="cat-prod-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal édition produit -->
+        <div id="cat-prod-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:6000;padding:20px;overflow:auto;">
+          <div style="max-width:500px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+            <div style="background:var(--navy);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <h3 style="color:#fff;font-weight:900;font-size:.95rem;margin:0;">✏️ Modifier le produit</h3>
+              <button onclick="document.getElementById('cat-prod-modal').style.display='none'" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem;">✕</button>
+            </div>
+            <div style="padding:20px;display:grid;gap:14px;">
+              <div>
+                <div style="font-size:.78rem;color:var(--slate);font-weight:700;margin-bottom:4px;">MARQUE</div>
+                <div id="cat-modal-brand" style="font-weight:700;color:var(--orange);"></div>
+              </div>
+              <div>
+                <div style="font-size:.78rem;color:var(--slate);font-weight:700;margin-bottom:4px;">PRODUIT</div>
+                <div id="cat-modal-name" style="font-weight:700;color:var(--navy);"></div>
+              </div>
+              <div>
+                <label style="font-size:.82rem;font-weight:700;color:var(--slate);display:block;margin-bottom:6px;">DESCRIPTION (optionnelle)</label>
+                <textarea id="cat-modal-desc" rows="3" placeholder="Ex: Crème hydratante 50ml, idéale pour peau sèche…" style="width:100%;padding:10px 12px;border:2px solid #e8eaf0;border-radius:10px;font-size:.85rem;resize:vertical;box-sizing:border-box;"></textarea>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#fafbfc;border-radius:10px;">
+                <input type="checkbox" id="cat-modal-disabled" style="width:18px;height:18px;cursor:pointer;">
+                <label for="cat-modal-disabled" style="font-size:.88rem;font-weight:600;color:var(--navy);cursor:pointer;">Désactiver ce produit (caché dans la boutique)</label>
+              </div>
+              <input type="hidden" id="cat-modal-idx">
+              <button onclick="catSaveProduct()" style="background:var(--navy);color:#fff;border:none;padding:12px;border-radius:10px;font-weight:800;font-size:.9rem;cursor:pointer;">💾 Sauvegarder</button>
+            </div>
           </div>
         </div>
       </div>
@@ -4826,6 +4902,224 @@ function doUpdate(){
     if (sel) sel.value = '';
   }
 
+  // ─── ADMIN CATALOGUE BOUTIQUE ──────────────────────────────────────────────────
+
+  var _catConfig = {};      // {brand_NNN: url, prod_NNN_desc: txt, prod_NNN_disabled: true}
+  var _catLoaded = false;
+
+  function admCatLoad() {
+    if (_catLoaded) { catSubTab('brands'); return; }
+    // Load all config from Supabase
+    fetch(SUPA_URL + '/rest/v1/gcc_boutique_config?select=*&order=id.asc', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows) {
+      _catConfig = {};
+      (rows||[]).forEach(function(r) {
+        if (r.type === 'brand_photo' && r.brand_idx !== null) _catConfig['brand_' + r.brand_idx] = r.value;
+        if (r.type === 'product_desc' && r.product_idx !== null) _catConfig['prod_' + r.product_idx + '_desc'] = r.value;
+        if (r.type === 'product_disabled' && r.product_idx !== null) _catConfig['prod_' + r.product_idx + '_disabled'] = r.disabled;
+      });
+      _catLoaded = true;
+      catSubTab('brands');
+      catRenderBrands();
+      catPopulateBrandFilter();
+      catFilterProducts();
+    })
+    .catch(function(e){ showToast('⚠️','Erreur chargement catalogue'); });
+  }
+
+  function catSubTab(tab) {
+    document.getElementById('cat-brands-panel').style.display = tab === 'brands' ? 'block' : 'none';
+    document.getElementById('cat-products-panel').style.display = tab === 'products' ? 'block' : 'none';
+    var btnB = document.getElementById('cat-tab-brands');
+    var btnP = document.getElementById('cat-tab-products');
+    if (tab === 'brands') {
+      btnB.style.background = 'var(--navy)'; btnB.style.color = '#fff'; btnB.style.borderColor = 'var(--navy)';
+      btnP.style.background = '#fff'; btnP.style.color = 'var(--navy)'; btnP.style.borderColor = '#dde';
+    } else {
+      btnP.style.background = 'var(--navy)'; btnP.style.color = '#fff'; btnP.style.borderColor = 'var(--navy)';
+      btnB.style.background = '#fff'; btnB.style.color = 'var(--navy)'; btnB.style.borderColor = '#dde';
+    }
+  }
+
+  function catRenderBrands() {
+    var grid = document.getElementById('cat-brands-grid');
+    if (!grid || !_BDATA) return;
+    var html = '';
+    _BDATA.b.forEach(function(brand, bi) {
+      var customUrl = _catConfig['brand_' + bi];
+      var imgSrc = customUrl || (_BIMGS && _BIMGS[bi] ? _BIMGS[bi] : '');
+      var hasCustom = !!customUrl;
+      html += '<div style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden;cursor:pointer;" onclick="catUploadBrandPhoto(' + bi + ')">' +
+        '<div style="height:100px;display:flex;align-items:center;justify-content:center;background:#f4f6fb;position:relative;">' +
+          (imgSrc ? '<img src="' + imgSrc + '" style="width:90px;height:90px;object-fit:cover;border-radius:8px;">' :
+            '<div style="font-size:1.5rem;font-weight:900;color:#94a3b8;">' + brand.slice(0,2).toUpperCase() + '</div>') +
+          (hasCustom ? '<div style="position:absolute;top:4px;right:4px;background:#22c55e;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.6rem;display:flex;align-items:center;justify-content:center;">✓</div>' : '') +
+        '</div>' +
+        '<div style="padding:8px 10px;">' +
+          '<div style="font-size:.72rem;font-weight:800;color:var(--navy);margin-bottom:2px;">' + brand + '</div>' +
+          '<div style="font-size:.68rem;color:var(--slate);">' + (hasCustom ? '✅ Photo custom' : '📷 Cliquer pour changer') + '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function catUploadBrandPhoto(bi) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function() {
+      var file = input.files[0];
+      if (!file) return;
+      showToast('⏳', 'Upload en cours…');
+      // Resize to 200x200 canvas before upload
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          canvas.width = 200; canvas.height = 200;
+          var ctx = canvas.getContext('2d');
+          var size = Math.min(img.width, img.height);
+          var sx = (img.width - size) / 2;
+          var sy = (img.height - size) / 2;
+          ctx.drawImage(img, sx, sy, size, size, 0, 0, 200, 200);
+          canvas.toBlob(function(blob) {
+            var path = 'boutique/brand_' + bi + '_' + Date.now() + '.jpg';
+            fetch(SUPA_URL + '/storage/v1/object/gcc-files/' + path, {
+              method: 'POST',
+              headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'image/jpeg' },
+              body: blob
+            })
+            .then(function(r) {
+              if (!r.ok) throw new Error('Upload failed');
+              var publicUrl = SUPA_URL + '/storage/v1/object/public/gcc-files/' + path;
+              return catSaveBrandConfig(bi, publicUrl);
+            })
+            .then(function() {
+              _catConfig['brand_' + bi] = SUPA_URL + '/storage/v1/object/public/gcc-files/boutique/brand_' + bi + '_' + Date.now() + '.jpg';
+              showToast('✅', 'Photo mise à jour !');
+              _catLoaded = false;
+              admCatLoad();
+            })
+            .catch(function(e) { showToast('⚠️', 'Erreur upload: ' + e.message); });
+          }, 'image/jpeg', 0.82);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function catSaveBrandConfig(bi, url) {
+    // Upsert: delete existing then insert
+    return fetch(SUPA_URL + '/rest/v1/gcc_boutique_config?type=eq.brand_photo&brand_idx=eq.' + bi, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    }).then(function() {
+      return fetch(SUPA_URL + '/rest/v1/gcc_boutique_config', {
+        method: 'POST',
+        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ type: 'brand_photo', brand_idx: bi, value: url, updated_at: new Date().toISOString() })
+      });
+    });
+  }
+
+  function catPopulateBrandFilter() {
+    var sel = document.getElementById('cat-brand-filter');
+    if (!sel || !_BDATA) return;
+    sel.innerHTML = '<option value="">Toutes les marques</option>';
+    _BDATA.b.forEach(function(br, i) {
+      var o = document.createElement('option');
+      o.value = i;
+      o.textContent = br;
+      sel.appendChild(o);
+    });
+  }
+
+  function catFilterProducts() {
+    var brandFilter = document.getElementById('cat-brand-filter') ? parseInt(document.getElementById('cat-brand-filter').value) : NaN;
+    var search = (document.getElementById('cat-prod-search') ? document.getElementById('cat-prod-search').value : '').toLowerCase().trim();
+    var tbody = document.getElementById('cat-prod-tbody');
+    if (!tbody || !_BDATA) return;
+    var html = '';
+    var count = 0;
+    _BDATA.p.forEach(function(p, idx) {
+      var bi = p[0], name = p[1], price = p[2];
+      if (!isNaN(brandFilter) && bi !== brandFilter) return;
+      var brand = _BDATA.b[bi] || '';
+      if (search && (brand + ' ' + name).toLowerCase().indexOf(search) === -1) return;
+      count++;
+      var desc = _catConfig['prod_' + idx + '_desc'] || '';
+      var disabled = _catConfig['prod_' + idx + '_disabled'] || false;
+      html += '<tr style="border-bottom:1px solid #f0f2f5;' + (disabled ? 'opacity:.45;' : '') + '">' +
+        '<td style="padding:8px 12px;font-size:.78rem;font-weight:700;color:var(--orange);">' + brand + '</td>' +
+        '<td style="padding:8px 12px;font-size:.82rem;color:var(--navy);max-width:200px;">' + name + '</td>' +
+        '<td style="padding:8px 12px;font-size:.82rem;font-weight:700;">₱' + price + '</td>' +
+        '<td style="padding:8px 12px;font-size:.78rem;color:var(--slate);max-width:180px;">' + (desc || '<em style="color:#cbd5e1;">—</em>') + '</td>' +
+        '<td style="padding:8px 12px;text-align:center;">' + (disabled ? '<span style="color:#ef4444;font-size:.75rem;font-weight:700;">CACHÉ</span>' : '<span style="color:#22c55e;font-size:.75rem;font-weight:700;">✓</span>') + '</td>' +
+        '<td style="padding:8px 12px;"><button onclick="catEditProduct(' + idx + ')" style="background:var(--navy);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:.75rem;cursor:pointer;">✏️ Éditer</button></td>' +
+      '</tr>';
+    });
+    if (count === 0) html = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--slate);">Aucun produit trouvé</td></tr>';
+    tbody.innerHTML = html;
+  }
+
+  function catEditProduct(idx) {
+    var p = _BDATA.p[idx];
+    if (!p) return;
+    document.getElementById('cat-modal-brand').textContent = _BDATA.b[p[0]] || '';
+    document.getElementById('cat-modal-name').textContent = p[1] + ' — ₱' + p[2];
+    document.getElementById('cat-modal-desc').value = _catConfig['prod_' + idx + '_desc'] || '';
+    document.getElementById('cat-modal-disabled').checked = !!_catConfig['prod_' + idx + '_disabled'];
+    document.getElementById('cat-modal-idx').value = idx;
+    document.getElementById('cat-prod-modal').style.display = 'block';
+  }
+
+  function catSaveProduct() {
+    var idx = parseInt(document.getElementById('cat-modal-idx').value);
+    var desc = document.getElementById('cat-modal-desc').value.trim();
+    var disabled = document.getElementById('cat-modal-disabled').checked;
+    var ops = [];
+    // Save description
+    ops.push(
+      fetch(SUPA_URL + '/rest/v1/gcc_boutique_config?type=eq.product_desc&product_idx=eq.' + idx, {
+        method: 'DELETE', headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+      }).then(function() {
+        if (!desc) return;
+        return fetch(SUPA_URL + '/rest/v1/gcc_boutique_config', {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ type: 'product_desc', product_idx: idx, value: desc, updated_at: new Date().toISOString() })
+        });
+      })
+    );
+    // Save disabled status
+    ops.push(
+      fetch(SUPA_URL + '/rest/v1/gcc_boutique_config?type=eq.product_disabled&product_idx=eq.' + idx, {
+        method: 'DELETE', headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+      }).then(function() {
+        if (!disabled) return;
+        return fetch(SUPA_URL + '/rest/v1/gcc_boutique_config', {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ type: 'product_disabled', product_idx: idx, disabled: true, updated_at: new Date().toISOString() })
+        });
+      })
+    );
+    Promise.all(ops).then(function() {
+      _catConfig['prod_' + idx + '_desc'] = desc;
+      _catConfig['prod_' + idx + '_disabled'] = disabled;
+      document.getElementById('cat-prod-modal').style.display = 'none';
+      showToast('✅', 'Produit mis à jour !');
+      catFilterProducts();
+    }).catch(function(e) { showToast('⚠️', 'Erreur sauvegarde'); });
+  }
+
   // ─── FIN ADMIN BOUTIQUE ─────────────────────────────────────────────────────
 
   // ─── BOUTIQUE ──────────────────────────────────────────────────────────────
@@ -4867,56 +5161,143 @@ function doUpdate(){
     boutFiltre();
   }
 
+  var _boutCfg = null;  // cache de la config boutique chargée depuis Supabase
+
+  function boutLoadConfig(cb) {
+    if (_boutCfg !== null) { cb(); return; }
+    fetch(SUPA_URL + '/rest/v1/gcc_boutique_config?select=*', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows) {
+      _boutCfg = {};
+      (rows||[]).forEach(function(r) {
+        if (r.type === 'brand_photo' && r.brand_idx !== null) _boutCfg['brand_' + r.brand_idx] = r.value;
+        if (r.type === 'product_desc' && r.product_idx !== null) _boutCfg['prod_' + r.product_idx + '_desc'] = r.value;
+        if (r.type === 'product_disabled' && r.product_idx !== null) _boutCfg['prod_' + r.product_idx + '_disabled'] = r.disabled;
+      });
+      cb();
+    })
+    .catch(function(){ _boutCfg = {}; cb(); });
+  }
+
   function boutFiltre() {
+    boutLoadConfig(function() { _boutFiltreRender(); });
+  }
+
+  function _boutFiltreRender() {
     var search = (document.getElementById('b-search').value || '').toLowerCase().trim();
     var brandIdx = document.getElementById('b-brand').value;
     var grid = document.getElementById('b-grid');
     var empty = document.getElementById('b-empty');
     grid.innerHTML = '';
     var count = 0;
+
+    // Group products by brand
+    var grouped = {}; // { bi: [ {idx, name, price, desc} ] }
+    var brandOrder = [];
     _BDATA.p.forEach(function(p, idx) {
       var bi = p[0], name = p[1], price = p[2];
       if (brandIdx !== '' && parseInt(brandIdx) !== bi) return;
+      if (_boutCfg && _boutCfg['prod_' + idx + '_disabled']) return;
       var brand = _BDATA.b[bi] || '';
       var fullText = (brand + ' ' + name).toLowerCase();
       if (search && fullText.indexOf(search) === -1) return;
       count++;
-      var qty = _bCart[idx] || 0;
-      var card = document.createElement('div');
-      card.style.cssText = 'background:#fff;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s;';
-      card.onmouseover = function() { this.style.boxShadow='0 6px 24px rgba(0,0,0,.13)'; };
-      card.onmouseout = function() { this.style.boxShadow='0 2px 14px rgba(0,0,0,.07)'; };
-      var bColors = ['#f97316','#8b5cf6','#ec4899','#06b6d4','#10b981','#f59e0b','#3b82f6','#ef4444','#84cc16','#f43f5e'];
+      if (!grouped[bi]) { grouped[bi] = []; brandOrder.push(bi); }
+      grouped[bi].push({ idx: idx, name: name, price: price });
+    });
+
+    var bColors = ['#f97316','#8b5cf6','#ec4899','#06b6d4','#10b981','#f59e0b','#3b82f6','#ef4444','#84cc16','#f43f5e'];
+
+    brandOrder.forEach(function(bi) {
+      var brand = _BDATA.b[bi] || '';
       var bc = bColors[bi % bColors.length];
       var initials = brand.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
-      var imgHtml;
-      if (typeof _BIMGS !== 'undefined' && _BIMGS[bi]) {
-        imgHtml = '<div style="height:110px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + bc + '10,' + bc + '20);overflow:hidden;">' +
-          '<img src="' + _BIMGS[bi] + '" style="width:100px;height:100px;object-fit:cover;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);" loading="lazy">' +
-          '</div>';
+      var customPhoto = _boutCfg && _boutCfg['brand_' + bi];
+      var products = grouped[bi];
+
+      // Brand section header
+      var section = document.createElement('div');
+      section.style.cssText = 'margin-bottom:28px;';
+
+      // Build brand logo for header
+      var logoHtml;
+      if (customPhoto) {
+        logoHtml = '<img src="' + customPhoto + '" style="width:40px;height:40px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">';
+      } else if (typeof _BIMGS !== 'undefined' && _BIMGS[bi]) {
+        logoHtml = '<img src="' + _BIMGS[bi] + '" style="width:40px;height:40px;object-fit:cover;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.12);">';
       } else {
-        imgHtml = '<div style="background:linear-gradient(135deg,' + bc + '18,' + bc + '30);height:110px;display:flex;align-items:center;justify-content:center;position:relative;">' +
-          '<div style="width:72px;height:72px;border-radius:14px;background:#fff;box-shadow:0 4px 16px ' + bc + '44;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">' +
-            '<div style="font-size:1.3rem;font-weight:900;color:' + bc + ';font-family:\'Barlow\',sans-serif;letter-spacing:-1px;">' + initials + '</div>' +
-            '<div style="width:28px;height:3px;background:' + bc + ';border-radius:2px;opacity:.5;"></div>' +
-          '</div>' +
-        '</div>';
+        logoHtml = '<div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,' + bc + '30,' + bc + '60);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:' + bc + ';font-family:\'Barlow\',sans-serif;">' + initials + '</div>';
       }
-      card.innerHTML = imgHtml +
-        '<div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">' +
-          '<div style="font-size:.7rem;color:var(--orange);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">' + boutEsc(brand) + '</div>' +
-          '<div style="font-size:.88rem;font-weight:700;color:var(--navy);flex:1;line-height:1.4;margin-bottom:10px;">' + boutEsc(name) + '</div>' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
-            '<span style="font-size:1rem;font-weight:900;color:var(--orange);">₱' + price + '</span>' +
-            '<div style="display:flex;align-items:center;gap:6px;" id="bqc-' + idx + '">' + boutQtyHTML(idx, qty) + '</div>' +
-          '</div>' +
-        '</div>';
-      grid.appendChild(card);
+
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;gap:12px;padding:14px 18px;background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;margin-bottom:14px;border-left:4px solid ' + bc + ';user-select:none;';
+      header.innerHTML = logoHtml +
+        '<div style="flex:1;">' +
+          '<div style="font-size:.95rem;font-weight:800;color:var(--navy);">' + boutEsc(brand) + '</div>' +
+          '<div style="font-size:.75rem;color:#888;">' + products.length + ' produit' + (products.length>1?'s':'') + '</div>' +
+        '</div>' +
+        '<div style="font-size:1.1rem;color:#aaa;transition:transform .2s;" class="b-chev">▾</div>';
+
+      var cardsDiv = document.createElement('div');
+      cardsDiv.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;';
+
+      // Toggle collapse
+      header.addEventListener('click', function() {
+        var open = cardsDiv.style.display !== 'none';
+        cardsDiv.style.display = open ? 'none' : 'grid';
+        header.querySelector('.b-chev').style.transform = open ? 'rotate(-90deg)' : '';
+      });
+
+      // Product cards inside the brand group
+      products.forEach(function(prod) {
+        var idx = prod.idx, name = prod.name, price = prod.price;
+        var qty = _bCart[idx] || 0;
+        var prodDesc = _boutCfg && _boutCfg['prod_' + idx + '_desc'] || '';
+        var card = document.createElement('div');
+        card.style.cssText = 'background:#fff;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s;';
+        card.onmouseover = function() { this.style.boxShadow='0 6px 24px rgba(0,0,0,.13)'; };
+        card.onmouseout = function() { this.style.boxShadow='0 2px 14px rgba(0,0,0,.07)'; };
+
+        var imgHtml;
+        if (customPhoto) {
+          imgHtml = '<div style="height:110px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + bc + '10,' + bc + '20);overflow:hidden;">' +
+            '<img src="' + customPhoto + '" style="width:100px;height:100px;object-fit:cover;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);" loading="lazy">' +
+            '</div>';
+        } else if (typeof _BIMGS !== 'undefined' && _BIMGS[bi]) {
+          imgHtml = '<div style="height:110px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,' + bc + '10,' + bc + '20);overflow:hidden;">' +
+            '<img src="' + _BIMGS[bi] + '" style="width:100px;height:100px;object-fit:cover;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);" loading="lazy">' +
+            '</div>';
+        } else {
+          imgHtml = '<div style="background:linear-gradient(135deg,' + bc + '18,' + bc + '30);height:110px;display:flex;align-items:center;justify-content:center;position:relative;">' +
+            '<div style="width:72px;height:72px;border-radius:14px;background:#fff;box-shadow:0 4px 16px ' + bc + '44;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">' +
+              '<div style="font-size:1.3rem;font-weight:900;color:' + bc + ';font-family:\'Barlow\',sans-serif;letter-spacing:-1px;">' + initials + '</div>' +
+              '<div style="width:28px;height:3px;background:' + bc + ';border-radius:2px;opacity:.5;"></div>' +
+            '</div>' +
+          '</div>';
+        }
+
+        card.innerHTML = imgHtml +
+          '<div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">' +
+            '<div style="font-size:.88rem;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:' + (prodDesc?'4px':'10px') + ';">' + boutEsc(name) + '</div>' +
+            (prodDesc ? '<div style="font-size:.73rem;color:#888;font-style:italic;margin-bottom:10px;line-height:1.3;">' + boutEsc(prodDesc) + '</div>' : '') +
+            '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+              '<span style="font-size:1rem;font-weight:900;color:var(--orange);">₱' + price + '</span>' +
+              '<div style="display:flex;align-items:center;gap:6px;" id="bqc-' + idx + '">' + boutQtyHTML(idx, qty) + '</div>' +
+            '</div>' +
+          '</div>';
+        cardsDiv.appendChild(card);
+      });
+
+      section.appendChild(header);
+      section.appendChild(cardsDiv);
+      grid.appendChild(section);
     });
+
     document.getElementById('b-count').textContent = count + ' produit' + (count > 1 ? 's' : '');
     empty.style.display = count === 0 ? 'block' : 'none';
   }
-
   function boutQtyHTML(idx, qty) {
     if (qty === 0) {
       return '<button onclick="boutAdd(' + idx + ')" style="background:var(--orange);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;">+ Ajouter</button>';
