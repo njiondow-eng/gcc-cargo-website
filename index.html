@@ -1419,6 +1419,7 @@ function doAdminLogin() {
     if (page === 'parametres') { loadTarifs(); loadPayConfig(); _buildDestTarifGrid(); loadDestTarifs(); }
     if (page === 'flyers') { loadFlyersAdmin(); }
     if (page === 'boutique-orders') { admBoutLoad(); }
+    if (page === 'boutique-catalog') { boutEnsureInit(); }
   }
   function admNav(page, el) { showAdmTab(page, el); }
 
@@ -4824,13 +4825,15 @@ function doUpdate(){
     // Populate brand dropdown
     var sel = document.getElementById('b-brand');
     if (!sel) return;
-    _BDATA.b.forEach(function(br, i) {
-      var opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = br;
-      sel.appendChild(opt);
-    });
-    boutFiltre();
+    if (sel.options.length <= 1) { // Only add if not already populated
+      _BDATA.b.forEach(function(br, i) {
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = br;
+        sel.appendChild(opt);
+      });
+    }
+    // NE PAS appeler boutFiltre() ici — seulement quand l'onglet est visible
     // Responsive: stack on mobile
     var layout = document.getElementById('boutique-layout');
     function chkWidth() {
@@ -4840,6 +4843,15 @@ function doUpdate(){
     }
     chkWidth();
     window.addEventListener('resize', chkWidth);
+  }
+
+  var _boutInitDone = false;
+  function boutEnsureInit() {
+    if (!_boutInitDone) {
+      _boutInitDone = true;
+      boutInit();
+    }
+    boutFiltre();
   }
 
   function boutFiltre() {
@@ -4861,8 +4873,16 @@ function doUpdate(){
       card.style.cssText = 'background:#fff;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s;';
       card.onmouseover = function() { this.style.boxShadow='0 6px 24px rgba(0,0,0,.13)'; };
       card.onmouseout = function() { this.style.boxShadow='0 2px 14px rgba(0,0,0,.07)'; };
+      var bColors = ['#f97316','#8b5cf6','#ec4899','#06b6d4','#10b981','#f59e0b','#3b82f6','#ef4444','#84cc16','#f43f5e'];
+      var bc = bColors[bi % bColors.length];
+      var initials = brand.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       card.innerHTML =
-        '<div style="background:linear-gradient(135deg,#f8f4ff,#e8f4ff);height:110px;display:flex;align-items:center;justify-content:center;font-size:3rem;">🧴</div>' +
+        '<div style="background:linear-gradient(135deg,' + bc + '18,' + bc + '30);height:110px;display:flex;align-items:center;justify-content:center;position:relative;">' +
+          '<div style="width:72px;height:72px;border-radius:14px;background:#fff;box-shadow:0 4px 16px ' + bc + '44;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;">' +
+            '<div style="font-size:1.3rem;font-weight:900;color:' + bc + ';font-family:\'Barlow\',sans-serif;letter-spacing:-1px;">' + initials + '</div>' +
+            '<div style="width:28px;height:3px;background:' + bc + ';border-radius:2px;opacity:.5;"></div>' +
+          '</div>' +
+        '</div>' +
         '<div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">' +
           '<div style="font-size:.7rem;color:var(--orange);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">' + boutEsc(brand) + '</div>' +
           '<div style="font-size:.88rem;font-weight:700;color:var(--navy);flex:1;line-height:1.4;margin-bottom:10px;">' + boutEsc(name) + '</div>' +
@@ -4960,7 +4980,7 @@ function doUpdate(){
 
   function boutClearCart() {
     _bCart = {};
-    boutFiltre();
+    if (_boutInitDone) boutFiltre();
     boutUpdateCart();
   }
 
@@ -5070,7 +5090,7 @@ function doUpdate(){
       // Success
       boutCloseForm();
       _bCart = {};
-      boutFiltre();
+      if (_boutInitDone) boutFiltre();
       boutUpdateCart();
       showToast('✅', 'Commande envoyée ! Ref: ' + ref + '. Nous vous contacterons sous 24h.');
     })
@@ -5084,7 +5104,15 @@ function doUpdate(){
   }
 
   // Init boutique on DOM ready
-  document.addEventListener('DOMContentLoaded', boutInit);
+  // boutInit est appelé uniquement quand l'utilisateur navigue vers #boutique
+  document.addEventListener('DOMContentLoaded', function() {
+    // Déclencher boutEnsureInit au clic sur n'importe quel lien #boutique
+    document.querySelectorAll('a[href="#boutique"]').forEach(function(a) {
+      a.addEventListener('click', function() {
+        setTimeout(boutEnsureInit, 50);
+      });
+    });
+  });
   // ─── FIN BOUTIQUE ──────────────────────────────────────────────────────────
 </script>
 
