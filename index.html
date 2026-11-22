@@ -1418,6 +1418,7 @@ function doAdminLogin() {
     if (page === 'notifs') refreshNotifs();
     if (page === 'parametres') { loadTarifs(); loadPayConfig(); _buildDestTarifGrid(); loadDestTarifs(); }
     if (page === 'flyers') { loadFlyersAdmin(); }
+    if (page === 'boutique-orders') { admBoutLoad(); }
   }
   function admNav(page, el) { showAdmTab(page, el); }
 
@@ -3013,6 +3014,7 @@ function doLogout() {
     <li><a href="#services" data-fr="Services" data-en="Services" data-tl="Mga Serbisyo">Services</a></li>
     <li><a href="#envoyer" data-fr="Envoyer" data-en="Ship" data-tl="Magpadala">Envoyer</a></li>
     <li><a href="#tracking" data-fr="Tracking" data-en="Tracking" data-tl="Subaybayan">Tracking</a></li>
+    <li><a href="#boutique" data-fr="Boutique" data-en="Shop" data-tl="Tindahan">Boutique</a></li>
     <li><a href="#parrainage" data-fr="Parrainage" data-en="Referral" data-tl="Referral">Parrainage</a></li>
     <li><a href="#contact" data-fr="Contact" data-en="Contact" data-tl="Makipag-ugnayan">Contact</a></li>
   </ul>
@@ -3029,6 +3031,7 @@ function doLogout() {
     <li><a href="#destinations" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🌍 Destinations</a></li>
     <li><a href="#services" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">📦 Services</a></li>
     <li><a href="#tracking" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🔍 Tracking</a></li>
+    <li><a href="#boutique" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--orange);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🛒 Boutique</a></li>
     <li><a href="#parrainage" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">🤝 Parrainage</a></li>
     <li><a href="#contact" onclick="closeMobileMenu()" style="display:flex;align-items:center;gap:10px;padding:15px 0;color:var(--ice);font-weight:700;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow',sans-serif;">📞 Contact</a></li>
   </ul>
@@ -3476,6 +3479,118 @@ function doLogout() {
   </div>
 </section>
 
+<!-- ░░ BOUTIQUE ░░ -->
+<section id="boutique" style="background:linear-gradient(180deg,#f4f6fb 0%,#fff 100%);padding:60px 0 80px;">
+  <div style="max-width:1200px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px));">
+    <div style="text-align:center;margin-bottom:48px;">
+      <span style="background:var(--orange);color:#fff;font-size:.75rem;font-weight:800;letter-spacing:2px;padding:6px 18px;border-radius:20px;text-transform:uppercase;">🛒 Boutique</span>
+      <h2 style="font-family:'Barlow',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:var(--navy);margin:16px 0 12px;">Commandez &amp; Faites Livrer</h2>
+      <p style="color:var(--slate);font-size:1rem;max-width:600px;margin:0 auto;">Sélectionnez vos produits beauty &amp; skin care, passez votre commande — on s'occupe du reste jusqu'à votre porte.</p>
+    </div>
+    <div id="boutique-layout" style="display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start;">
+      <div>
+        <div style="background:#fff;border-radius:16px;padding:16px 20px;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <input id="b-search" type="text" placeholder="🔍 Rechercher…" oninput="boutFiltre()" style="flex:1;min-width:160px;padding:10px 14px;border:2px solid #e8eaf0;border-radius:10px;font-size:.9rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
+          <select id="b-brand" onchange="boutFiltre()" style="flex:1;min-width:160px;padding:10px 12px;border:2px solid #e8eaf0;border-radius:10px;font-size:.9rem;font-family:'Barlow',sans-serif;outline:none;cursor:pointer;">
+            <option value="">Toutes les marques</option>
+          </select>
+          <span id="b-count" style="font-size:.82rem;color:var(--slate);font-weight:600;white-space:nowrap;"></span>
+        </div>
+        <div id="b-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
+        <div id="b-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--slate);">
+          <div style="font-size:3rem;margin-bottom:12px;">🔍</div>
+          <p style="font-weight:600;">Aucun produit trouvé</p>
+        </div>
+      </div>
+      <div id="b-cart-col" style="position:sticky;top:80px;">
+        <div style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden;">
+          <div style="background:var(--navy);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="color:#fff;font-family:'Barlow',sans-serif;font-weight:800;font-size:1rem;margin:0;">🛒 Mon Panier</h3>
+            <span id="b-cart-count" style="background:var(--orange);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;">0</span>
+          </div>
+          <div id="b-cart-items" style="padding:14px 18px;max-height:300px;overflow-y:auto;">
+            <div id="b-cart-empty" style="text-align:center;padding:28px 10px;color:var(--slate);">
+              <div style="font-size:2rem;margin-bottom:8px;">🛍️</div>
+              <p style="font-size:.88rem;">Votre panier est vide</p>
+            </div>
+          </div>
+          <div id="b-cart-footer" style="display:none;padding:14px 18px;border-top:2px solid #f0f2f5;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+              <span style="font-weight:700;color:var(--navy);">Total :</span>
+              <span id="b-total" style="font-size:1.2rem;font-weight:900;color:var(--orange);">₱0</span>
+            </div>
+            <button onclick="boutOpenForm()" style="width:100%;background:var(--orange);color:#fff;border:none;padding:13px;border-radius:10px;font-size:.95rem;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif;">✅ Commander</button>
+            <button onclick="boutClearCart()" style="width:100%;background:transparent;color:var(--slate);border:1px solid #dde;padding:9px;border-radius:10px;font-size:.82rem;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:7px;">🗑️ Vider</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal commande boutique -->
+<div id="b-order-modal" style="display:none;position:fixed;inset:0;background:rgba(10,20,45,.65);z-index:9000;overflow-y:auto;padding:20px;box-sizing:border-box;">
+  <div style="max-width:580px;margin:40px auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="background:var(--navy);padding:20px 26px;display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="color:#fff;font-family:'Barlow',sans-serif;font-weight:900;font-size:1.1rem;margin:0;">🧾 Votre Commande</h3>
+      <button onclick="boutCloseForm()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:24px;">
+      <div id="b-order-recap" style="background:#f8f9fb;border-radius:12px;padding:14px 18px;margin-bottom:22px;">
+        <h4 style="font-family:'Barlow',sans-serif;font-weight:800;color:var(--navy);margin:0 0 10px;font-size:.95rem;">Récapitulatif</h4>
+        <div id="b-recap-list" style="font-size:.88rem;line-height:1.9;color:#444;"></div>
+        <div style="border-top:2px solid #e0e3ea;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;">
+          <span style="font-weight:700;color:var(--navy);">Total :</span>
+          <span id="b-recap-total" style="font-size:1.1rem;font-weight:900;color:var(--orange);"></span>
+        </div>
+      </div>
+      <form id="b-order-form" onsubmit="boutSubmitOrder(event)">
+        <div style="display:grid;gap:14px;">
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">👤 Destinataire *</label>
+            <input id="b-destinataire" type="text" required placeholder="Prénom Nom" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
+          </div>
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">📱 Téléphone / WhatsApp *</label>
+            <input id="b-phone" type="tel" required placeholder="+33 6 12 34 56 78" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
+          </div>
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">🌍 Pays de livraison *</label>
+            <select id="b-country" required style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;cursor:pointer;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
+              <option value="">Sélectionnez un pays…</option>
+              <option>🇫🇷 France</option><option>🇧🇪 Belgique</option><option>🇨🇭 Suisse</option><option>🇱🇺 Luxembourg</option><option>🇨🇦 Canada</option><option>🇺🇸 États-Unis</option><option>🇬🇧 Royaume-Uni</option><option>🇩🇪 Allemagne</option><option>🇪🇸 Espagne</option><option>🇮🇹 Italie</option><option>🇳🇱 Pays-Bas</option><option>🇦🇺 Australie</option><option>🇯🇵 Japon</option><option>🇰🇷 Corée du Sud</option><option>🇦🇪 Émirats Arabes Unis</option><option>🇸🇦 Arabie Saoudite</option><option>🇶🇦 Qatar</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">📍 Adresse complète *</label>
+            <textarea id="b-address" required placeholder="Numéro, Rue, Code postal, Ville" rows="2" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;resize:vertical;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'"></textarea>
+          </div>
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:8px;">💳 Mode de paiement *</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div id="b-pay-gcash" onclick="boutSelectPay('GCash')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+                <div style="font-size:1.4rem;margin-bottom:4px;">💙</div>
+                <div style="font-weight:700;font-size:.88rem;color:var(--navy);">GCash</div>
+              </div>
+              <div id="b-pay-bank" onclick="boutSelectPay('Virement bancaire')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+                <div style="font-size:1.4rem;margin-bottom:4px;">🏦</div>
+                <div style="font-weight:700;font-size:.88rem;color:var(--navy);">Virement bancaire</div>
+              </div>
+            </div>
+            <input type="hidden" id="b-paiement">
+          </div>
+          <div>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">💬 Notes (optionnel)</label>
+            <textarea id="b-notes" placeholder="Instructions spéciales…" rows="2" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;resize:vertical;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'"></textarea>
+          </div>
+        </div>
+        <div id="b-order-error" style="display:none;background:#fff0f0;border:1px solid #ffcccc;border-radius:10px;padding:11px 15px;margin-top:14px;color:#c00;font-size:.88rem;"></div>
+        <button type="submit" id="b-submit-btn" style="width:100%;background:var(--orange);color:#fff;border:none;padding:15px;border-radius:12px;font-size:1rem;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:18px;">🚀 Envoyer ma commande</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ░░ PARRAINAGE ░░ -->
 <section class="referral" id="parrainage">
   <div class="ref-visual">
@@ -3606,6 +3721,7 @@ function doLogout() {
     <div class="adm-tab" onclick="showAdmTab('parrainage',this)">&#129309; Parrainage</div>
     <div class="adm-tab" onclick="showAdmTab('notifs',this)">&#128276; Notifications</div>
     <div class="adm-tab" onclick="showAdmTab('flyers',this)">&#128444; Flyers</div>
+    <div class="adm-tab" onclick="showAdmTab('boutique-orders',this)">&#128722; Boutique</div>
     <div class="adm-tab" onclick="showAdmTab('parametres',this)">&#9881; Paramètres</div>
   </div>
   <main class="admin-main">
@@ -4023,6 +4139,51 @@ function doLogout() {
               <div style="font-weight:700;color:var(--navy);margin-bottom:4px;">Comment ça marche</div>
               <div style="font-size:.85rem;color:var(--slate);">Uploadez 1 ou 2 flyers. Ils s'affichent automatiquement en popup dès qu'un visiteur arrive sur le site. Si vous supprimez un flyer, il disparaît immédiatement du popup.</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: BOUTIQUE ORDERS -->
+      <div class="adm-page" id="adm-boutique-orders" style="display:none;">
+        <div class="adm-page-title">🛒 Commandes Boutique</div>
+        <div class="adm-page-sub">Commandes reçues via la boutique en ligne</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <select id="adm-bout-filter" onchange="admBoutLoad()" style="padding:9px 14px;border:2px solid #e8eaf0;border-radius:10px;font-size:.88rem;font-family:'Barlow',sans-serif;outline:none;">
+            <option value="">Tous les statuts</option>
+            <option value="boutique_nouvelle">Nouvelles</option>
+            <option value="boutique_en_cours">En cours</option>
+            <option value="boutique_livree">Livrées</option>
+          </select>
+          <button onclick="admBoutLoad()" style="background:var(--navy);color:#fff;border:none;padding:9px 20px;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;">🔄 Actualiser</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="adm-tbl" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f4f6fb;">
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Référence</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Date</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Destinataire</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Pays</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Articles</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Total</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Paiement</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Statut</th>
+                <th style="padding:11px 14px;text-align:left;font-size:.8rem;color:var(--slate);font-weight:700;border-bottom:2px solid #e8eaf0;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adm-bout-tbody">
+              <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Detail modal -->
+        <div id="adm-bout-detail" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:5000;padding:20px;overflow-y:auto;">
+          <div style="max-width:580px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+            <div style="background:var(--navy);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+              <h3 style="color:#fff;font-family:'Barlow',sans-serif;font-weight:900;font-size:1rem;margin:0;">📦 Détail Commande</h3>
+              <button onclick="document.getElementById('adm-bout-detail').style.display='none'" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;">✕</button>
+            </div>
+            <div id="adm-bout-detail-content" style="padding:22px;"></div>
           </div>
         </div>
       </div>
@@ -4544,6 +4705,387 @@ function doUpdate(){
       });
     }
   });
+
+  // ─── ADMIN BOUTIQUE ────────────────────────────────────────────────────────
+  function admBoutLoad() {
+    var filter = document.getElementById('adm-bout-filter') ? document.getElementById('adm-bout-filter').value : '';
+    var tbody = document.getElementById('adm-bout-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);">Chargement…</td></tr>';
+    var url = SUPA_URL + '/rest/v1/gcc_demandes?statut=like.boutique_*&order=created_at.desc&limit=100';
+    if (filter) url = SUPA_URL + '/rest/v1/gcc_demandes?statut=eq.' + filter + '&order=created_at.desc&limit=100';
+    fetch(url, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows) {
+      if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);">Aucune commande boutique</td></tr>';
+        return;
+      }
+      var html = '';
+      rows.forEach(function(row) {
+        var d = row.data || {};
+        var articles = d.articles || [];
+        var nbArticles = articles.reduce(function(s,a){ return s + (a.qty||1); }, 0);
+        var total = d.total || 0;
+        var date = row.created_at ? new Date(row.created_at).toLocaleDateString('fr-FR') : '—';
+        var statutColor = { 'boutique_nouvelle': '#f97316', 'boutique_en_cours': '#3b82f6', 'boutique_livree': '#22c55e' };
+        var sc = statutColor[row.statut] || '#888';
+        var statutLabel = { 'boutique_nouvelle': 'Nouvelle', 'boutique_en_cours': 'En cours', 'boutique_livree': 'Livrée' };
+        var sl = statutLabel[row.statut] || row.statut;
+        html += '<tr style="border-bottom:1px solid #f0f2f5;">' +
+          '<td style="padding:10px 14px;font-size:.82rem;font-weight:700;color:var(--navy);">' + (row.ref || '—') + '</td>' +
+          '<td style="padding:10px 14px;font-size:.82rem;color:var(--slate);">' + date + '</td>' +
+          '<td style="padding:10px 14px;font-size:.88rem;font-weight:600;">' + (d.destinataire || row.expediteur || '—') + '</td>' +
+          '<td style="padding:10px 14px;font-size:.82rem;">' + (d.pays || row.destination || '—') + '</td>' +
+          '<td style="padding:10px 14px;font-size:.82rem;text-align:center;">' + nbArticles + '</td>' +
+          '<td style="padding:10px 14px;font-size:.88rem;font-weight:800;color:var(--orange);">₱' + (total).toLocaleString() + '</td>' +
+          '<td style="padding:10px 14px;font-size:.82rem;">' + (d.paiement || '—') + '</td>' +
+          '<td style="padding:10px 14px;"><span style="background:' + sc + '22;color:' + sc + ';border-radius:6px;padding:3px 10px;font-size:.75rem;font-weight:700;">' + sl + '</span></td>' +
+          '<td style="padding:10px 14px;"><div style="display:flex;gap:6px;">' +
+            '<button onclick="admBoutDetail(\'' + row.id + '\')" style="background:var(--navy);color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:.75rem;cursor:pointer;">👁 Voir</button>' +
+            '<select onchange="admBoutStatus(\'' + row.id + '\',this.value,this)" style="padding:5px 8px;border:1px solid #dde;border-radius:6px;font-size:.75rem;cursor:pointer;">' +
+              '<option value="">Statut…</option>' +
+              '<option value="boutique_nouvelle">Nouvelle</option>' +
+              '<option value="boutique_en_cours">En cours</option>' +
+              '<option value="boutique_livree">Livrée</option>' +
+            '</select>' +
+          '</div></td>' +
+        '</tr>';
+      });
+      tbody.innerHTML = html;
+    })
+    .catch(function(err) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#c00;">Erreur de chargement</td></tr>';
+    });
+  }
+
+  function admBoutDetail(id) {
+    var modal = document.getElementById('adm-bout-detail');
+    var content = document.getElementById('adm-bout-detail-content');
+    if (!modal || !content) return;
+    content.innerHTML = '<p style="text-align:center;color:var(--slate);">Chargement…</p>';
+    modal.style.display = 'block';
+    fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + id, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(rows) {
+      if (!rows || rows.length === 0) { content.innerHTML = '<p>Introuvable</p>'; return; }
+      var row = rows[0], d = row.data || {};
+      var articles = d.articles || [];
+      var artHtml = articles.map(function(a) {
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f2f5;">' +
+          '<span>' + a.brand + ' — ' + a.name + ' × ' + a.qty + '</span>' +
+          '<span style="font-weight:700;">₱' + (a.subtotal||a.price*a.qty).toLocaleString() + '</span>' +
+          '</div>';
+      }).join('');
+      content.innerHTML =
+        '<div style="display:grid;gap:10px;font-size:.9rem;">' +
+          '<div><strong>Référence :</strong> ' + (row.ref||'—') + '</div>' +
+          '<div><strong>Destinataire :</strong> ' + (d.destinataire||'—') + '</div>' +
+          '<div><strong>Téléphone :</strong> ' + (d.telephone||'—') + '</div>' +
+          '<div><strong>Pays :</strong> ' + (d.pays||'—') + '</div>' +
+          '<div><strong>Adresse :</strong> ' + (d.adresse||'—') + '</div>' +
+          '<div><strong>Paiement :</strong> ' + (d.paiement||'—') + '</div>' +
+          '<div><strong>Notes :</strong> ' + (d.notes||'—') + '</div>' +
+          '<div style="margin-top:10px;"><strong>Articles :</strong></div>' +
+          artHtml +
+          '<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:1rem;font-weight:900;color:var(--orange);">' +
+            '<span>TOTAL</span><span>₱' + (d.total||0).toLocaleString() + '</span>' +
+          '</div>' +
+        '</div>';
+    });
+  }
+
+  function admBoutStatus(id, newStatus, sel) {
+    if (!newStatus) return;
+    fetch(SUPA_URL + '/rest/v1/gcc_demandes?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ statut: newStatus })
+    })
+    .then(function(r) {
+      if (r.ok) { showToast('✅','Statut mis à jour'); admBoutLoad(); }
+      else showToast('⚠️','Erreur mise à jour');
+    });
+    if (sel) sel.value = '';
+  }
+
+  // ─── FIN ADMIN BOUTIQUE ─────────────────────────────────────────────────────
+
+  // ─── BOUTIQUE ──────────────────────────────────────────────────────────────
+  var _BDATA = {"b":["A Bonne","Adorn","Aishi","Ar Niacinamide","Assorted Products","Barefaced","Beauche","Beauty & Graces","Beauty Vault","Bella Amore","Belo Essentials","Bikini & Inner","Bmrs","Bonita","Bremod","Brightest","Brilliant","Capadosa","Cc Glam","Cc Glowming","Daily Plus","Dear Face","Dr. Alvin","Dr. Blem","Dr.Meinaier","Fairy Skin","Fitgum","G-Skin Icare","Geisha","Glutalipo","Habibi Skin","Hamisan","Heera Glow","Hello Bloom","Her Choice Ph","Hikari","Honest Glow","Hot Babe","Jrk Dream","Jskin Beauty","K Beauty","Keisha","Kerabond","Kojiesan","Kserene","Lumei","Luna Aura","Luxe Organix","Luxe Organix Alcospray","Luxe Organix Alcospray Berry","Luxe Organix Bronze Off","Luxe Organix Bye Brass","Luxe Skin","Luxe Slim","Luxe Wax","Magara Skin","Manic","Minoxidil Kormesic","Mk Cosmetics & Drinks","Ms. Tsung Essentials","Namiroseus","Negra Ultima","Niacinamide","Og","Ohayo Tyo Ex","Organic Skin","Papafeel","Paragis","Perfect Skin","Prestige","Pure Beauty Collagen","Real Skin","Rosmar","Ryx Skin Sincerity","S And J","Sadoer","Saskin","Scd","Sct Unlimited","Sevendays","Shaha","Shawill","Simplee Supplements","Skin Fantasy","Skin Magical","Skin Perfection","Skin Sensation","Sy Glow","Tea Shell","Transformed Skin","Vaseline Lotion","Venature","Vita Bears","Wellness Whispers","Wonderline","Yanhee","You Glow Babe"],"p":[[0,"Spa Milk Salt 350g",95],[0,"Hokkaido Whitening Lotion 500ml",240],[0,"Collagen Lotion 500ml",240],[0,"Miracle Tomato Lotion 500ml",240],[0,"Snail Yogurt Whitening Lotion",240],[0,"Miracle White C Lotion 500ml",240],[1,"Adorn Rejuvenating Set",242],[1,"Adorn Premium Sunscreen 50g",175],[1,"Adorn Tinted Sunscreen 50g",250],[1,"Adorn Whitening Milky Lotion 500ml",300],[1,"Adorn Chimchigan 70g Soap",36],[1,"Adorn Serum 30ml",160],[1,"Adorn Toner 120ml",184],[2,"Aishi Tokyo Capsule",365],[2,"Aishi Melony",385],[3,"Ar Niacinamide Soap",180],[3,"Ar Niacinamide Underarm Cream",159],[3,"Ar Niacinamide Underarm Roll On",159],[3,"Ar Brightening Cream",199],[3,"Ar Niacinamide",399],[3,"Ar Cleansing Gel",250],[3,"Ar Intensive Moisture",339],[3,"Ar Intensive Relief",469],[5,"Light Tinted 50g Bottle",269],[5,"Dark Tinted 50g Bottle",269],[5,"Light Tinted 20g Pouch",145],[5,"Dark Tinted 20g Pouch",145],[5,"Illuminating Sunscreen Tube",185],[5,"Keep It Matte",269],[8,"Beauty Vault Rejuvenating Set",220],[8,"Beauty Vault Maintenace Set",220],[8,"Hydrating Sunscreen Egg 50g",160],[8,"Tinted Sunblock 50g",205],[8,"Tinted Sunscreen Egg 50g",220],[8,"Rejuvenating Toner 120ml",145],[8,"Maintenance Toner 120ml",145],[8,"Adlaw Sunscreen 175 50g",199],[8,"Rejuvenating",145],[8,"Lumi 60’s Capsule",320],[6,"Beauty Set",400],[6,"Rejuvenating Set",315],[6,"Beauty Bar Soap",40],[6,"Kojic Soap",44],[7,"Pretty Peach",90],[7,"BG Perfume",80],[12,"Empress Feminine Wash",95],[12,"Niacinamide Soap",30],[12,"Milky Hya Soap",30],[12,"Niacinamide Toner",90],[12,"Yuna Glow Cream",160],[9,"Himalayan Soap",129],[9,"Glutaberry Mini Soap",33],[9,"Gutaberry Lotion",237],[9,"Manuka Cream",169],[9,"Sulit Deals Miracle (HIMALAYAN SOAP 50G & MANUKA CREAM 30ML)",185],[9,"Himalayan Shampoo Bottle",238],[9,"Himalayan Shampoo Pouch",224],[10,"Whitening Lotion 200m+100ml Pink",250],[10,"Underarm Whitening Cream 40g B1T1",375],[10,"Sunexpert Whitening Sunscreen SpF50 30ml B1T1",225],[10,"Sunexpert Whitening Sunscreen 50ml",380],[10,"Sunexpert Tinted Sunscreen 50ml B1T1",415],[10,"Sunexpert Tinted Sunscreen 10ml",175],[10,"B1T1 Sunexpert Reef Friendly",50],[10,"Sunexpert Lip Shield SPF50+ 4g",280],[10,"Sunexpert Face cover SPF40 20ml",195],[10,"Sunexpert Dewy Essence Sunscreen SPF50 30ml B1T1",225],[10,"Sunexpert Dewy Essence Sunscreen 50ml B1T1",380],[10,"Sunexpert Body Shield SPF60 100ml",485],[10,"Reef-Friendly Sunscreen 50ml B1T1",415],[10,"Intensive Whitening Face & Neck Cream",270],[10,"Intensive Whitening BB Cream 10ml",69],[10,"Intensive Whitening bar soap 65gx3",125],[10,"Intense White Deodorant Roll-on",157],[10,"Glutathione with Collagen 30capsules",470],[10,"Essentials Intense White Antiperspirant deo spray",280],[10,"Essentials Beauty deo powder 80g",92],[10,"Beauty deo roll-on 40ml B1T1 (pink)B1T1",148],[10,"AHA/BHA skin renewing serum",259],[10,"Acnepro Hydrocolloid pimple patch + free",220],[14,"Bremod Shampoo 400ml",120],[14,"Bremod Conditioner 400ml",120],[14,"Bremod Argan Oil 100ml",110],[14,"Bremod 10in1 Hair Serum 210ml",139],[14,"Bremod Superflex 10ml",50],[14,"Bremod Rebonding Set 1 & 2",320],[14,"Bremod Milky Rebonding Set",320],[14,"Premium Colourant (Set with Oxi) GRAY",120],[14,"Ordinary Colourant (Set with Oxi) GREEN",120],[15,"Brightest Facial Set",160],[15,"Brightest Intensive",130],[16,"Rejuvenating Set",220],[16,"Maintenance Set",250],[16,"Advanced Hydrating Kit",230],[16,"Tomato Set",198],[16,"Rejuvenating Toner 135ml",156],[16,"Rejuvenating Toner 60ml",70],[16,"Whitening Toner 135ml",120],[16,"Aha Toner 100ml",155],[16,"Kojic Soap 135g",69],[16,"Gluta Arbutin Soap 135g",65],[16,"Sunscreen Gel cream 13g",65],[16,"Sunscreen Gel Cream 50g",220],[16,"Tinted Sunscreen 20g",160],[16,"Facial Foam Wash 100ml",220],[16,"Aha Serum 30ml",90],[16,"Deo Spray 60ml",130],[16,"Moisture Booster Jar",220],[16,"Advanced Moisture Pouch",220],[16,"Sunscreen Gel cream 10g",65],[16,"Advanced Sunscreen Gel Cream 50g",220],[16,"Vitamin E Moisturizer",265],[13,"Bonita Himalayan Body Oil",150],[13,"Bonita Sunflower Body Oil",150],[13,"Bonita Himalayan Pink Salt",99],[13,"Bonita Tawas Calamansi Persimmon",99],[13,"Bonita Sunflower Niacinamide Soap",99],[17,"Capadosa Pekas Cream 10g",222],[17,"Capadosa Botox",222],[11,"THIGH SERUM 30ML",219],[11,"Elbow, Knees and Butt Serum 30ml",219],[11,"Nipple Serum 30ml",219],[11,"Scar Removal Serum 30ml",239],[11,"Hair Intensive Serum 30ml",239],[18,"Kojic Foaming Wash",232],[18,"Glass Skin Foaming Wash",232],[18,"Australian Mask",275],[18,"Glass Skin Serum",225],[18,"Glowming Toner",225],[18,"Gluta Bleach Lotion",235],[18,"Whitening & Bleaching Soap",36],[18,"Cc Glam Sunscreen",265],[18,"Glass Skin Set",330],[19,"Milky Matcha",320],[19,"Milky Mango",320],[19,"Pure Collagen",490],[19,"GlutaFlit Capsule",320],[19,"Caffe Latte",320],[19,"Coffe Shape",320],[19,"Berry Glow",320],[19,"Pomegranate",320],[19,"Choco",331],[21,"Beauty Milk Lychee 180g",315],[21,"Beauty Milk Matcha Latte 180g",320],[21,"Beauty Milk Melon 180g",315],[21,"Beauty Milk Strawberry",315],[21,"Beauty Milk Strawberry & Cream 180g",315],[21,"Beauty Milk Banana 180g",315],[21,"Beauty Milk Sweet Mango 180g",315],[21,"Beauty Bean Mocha Coffee 180g",315],[21,"Beauty Bean Choco Mallows 180g",315],[21,"Tinted Tube 50ml",215],[21,"Twin Tinted Sachet 30ml+30ml",215],[21,"Premium Hybrid Tube 50ml",215],[21,"Twin Premium Hybrid Sachet 30ml+30ml",215],[21,"Sunbounce Luminous 50ml",215],[23,"Pekas Cream",125],[23,"Botox Whitening",125],[23,"Pekas Toner",125],[22,"Dr. Alvin Rejuvenating Set Gold",220],[22,"Dr. Alvin Rejumax Mild Strength Set 1",187],[22,"Dr. Alvin Rejumax Regular Strength Set",189],[22,"Dr. Alvin Rejumax Max Strength Set 3",191],[22,"Dr. Alvin Rejumax Set 4",193],[22,"Dr. Alvin Rejuvenating Set 5",195],[22,"Dr. Alvin Maintenance Set",210],[22,"Dr. Alvin Kojic Acid Soap 135g",65],[22,"Dr. Alvin Gluta Papaya Facial Foam Cleanser",230],[22,"Dr. Alvin Rejuvenating Toner 120ml",120],[22,"Dr. Alvin Whitening",200],[24,"Alpha Arbutin Face and Body Serum",170],[24,"AHA Body Serum",90],[20,"Digestive Aid",450],[20,"ShapeXpress",330],[20,"Pearl Skin White Tomato",310],[20,"Collagen",310],[25,"Facial Mild Kit",290],[25,"Premium Brightening Kit",290],[25,"Derma Facial Set",280],[25,"Premium Brightening Sunscreen 50g",205],[25,"Premium Tinted Sunscreen 50g",255],[25,"Sunny Dew Lip Treatment 13ml",245],[26,"Organic Barley Box",130],[26,"Coffee Pouch",160],[26,"Acai Berry",170],[28,"Geisha Intense 3 Bar’s",142],[28,"Geisha Classic 3 Bar’s",142],[28,"Geisha Intense 2 Bar’s",120],[28,"Bar’s 114 Geisha Intense Lightening Lotion",284],[28,"Geisha Toner",180],[28,"Geisha Bikini Serum",240],[28,"Geisha FacSerum",220],[28,"Geisha Hair Serum",284],[28,"Swipe Right Premium Rejuvenating Kit",252],[28,"Golden Dust Glass Skin Soap 135g",173],[28,"Golden Dust Glass Skin Soap Mini Size 60g",35],[28,"Kojic Papaya Honey Oatmeal Soap 150g",129],[28,"Kojic Papaya Honey Oatmeal Soap Mini 60g",34],[28,"G21 Booster Serum 60ml",269],[28,"Vanilla Ice Cream Scrub 300g",206],[28,"Milky Citrus Cream Scrub 300g",206],[28,"Shea Butter Cream",307],[28,"Dear January 2.0",750],[28,"Hydrocolloid Clear Pimple Patch",158],[28,"Hydrocolloid Pink Heart Pimple Patch",147],[29,"Classic Detox Coffee 210g",275],[29,"Juice Drink",275],[29,"Gold Series Fiber",285],[29,"Gold Series Dark 395 Chocolate 250g",290],[29,"Gold Series Red Iced Tea 250g",285],[29,"Gold Series Milky Melon 250g",285],[27,"Botox Keratin Grapes 100ml",120],[27,"Brazilian Blowout Strawberry 100ml",120],[31,"Hamisan Rejuvenating Set",175],[31,"Hamisan Extreme Rejuv Set",180],[31,"Hamisan Hijo 200 Body Peel Soap",250],[31,"Hamisan Trio",195],[31,"Hamisan Big 195",250],[31,"Hamisan Big Toner",115],[31,"Hamisan Day",195],[31,"Hamisan Extreme Sunscreen 50g",159],[30,"Glowing Set",290],[30,"Rejuvenating Set",220],[30,"Babad Soap 210g",140],[30,"Milky Peeling Soap",380],[30,"Whitening Sunscreen 50ml",150],[30,"Brightening Serum 30ml",185],[30,"Instant Whitening Lotion 100g",220],[30,"Lumay Soap 70g",50],[30,"Tinted Sunscreen 50g",155],[30,"Sunmuse Lotion 299 200ml",230],[33,"Grapefruit",265],[33,"Lychee",265],[33,"Lemon Cucumber",265],[33,"Apple Red Ice Tea",265],[33,"Strawberry",265],[33,"House Blend Lemon",265],[32,"Absolve Hydration 20in1 500mg",30],[34,"Intensive Bleaching Bar Soap 120g",103],[34,"Kojic + Papaya Intensive Whitening Soap 120g",103],[34,"Instant Whitening Lotion 250ml",324],[34,"Pekas Remover Cream 50g",284],[34,"Broad Spectrum Sunshield 50g",229],[34,"Premium Tinted Sunscreen 50g",280],[34,"Sunflower Oil",259],[34,"Her Choice Renewal Serum",369],[34,"Her choice Intimate Serum",369],[34,"Her choice Serum Duo",730],[34,"Her choice Centella Set",875],[34,"Her choice Set C",700],[79,"Sevendays Rejuvenating Set",200],[79,"Secret Glow Set",300],[79,"Revita Glow Skin 250 Rescue Set",349],[79,"Sun Defense 50g",130],[79,"Sevendays Power Sun Protect 50g",140],[79,"Sevendays Power Soap 80g",35],[79,"Sevendays Power Exfoliating Toner 100ml",125],[79,"Double Brightening Body Lotion 250ml",215],[79,"Sun Blush Serum",120],[79,"Nekothione Bottle",460],[79,"Nekocee",240],[79,"Ovarsitol",680],[35,"Hikari Rejuvenating Set",170],[35,"Hikari Sunscreen 50ml",140],[35,"Hikari Tinted Sunscreen 50ml",210],[35,"Hikari Toner 120ml",140],[35,"Hikari Aurum 60 capsules",650],[35,"Hikari Miracle Soap (1 pouch = 5pcs)",200],[35,"Hikari Serum",185],[35,"Hikari Pouch Serum",100],[35,"Hikari Kojic Soap",35],[35,"Hikari Aurum 14s’s Pouch",320],[35,"Hikari Tawas Cream",49],[35,"Hikari Sunscreen 10ml",60],[35,"Hikari Tinted Sunscreen 10ml",60],[35,"Hikari Pure Barley",550],[36,"Pink Foam Wash",115],[36,"Daily Sunscreen 50g",155],[36,"24k Gold Papaya Serum 30ml",125],[36,"Glass Skin Serum 30ml",125],[36,"Niacinamide Serum 30ml",145],[36,"Papaya Serum Lotion SPF50 250ml",155],[36,"Aloe Ice Serum Lotion 250ml",155],[36,"Glow 190 Rejuvenating Soap",35],[36,"Tinted Papaya Sunscreen 50g",155],[36,"Glass Skin Soap 80g",30],[36,"Glass Skin Soap 125g",45],[36,"Kojic Papaya Soap 70g",30],[36,"Kojic Papaya Soap Pack",169],[37,"Black Vanilla Chia",265],[37,"Black Barako",265],[37,"Black Macchiato",265],[39,"Jskin Hydra Sunshield",224],[39,"Moisture & Barrier Booster Cream",370],[39,"Hydra Moist Ice Sleeping Mask 300g",168],[39,"Hydra Ice Cube Soap 70g Individual",40],[39,"Hy-Drop Glow Boost Serum 30ml",134],[38,"Lychee Flavor 210g",279],[42,"Kerabond Strong 500ml",180],[42,"Kerabond Mild 500ml",180],[42,"Kerabond Strong 100ml",110],[42,"Kerabond Mild 100ml",110],[42,"Kerabond Hot Oil 60ml",110],[42,"Kerabond Straight Pink 500ml",180],[42,"Kerabond Straight Pink 100ml",120],[41,"Keisha Milky Soap 70g",35],[41,"Keisha Milky Lotion 250ml",190],[41,"Keisha Tawas",110],[40,"Sip N Go Cocoa",302],[40,"Sip N Go Coffee",302],[40,"Sweet Kiss Lip Serum",104],[40,"Cucumber Niacinamide Soap",68],[40,"TaWhite Ua Cream",113],[40,"Sunglow 50ml",150],[43,"Skin Lightening Classic 65gx3 Bars",114],[43,"Skin Lightening Classic 100gx3 Bars",164],[43,"Skin Lightening Classic 65gx2 Bars",75],[44,"Kserene Kilibum Soap",120],[44,"Kserene Ua Cream",150],[44,"Kserene Deo Spray B1T1",294],[45,"Lumei Rosemary Infused Shampoo 255ml",230],[45,"Lumei Rosemary Infused Conditioner 255ml",230],[45,"Lumei Rosemary Infused Serum",230],[45,"Lumei Rosemary Infused",230],[46,"Luna Aura Hope Glow 30caps Classic",189],[46,"Hope Glow Glutathione Super",60],[46,"Hope Glow Glutathione",14],[46,"Hope Glow Skin Pro",30],[46,"Hope C Plus",30],[46,"Hope Glow Light Caps",229],[46,"Hope Glow Crystal Peach Juice Drinks",304],[46,"Hope Glow Cinnamon Juice Drinks",304],[46,"Hope Glow Honey",304],[53,"Caffe Macchiato 8's",285],[53,"Caffe Macchiato Decaf 8's",285],[53,"Avocado 8’s",285],[53,"Dark Chocolate 8's",285],[53,"Four Seasons Juice 8's",285],[53,"Cucumber & Dalandan Juice 8's",285],[53,"Matcha Latte 8's",285],[53,"Caffe Black 8's",285],[53,"Cantaloupe Melon 8's",285],[53,"Lychee 8's",285],[53,"Caffe Macchiato Half Kilo",725],[53,"Caffe Macchiato Decaf Half Kilo",725],[53,"Dark Chocolate Half Kilo",725],[53,"Four Seasons Juice Half Kilo",725],[53,"Cucumber & Dalandan Juice Half Kio",725],[53,"Matcha Latte Half Kilo",725],[53,"Cantaloupe Melon Half Kilo",725],[53,"Blueberry Half Kilo",725],[53,"Dark Choco Jar",725],[53,"Macchiato 1kg 1,",310],[53,"Ls Konjac 80g",46],[53,"Ls Konjac 500g",269],[53,"Ls Konjac 1kg",519],[52,"Beauty Talks",890],[52,"Booster C Lanna",780],[52,"Lanna",780],[52,"Luxe Skin Tinted Sunscreen",475],[52,"Luxe Skin Ecran Cleanser",489],[52,"Luxe Skin Ecran Sunscreen",489],[54,"Luxe Waxx Trial Kit",195],[54,"Luxe Wax Mini Jar 350g",195],[54,"Luxe Wax Mini Kit",185],[54,"Luxe Wax Organic Sugar Wax Big",304],[54,"Luxe Wax Sunflower 209 Oil 50ml",134],[55,"Cuffu Bar Coffee Scrub Soap 60g",59],[55,"Cuffu Buff Smoothing Glass Soap 70g",44],[56,"Manic Like A Day Dream Shampoo 250ml",330],[56,"Cloud Like Conditioner 250m",330],[57,"Minoxidil Shampoo",90],[57,"Minoxidil Conditioner",90],[57,"Minoxidil Massage Cream",70],[57,"Minoxidil Serum",70],[57,"Minoxidil Strand",270],[57,"Kormesic Argan Oil",120],[57,"Kormesic Botox",120],[59,"Rejuvenating Set",151],[59,"Glass Skin Facial",135],[59,"Rejuvenating Toner",115],[59,"Intense Whitening",59],[59,"10x Whitening",159],[59,"Luminous Sunblock",115],[59,"Glow Mist 60ml",121],[59,"Ms. Tsung Tinted",225],[59,"Ms. Tsung Retinol Lotion",165],[58,"MK Cosmetics Mamoru 4+1 Rejuvenating Set",177],[58,"MK Cosmetics 320 Maintenance Set",240],[58,"MK Cosmetics Mamoru Sunscreen SPF60 50g",184],[58,"MK Cosmetics 24K Cosme Gold Serum 30ml",150],[58,"Coffee Jumbo",850],[58,"Coffee 210g",270],[58,"Kape Krema 210g",360],[58,"Kapre Krema Jumbo",850],[58,"Tsokolate 210g",340],[58,"Cuculemon 180g",300],[62,"Niacinamide Tawas Soap Big",79],[62,"Niacinamide Tawas Soap Mini",40],[62,"Niacinamide Tawas Cream",99],[62,"Niacinamide Tawas FormuLove Ua Mist",100],[62,"Niacinamide Tawas Cowjic Soap",159],[60,"Tokyo",295],[60,"Kyoto",295],[60,"Niacinamide Tawas Cream",295],[60,"Hanami",295],[60,"Sakura Milk Tea",295],[61,"Negra Ultima Gluta Papaya Soap 6x70g",170],[64,"Ohayo Tyo Ex Lumine White",60],[65,"Organic Beauty Oil",180],[65,"Organic Skin Intensive Whitening Deodorant",180],[65,"Organic Skin Japan Deodorant for Sensitive",180],[65,"Organic Skin Japan Anti-Perspirant Deodorant",180],[66,"Papafeel Moisturizer",499],[66,"Papafeel 3X Retinol",499],[67,"Paragis Guyabano Tea",799],[67,"Paragis Goose Grass Herbal Tea",358],[67,"Paragis Moringa",468],[67,"Paragis Gold",678],[68,"Rejuvenating Set",150],[68,"Rejuvenating Set 2 Anti Aging and",145],[68,"Whitening Set",145],[68,"Duo Tinted Sunblock 30g",150],[68,"Sunblock Gel Cream SPF45 50g",140],[68,"Gluta Arbutin Whitening Body",200],[69,"Rejuvenating Facial Set",185],[69,"Niacinamide Soap",23],[69,"Glutamansi Lotion",150],[69,"Luxury Lotion",175],[69,"Niacinamide Lotion",140],[70,"Pure Beauty Collagen Powder 1,",599],[71,"Vitashape Mixed Berries",30],[71,"Vitashape Mango 30 capsules",240],[71,"Vitashape Mixed Berries Bottle",430],[71,"Vitashape Mango Bottle",430],[73,"Glow Bomb Set",225],[73,"Radiant Boost",370],[73,"Beyouthiful Power",385],[73,"Sunshield 50ml",210],[73,"Invisible Sunshield",210],[73,"Glow Bar 135g",155],[73,"Glow Bar Mini 70gx5",265],[73,"Beauty Lotion 200ml",560],[73,"Bare Barrier Double Cleanse Duo",330],[73,"Ryx Morning Serum",310],[73,"Ryx Night Serum",310],[73,"Ryx Cleansing",200],[73,"Ryx Shitori Hair",340],[73,"Beloved 1996 Perfume",385],[73,"Ryx Fiber Blend",425],[73,"Ryx Fiber Blend Lemon",325],[72,"Kagayaku Vanilla Tinted Sunscreen",190],[72,"B1T1 Kagayaku Vanilla Tinted Sunscreen",220],[72,"Kagayaku Alpha Arbutin Cream",225],[72,"Kagayaku Alpha Arbutin Whipped",225],[72,"Scrub Kagayaku Alpha Arbutin Whipped",225],[76,"Kili-Kili Fied Deodorant Spray 100ml",86],[76,"Kili-Kili Fied UA Night Cream 10g",86],[76,"Sexy Love Whitening Face and Body Soap 70g",36],[76,"Reset Rejuvenating Set",109],[76,"Saskin Lotion",189],[80,"SHAHA Hakuji Cream",295],[80,"SHAHA Hakuji Soap",249],[80,"SHAHA PureGlow Sunscreen",195],[80,"SHAHA Glow Light Sunscreen",195],[80,"SHAHA Glow Warm Sunscreen",195],[78,"Sunflower Oil 60ml",129],[78,"White Blast Bleaching Soap 70gx10",290],[78,"Sunflower Lotion 250ml",264],[77,"SCD Peeling Big Set",298],[77,"SCD Peeling Small Set",240],[77,"SCD Peeling Lotion Big",178],[77,"SCD Peeling Lotion Small",126],[83,"Rejuvenating Set",160],[83,"Day Cream 50g",120],[84,"Rejuvenating Set 1",190],[84,"Rejuvenating Set 2",190],[84,"Rejuvenating Set 3",190],[85,"Rejuvenating Set",140],[85,"Sunscreen 50ml",150],[86,"Scarminator Cream 50ml",170],[86,"Scarminator Soap 100gx2",190],[86,"Scarminator Glow Lotion 250ml",205],[87,"Glass Skin Set",183],[87,"Rejuvenating Set",233],[87,"10x Ice Cream Lotion",348],[87,"Triple Whitening Hand and Body Lotion 200ml",270],[87,"Sy Glow 24K Rejuv 270 Set",318],[87,"Syglow 24k Lotion",270],[87,"10x Whitening",108],[87,"Fast White Ice Cream Whipped Soap 236g",165],[87,"Sunscreen Gel-Cream 50ml",185],[87,"Syglow 24k Soap",165],[87,"Syglow Snow Gold",270],[81,"Shawill Sakura Pink Lotion",209],[81,"Shawill Niacinamide Blue Lotion",209],[81,"Shawill Niacinamide Collagen Lotion",209],[81,"Shawill Radiance Glow Body Lotion",209],[81,"Shawill Shampoo",230],[81,"Shawill Conditioner",230],[74,"SJ Mild Rejuv Set",295],[74,"SJ Snail White Soap",160],[74,"SJ Claire Bright Set",320],[74,"SJ Glass Skin",320],[74,"SJ Botox Foam",195],[74,"SJ Tinted",200],[74,"SJ Mild",200],[74,"SJ Tangerine Soap",160],[75,"Sadoer Salicylic Acid YG",150],[75,"Sadoer Fullerene BG",150],[75,"Sadoer Astaxanthin",150],[63,"Sadoer Niacinamide PR",150],[63,"Sadoer Serum Red",250],[63,"Sadoer Cream",199],[82,"Simplee Collagen",350],[82,"Simplee Gluta-Gen C",350],[82,"Simplee Apple Cider",350],[82,"Simplee Serpentina",350],[89,"Rejuvenating Set",160],[89,"Maintenance Set",200],[88,"Niacinamide Soap",120],[88,"Niacinamide Serum",185],[88,"Niacinamide Facial Cream",135],[90,"Vaseline Gluta Hya Dewy Radiance",340],[90,"Vaseline Gluta Hya Flawless Bright",340],[90,"Vaseline Gluta Hya Spotless Glow",340],[90,"Vaseline Gluta Hya Pro-Age Store",340],[91,"Venature Lotion",300],[91,"Venature Serum",279],[92,"Chewable Fat Buster",360],[92,"Chewable Skin",360],[92,"Chewable Detox Vitamins",60],[92,"Chewable Sleep Vitamins",60],[92,"Chewable Flawless Glow",60],[94,"Pinky Secret Feminine Wash 150ml",100],[93,"Banana Melon",489],[93,"House Blend Ice Tea",489],[95,"Yanhee Blue",300],[95,"Yanhee Green",300],[96,"Beauty White Rejuv Set",240],[96,"Beauty White Soap",177],[96,"Beauty White Capsules",239],[96,"Beauty Sunscreen Twin",177],[96,"Sheppu Appu Juice",285],[96,"12x Serum B1T1",372],[96,"Sheppu Appu Tropical Punch",372],[4,"Fortima",720],[4,"Myra E",363],[4,"Stresstabs",350],[4,"Joji Astaxanthin",490],[4,"JojI Gluta Collagen",490],[4,"Luxcent Whitening Dietary Supplement 1,",500],[47,"ITEM 5% OFF SRP Aloe Vera Soothing Gel 300ml",208],[47,"Aloe Vera Soothing Gel 109 100ml Sachet",55],[47,"Snail & Aloe Soothing Gel 300ml",227],[47,"Snail & Aloe Soothing Gel Sachet 100ml",113],[47,"Rosewater Soothing Gel 300ml",246],[47,"Rosewater Soothing Gel 100g",122],[47,"Centella Asiatica Soothing Gel 300ml",246],[47,"Cica Soothing Gel 100ml",122],[47,"Papaya-Gluta Whitening Gel",189],[47,"ITEM 5% OFF SRP Papaya-Gluta Whitening Gel 300ml",236],[47,"Hyaluron Soothing Gel 200ml (NEW)",189],[47,"Hyaluron White Double Collagen Hydra-Cooling Moisturizer 50g",331],[47,"Aloe & Snail Moisturizing Cloud Soap 180g",151],[47,"Bentonite Exfoliating Cloud Soap 180g",151],[47,"Niacinamide Brightening Cloud Soap 180g",151],[47,"Niacinamide + Cica Cloud Soap 180g",151],[47,"Niacinamide + Retinol Cloud Soap 180g",151],[47,"Niacinamide + Alpha Arbutin Cloud Soap 3 x 80g",189],[47,"ITEM 5% OFF SRP Papaya + Kojic Acid Cloud Soap 3 x",80],[47,"Niacinamide + Retinol Cloud Soap 3 x",80],[47,"Retinol + Gluta Youthful Radiance Whitening Serum Lotion 350ml B1T1",420],[47,"Niacinamide + Arbutin Healthy Light Whitening Serum Lotion",420],[47,"Milk + Gluta Gentle Bright Whitening Serum Lotion 350ml B1T1",420],[47,"Niacinamide + Arbutin Healthy Light Whitening Serum Infused Body Wash 1000G",331],[47,"ITEM 5% OFF SRP Bakuchiol + Niacinamide Nano Complex Serum Lotion",284],[47,"Kiss My Body Sweetie Perfume Lotion SPF50 PA+++200g",284],[47,"Kiss My Body Love Story Perfume Lotion SPF50 PA+++200g",284],[47,"Kiss My Body Fly Me Away Perfume Lotion SPF50 PA+++200g",284],[47,"Niacinamide + Alpha Arbutin 3x Whitening Velvet Shower Spa Salt Srub 320",141],[47,"Niacinamide + Alpha Arbutin Double Brightening Spa Salt 300g",94],[47,"Niacinamide + Papaya Gluta Velvet Shower Salt Scrub 320g",141],[47,"Niacinamide + Papaya Gluta Velvet Salt Scrub 300g",94],[47,"Niacinamide + Bakuchiol Retinol Velvet Salt Scrub 300g",94],[47,"ITEM 5% OFF SRP Niacinamide + Bakuchiol Retinol Velvet Salt Shower Salt Scrub",141],[47,"Hydrocolloid Acne Spot Patch Night",208],[47,"Hydrocolloid Acne Spot Patch Day",208],[47,"Hydrocolloid Overnight Nose Patch 7's",189],[47,"Hydrocolloid Acne Mood Patch",217],[47,"Derma Pro Salicylic Acid 2% Acne Rescue Serum Antibacterial Body Wash 500ml",284],[47,"Luxe Organix 2 in 1 Acne Solution Mud Powder 9ml",75],[47,"DermaPRO Sulfur Soap 2.5% Acne Rescue 80g",94],[47,"Acne Defense Mugwort Clay Mask 52g",227],[47,"ITEM 5% OFF SRP Dark Fading Spot Niacinamide Clay Mask 52g",227],[47,"Cica Rescue Calming Cleanser 150g",274],[47,"Cica Rescue Calming Toner 150ml",331],[47,"Cica Rescue Calming Serum 30ml",474],[47,"Cica Rescue Gentle Brightening Derma Relief Moisturizer 50g",331],[47,"Cica Rescue Serum Boost Sheet Mask 25ml",65],[47,"Aloe Vera Vitamin Water for face & body",98],[47,"99% Aloe Vera Brightening Micro Foam Cleaner with Vitamin C 120ml",198],[47,"97% Aloe Vera All Day Moisture and Whitening Cream with Vitamin C 50g",236],[47,"ITEM 5% OFF SRP 98% Aloe Vera Natural Soap with Vitamin C and Glutathione 135g",113],[47,"Miracle Solutions PHA Serum 7ml",113],[47,"Miracle Solutions AHA BHA Serum 30ml",474],[47,"Miracle Solutions AHA/BHA Gel Cleanser 150ml",274],[47,"Miracle Solutions AHA/BHA Emulsion 80ml",360],[47,"Miracle Solutions AHA/BHA Pore Toner 150ml",331],[47,"Miracle Solutions AHA/BHA Spot Corrector Light 20g",189],[47,"Miracle Solutions AHA/BHA Soap For Face & Body 135g",141],[47,"Miracle Solutions Acne Derm+ Tencel Sheet Mask",65],[47,"First Cleanse Cleansing Oil P 120ml Pore Clarifying",331],[47,"First Cleanse Blackhead Clearing Cleansing Balm 45g",379],[47,"First Cleanse Dark Spot Fading Cleansing Balm 45g",379],[47,"First Cleanse Cleansing Oil Skin Brightening 120ml",331],[47,"Whitening Repair Ultra Light Glow Micellar Cleansing Beauty Water 300mL",284],[47,"Whitening Repair Cleanser Niacinamide 2% Cleanser 150ml",274],[47,"Niacinamide Vit E Toner 150ml",331],[47,"Whitening Repair Moisturizer 80g",360],[47,"Miracle Repair Niacinamide 4% Serum 30ml",474],[47,"Whitening Repair Niacinamide",10],[47,"Whitening repair Serum Niacinamide",10],[47,"Miracle Repair Luminous Bright Serum 7ml",113],[47,"Whitening Repair Serum Boost Sheet Mask 25ml",65],[47,"ITEM 5% OFF SRP Galactomyces Brightening Vitamin C Cleanser 150ml",274],[47,"Power Glow Serum 30ml",474],[47,"Power Glow Vita Glow C Serum 7ml",113],[47,"Galactomyces Vit C Toner 150ml",331],[47,"Power Glow Bright Revive Vitamin C Drip Moisturizer 50g",331],[47,"Power Glow Serum Boost Sheet Mask 25ml",65],[47,"Retinol + Bakuchiol Overnight Glow Gentle Treatment Cream 30g",303],[47,"Advanced Retinol + Bakuchiol Deep Wrinkle Eye Contour Overnight Cream 12g",284],[47,"Retinol Radiance Serum 30m",521],[47,"ITEM 5% OFF SRP Retinol Radiance Serum Sachet 7ml",122],[47,"Retinol + Bakuchiol Overnight Radiant Glow Botox Lifting Moisturizer 50g",331],[47,"Luxe Organix Aloe Vera Calming Toner 150ml",198],[47,"Vita C20 Booster Serum 30ml",521],[47,"Vita C20 Booster Serum Sachet 7ml",122],[47,"Age Reverse Collagen Glow Serum 7ml",113],[47,"Age Reverse Collagen Glow Serum Boost Tencel Sheet Mask 25ml",65],[47,"DermaPRO Melasma Clear 300 Liquid Microneedle Spicule Bright Serum 30ml",521],[47,"DermaPRO TXA Melasma Clear Exo-10 Exosome Bright Treatment Cream 30g",331],[47,"DermaPRO PDRN + Ceramides Exosome Recovery Barrier Cream Balm",331],[47,"Intensive Whitening Underarm Cream Sachet 9g",94],[47,"Intensive Whitening Milk Cream for Underarms, Knees, Elbows & Inner Thighs",284],[47,"Bright Eyes Eye Cream 80% Galactomyces 15g",189],[47,"Panthenol Therapy 24h Lip Serum Tinted lip Essence Berry Glaze 10g",132],[47,"Panthenol Therapy 24h Lip Serum Tinted lip Essence Cherry Glaze 10g",132],[47,"Panthenol Therapy 24h Lip Serum Tinted lip Essence Honey Glaze 10g",132],[47,"Panthenol Therapy 24H lipscreen Sun Lip Essence SPF90++++ 10g",189],[47,"Soft Lips Lip Mask 15g",170],[47,"Soft Lips Lip Exfoliating Scrub 15g",141],[47,"5in1 UV Pro Whitening Serum Sunscreen SPF",100],[47,"5in1 UV Pro Whitening 2x UVA & UVB Serum Sunscreen SPF 47 PA+++ 10mL",113],[47,"UV Tint Serum Sunscreen SPF 100 PA +++ 40g",360],[47,"ITEM 5% OFF SRP Perfecting UV Tint Serum Sunscreen SPF",50],[47,"Aqua Daily Sunscreen 50ml",331],[47,"Zero Shine Invisible Screen Daily Sun Stick 20g",379],[47,"High Protection Cloud Matte Soft Blurring Mineral Serum Sunscreen 40g",360],[47,"6-in-1 Maxshield Active Ultra Sheer Face & Body Invisible UV Mist 90ml",455],[47,"Femme Naturals Whitening Feminine Wash Cool Bliss Formulated For Daily Use 120ml",133],[47,"Bye Bye Bum Bumps White & Clear Booty Cream 230g",217],[47,"ITEM 5% OFF SRP Bye Bye Bum Bumps Clear & Smooth Booty Scrub 285g",189],[47,"Active Dry Whitening Serum Deo Underarm Revive 50g",160],[47,"Active Dry Whitening Serum Deo Underarm Rescue 50g",160],[47,"Beauty Mist by Anne Clutz 100ml",360],[47,"ITEM 5% OFF SRP Luxe Fragrances Love Luna Perfume Hand Cream 30g",94],[47,"Luxe Fragrances Blushing Bouquet Perfume Hand Cream 30g",94],[47,"Luxe Fragrances Dreamy Bliss Perfume Hand Cream 30g",94],[47,"Luxe Fragrances by Luxe Organix Dreamy Bliss Perfume Inspired Hand Wash 500ml",141],[47,"Luxe Organix Blushing Bouquet Perfume Inspired Hand Wash 500ml",141],[47,"Luxe Organix Love Luna Perfume Inspired Hand Wash 500ml",141],[47,"Luxe Organix Shine Free 3x Matte Ultra Fine Mist 80ml",236],[47,"Luxe Organix Rosy Glow 3x Bright Ultra Fine Mist 80ml",236],[47,"Luxe Organix Sun Niacinamide Serum SPF",75],[48,"PEAR PUNCH 100ML",103],[49,"BLUSH 100ML",103],[48,"LILAC LUSH 100ML",103],[48,"BEACH BLISS 100ML",103],[48,"Luxe Organix UV Protection Serum Hair Oil Soft and Nourish 50ML",208],[48,"Luxe Organix UV Protection Serum Hair Oil Restore and Revive 50ML",208],[48,"Luxe Organix UV Protection Serum Hair Oil Straight and Smooth 50ML",208],[48,"Luxe Organix Premium Keratin Treatment Argan Oil 250ml B1T1",246],[48,"Luxe Organix Premium Keratin Treatment Virgin Coconut Oil 250ml B1T1",246],[48,"Luxe Organix Premium Keratin Aloe 250ml B1T1",246],[48,"Luxe Organix Premium Keratin Castor Oil 250ml B1T1",246],[47,"ITEM 5% OFF SRP Luxe Organix Premium Keratin Manuka Honey 250ml B1T1",246],[47,"Luxe Organix Premium Keratin Tea Tree 250ml B1T1",246],[47,"Luxe Organix Premium Keratin Milk Protein 250ml B1T1",246],[47,"Luxe Organix Premium Keratin Argan Shampoo 210ml",122],[47,"Luxe Organix Premium Keratin VCO Shampoo 210ml",122],[47,"Luxe Organix Premium Keratin Castor Oil Shampoo 210ml",122],[51,"PURPLE CONDITIONER 250ML",170],[51,"PURPLE SHAMPOO 270ML",170],[51,"Luxe Organix Keratin Hair Color + Care Bleach 130ml",141],[50,"SHAMPOO 270ML",170],[50,"Luxe Fragrances Blushing Bouquet Perfume Hand Cream 30g",170],[50,"Luxe Organix Keratin Treatment Virgin Coconut Oil 30-minute miracle 20ml x 6pcs",80],[50,"Luxe Organix Keratin Treatment Argan 3-minute miracle 20ml x 6pcs",80],[50,"Luxe Organix Keratin Treatment Aloe 3-minute miracle 20ml x 6pcs",80],[50,"Luxe Organix Keratin Treatment Milk Protein 3-minute miracle 20ml x 6pcs",80],[50,"Luxe Organix Keratin Treatment Castor Oil 3-minute miracle 20ml x 6pcs",80],[50,"Luxe Organix Premium Keratin Treatment Tea Tree 6's",80],[50,"Luxe Organix Keratin Elixir Cuticle Coat 50ml",141],[47,"ITEM 5% OFF SRP Luxe Organix Keratin 10in1 Hair Elixir Leave-in Treatment 100ml",170],[47,"Luxe Organix Scalp Cleanse Hair Detox Scrub Clarifying Treatment Shampoo 220",208],[47,"Luxe Organix Hair Color Shampoo Brown 40ml",189],[47,"Luxe Organix Scalp Therapy Gentle Clarifying Detox Shampoo 270ml",189],[47,"Luxe Organix Scalp Therapy Anti-Hairfall Energizing Hair Serum 100ml",289],[47,"Luxe Organix Hair Color Shampoo Black 40ml",56],[47,"Luxe Organix Hair Color Shampoo Natural Brown 200ml",246],[47,"Luxe Organix Hair Color Shampoo Natural Black 200ml",246],[47,"ITEM 5% OFF SRP Luxe Organix Hair Color Shampoo Chestnut Brown 200ml",246],[47,"Luxe Organix Keratin Hair Color + Care Chocolate Blonde 130ml",160],[47,"Luxe Organix Keratin Hair Color + Care Light Brown 130ml",160],[47,"Luxe Organix Keratin Hair Color + Care Light Ash Brown 130ml",132],[47,"Luxe Organix Keratin Hair Color + Care Silver Ash 130ml",132],[47,"Luxe Organix Keratin Hair Color + Care Light Golden Ash Blonde 130ml",132],[47,"Luxe Organix Curl Define Intensive Hydration Daily Shampoo 270ml",189],[47,"Luxe Organix Curl Define Intensive Hydration Daily Conditioner 250ml",189],[47,"Luxe Organix Curling Essence 120ml",122],[47,"ITEM 5% OFF SRP Luxe Organix Curling Essence 250ml",208],[47,"Luxe Organix Curl and Define Volumizing Hair Mousse 250ml",261],[47,"Luxe Organix Aqua Light Straight 180ml B1T1",236],[47,"Luxe Organix Aqua Light Hydrated 180ml B1T1",236],[47,"Luxe Organix Aqua Light Shiny 180ml B1T1",236],[47,"Luxe Organix Keratin Shampoo Argan Oil 500ml",236],[47,"Luxe Organix Keratin castor Shampoo 500ml",236],[47,"Luxe Organix Dandruff Control Cooling Menthol Shampoo 240ml",189],[47,"Luxe Organix Dandruff Control Silky Smooth Shampoo 240ml",189],[47,"Kera Luxe Brazillian Botox Daily Keratin Treatment Rebond Straight 700ml B1T1",232],[47,"Kera Luxe Kerabond Collagen Daily Keratin Treatment Damage Repair 700ml B1T1",232],[47,"Kera Luxe Keraplex Straight Daily Keratin Treatment 700ml B1T1",232],[47,"ITEM 5% OFF SRP Luxe Organix Castor Oil Drops 120ml (FRAGILE AND BREAKABLE)",208],[47,"Luxe Organix Castor Oil Dual Tip Eyelash & Brow Growth Serum 18ml",160],[47,"Luxe Organix Castor Oil Mascara Serum 10ml",122],[47,"Luxe Organix Nail And Cuticle Castor Serum 10ml",113],[47,"Luxe Organix Activated Charcoal Whitening Toothpaste 120g VPACK",170],[47,"Luxe Organix Activated Charcoal Whitening Toothpaste 120g",94],[47,"Luxe Organix Gentle Peeling Foot Mask",94],[47,"Luxe Organix Soft & White Serum Foot Mask 1Pair",84],[47,"Luxe Organix Sparkle White Baking Soda Toothpaste 120g",170],[47,"ITEM 5% OFF SRP Luxe Organix Lavender Essential Oil 20ml",284],[47,"Luxe Organix Aloe Vera Calming Toner",198]]};
+  var _bCart = {};  // {productIdx: qty}
+  var _bPayMode = '';
+
+  function boutInit() {
+    // Populate brand dropdown
+    var sel = document.getElementById('b-brand');
+    if (!sel) return;
+    _BDATA.b.forEach(function(br, i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = br;
+      sel.appendChild(opt);
+    });
+    boutFiltre();
+    // Responsive: stack on mobile
+    var layout = document.getElementById('boutique-layout');
+    function chkWidth() {
+      if (layout) {
+        layout.style.gridTemplateColumns = window.innerWidth < 768 ? '1fr' : '1fr 320px';
+      }
+    }
+    chkWidth();
+    window.addEventListener('resize', chkWidth);
+  }
+
+  function boutFiltre() {
+    var search = (document.getElementById('b-search').value || '').toLowerCase().trim();
+    var brandIdx = document.getElementById('b-brand').value;
+    var grid = document.getElementById('b-grid');
+    var empty = document.getElementById('b-empty');
+    grid.innerHTML = '';
+    var count = 0;
+    _BDATA.p.forEach(function(p, idx) {
+      var bi = p[0], name = p[1], price = p[2];
+      if (brandIdx !== '' && parseInt(brandIdx) !== bi) return;
+      var brand = _BDATA.b[bi] || '';
+      var fullText = (brand + ' ' + name).toLowerCase();
+      if (search && fullText.indexOf(search) === -1) return;
+      count++;
+      var qty = _bCart[idx] || 0;
+      var card = document.createElement('div');
+      card.style.cssText = 'background:#fff;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s;';
+      card.onmouseover = function() { this.style.boxShadow='0 6px 24px rgba(0,0,0,.13)'; };
+      card.onmouseout = function() { this.style.boxShadow='0 2px 14px rgba(0,0,0,.07)'; };
+      card.innerHTML =
+        '<div style="background:linear-gradient(135deg,#f8f4ff,#e8f4ff);height:110px;display:flex;align-items:center;justify-content:center;font-size:3rem;">🧴</div>' +
+        '<div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">' +
+          '<div style="font-size:.7rem;color:var(--orange);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">' + boutEsc(brand) + '</div>' +
+          '<div style="font-size:.88rem;font-weight:700;color:var(--navy);flex:1;line-height:1.4;margin-bottom:10px;">' + boutEsc(name) + '</div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+            '<span style="font-size:1rem;font-weight:900;color:var(--orange);">₱' + price + '</span>' +
+            '<div style="display:flex;align-items:center;gap:6px;" id="bqc-' + idx + '">' + boutQtyHTML(idx, qty) + '</div>' +
+          '</div>' +
+        '</div>';
+      grid.appendChild(card);
+    });
+    document.getElementById('b-count').textContent = count + ' produit' + (count > 1 ? 's' : '');
+    empty.style.display = count === 0 ? 'block' : 'none';
+  }
+
+  function boutQtyHTML(idx, qty) {
+    if (qty === 0) {
+      return '<button onclick="boutAdd(' + idx + ')" style="background:var(--orange);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:\'Barlow\',sans-serif;">+ Ajouter</button>';
+    }
+    return '<button onclick="boutDec(' + idx + ')" style="background:#f0f2f5;border:none;width:28px;height:28px;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;color:var(--navy);">−</button>' +
+      '<span style="font-weight:800;min-width:20px;text-align:center;font-size:.95rem;">' + qty + '</span>' +
+      '<button onclick="boutInc(' + idx + ')" style="background:var(--orange);border:none;width:28px;height:28px;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;color:#fff;">+</button>';
+  }
+
+  function boutEsc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function boutAdd(idx) {
+    _bCart[idx] = (_bCart[idx] || 0) + 1;
+    boutUpdateQtyUI(idx);
+    boutUpdateCart();
+  }
+  function boutInc(idx) { boutAdd(idx); }
+  function boutDec(idx) {
+    if (_bCart[idx] > 0) _bCart[idx]--;
+    if (_bCart[idx] === 0) delete _bCart[idx];
+    boutUpdateQtyUI(idx);
+    boutUpdateCart();
+  }
+
+  function boutUpdateQtyUI(idx) {
+    var el = document.getElementById('bqc-' + idx);
+    if (el) el.innerHTML = boutQtyHTML(idx, _bCart[idx] || 0);
+  }
+
+  function boutUpdateCart() {
+    var total = 0;
+    var count = 0;
+    var items = [];
+    Object.keys(_bCart).forEach(function(k) {
+      var idx = parseInt(k), qty = _bCart[k];
+      var p = _BDATA.p[idx];
+      if (!p) return;
+      total += p[2] * qty;
+      count += qty;
+      items.push({ idx: idx, name: p[1], brand: _BDATA.b[p[0]], price: p[2], qty: qty });
+    });
+    // Update cart count badge
+    var badge = document.getElementById('b-cart-count');
+    if (badge) badge.textContent = count;
+    // Update total
+    var totalEl = document.getElementById('b-total');
+    if (totalEl) totalEl.textContent = '₱' + total.toLocaleString();
+    // Update cart items list
+    var cartItems = document.getElementById('b-cart-items');
+    var cartEmpty = document.getElementById('b-cart-empty');
+    var cartFooter = document.getElementById('b-cart-footer');
+    if (!cartItems) return;
+    if (items.length === 0) {
+      cartEmpty.style.display = 'block';
+      cartFooter.style.display = 'none';
+      cartItems.innerHTML = '';
+      cartItems.appendChild(cartEmpty);
+      return;
+    }
+    cartEmpty.style.display = 'none';
+    cartFooter.style.display = 'block';
+    var html = '';
+    items.forEach(function(it) {
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f2f5;gap:8px;">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:.8rem;font-weight:700;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + boutEsc(it.name) + '">' + boutEsc(it.name) + '</div>' +
+          '<div style="font-size:.72rem;color:var(--slate);">₱' + it.price + ' × ' + it.qty + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">' +
+          '<button onclick="boutDec(' + it.idx + ')" style="background:#f0f2f5;border:none;width:24px;height:24px;border-radius:5px;font-size:.9rem;cursor:pointer;font-weight:700;">−</button>' +
+          '<span style="font-weight:800;font-size:.85rem;min-width:16px;text-align:center;">' + it.qty + '</span>' +
+          '<button onclick="boutInc(' + it.idx + ')" style="background:var(--orange);border:none;width:24px;height:24px;border-radius:5px;font-size:.9rem;cursor:pointer;font-weight:700;color:#fff;">+</button>' +
+        '</div>' +
+        '<div style="font-weight:800;font-size:.88rem;color:var(--orange);flex-shrink:0;">₱' + (it.price * it.qty).toLocaleString() + '</div>' +
+      '</div>';
+    });
+    cartItems.innerHTML = html;
+  }
+
+  function boutClearCart() {
+    _bCart = {};
+    boutFiltre();
+    boutUpdateCart();
+  }
+
+  function boutOpenForm() {
+    // Check cart not empty
+    if (Object.keys(_bCart).length === 0) { showToast('⚠️','Votre panier est vide'); return; }
+    // Build recap
+    var total = 0;
+    var recapHtml = '';
+    Object.keys(_bCart).forEach(function(k) {
+      var idx = parseInt(k), qty = _bCart[k];
+      var p = _BDATA.p[idx];
+      if (!p) return;
+      var subtotal = p[2] * qty;
+      total += subtotal;
+      recapHtml += '<div style="display:flex;justify-content:space-between;gap:12px;">' +
+        '<span style="flex:1;">' + boutEsc(_BDATA.b[p[0]]) + ' — ' + boutEsc(p[1]) + ' × ' + qty + '</span>' +
+        '<span style="font-weight:700;white-space:nowrap;">₱' + subtotal.toLocaleString() + '</span>' +
+        '</div>';
+    });
+    document.getElementById('b-recap-list').innerHTML = recapHtml;
+    document.getElementById('b-recap-total').textContent = '₱' + total.toLocaleString();
+    // Reset payment
+    _bPayMode = '';
+    document.getElementById('b-paiement').value = '';
+    document.getElementById('b-pay-gcash').style.border = '2px solid #e8eaf0';
+    document.getElementById('b-pay-bank').style.border = '2px solid #e8eaf0';
+    document.getElementById('b-order-error').style.display = 'none';
+    document.getElementById('b-order-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function boutCloseForm() {
+    document.getElementById('b-order-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function boutSelectPay(mode) {
+    _bPayMode = mode;
+    document.getElementById('b-paiement').value = mode;
+    document.getElementById('b-pay-gcash').style.border = mode === 'GCash' ? '2px solid var(--orange)' : '2px solid #e8eaf0';
+    document.getElementById('b-pay-bank').style.border = mode === 'Virement bancaire' ? '2px solid var(--orange)' : '2px solid #e8eaf0';
+    document.getElementById('b-pay-gcash').style.background = mode === 'GCash' ? '#fff8f0' : '#fff';
+    document.getElementById('b-pay-bank').style.background = mode === 'Virement bancaire' ? '#fff8f0' : '#fff';
+  }
+
+  function boutSubmitOrder(e) {
+    e.preventDefault();
+    var dest = document.getElementById('b-destinataire').value.trim();
+    var phone = document.getElementById('b-phone').value.trim();
+    var country = document.getElementById('b-country').value;
+    var address = document.getElementById('b-address').value.trim();
+    var pay = document.getElementById('b-paiement').value;
+    var notes = document.getElementById('b-notes').value.trim();
+    var errEl = document.getElementById('b-order-error');
+    errEl.style.display = 'none';
+    if (!pay) {
+      errEl.textContent = 'Veuillez sélectionner un mode de paiement.';
+      errEl.style.display = 'block';
+      return;
+    }
+    // Build articles list
+    var articles = [];
+    var total = 0;
+    Object.keys(_bCart).forEach(function(k) {
+      var idx = parseInt(k), qty = _bCart[k];
+      var p = _BDATA.p[idx];
+      if (!p) return;
+      var sub = p[2] * qty;
+      total += sub;
+      articles.push({ brand: _BDATA.b[p[0]], name: p[1], price: p[2], qty: qty, subtotal: sub });
+    });
+    var btn = document.getElementById('b-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Envoi en cours…';
+    // Save to Supabase
+    var ref = 'BOUTIQUE-' + Date.now();
+    var row = {
+      ref: ref,
+      statut: 'boutique_nouvelle',
+      expediteur: dest,
+      destination: country,
+      data: {
+        type: 'boutique',
+        destinataire: dest,
+        telephone: phone,
+        pays: country,
+        adresse: address,
+        paiement: pay,
+        articles: articles,
+        total: total,
+        notes: notes,
+        created: new Date().toISOString()
+      }
+    };
+    fetch(SUPA_URL + '/rest/v1/gcc_demandes', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(row)
+    })
+    .then(function(r) {
+      if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
+      // Success
+      boutCloseForm();
+      _bCart = {};
+      boutFiltre();
+      boutUpdateCart();
+      showToast('✅', 'Commande envoyée ! Ref: ' + ref + '. Nous vous contacterons sous 24h.');
+    })
+    .catch(function(err) {
+      errEl.textContent = 'Erreur lors de l\'envoi. Réessayez ou contactez-nous directement.';
+      errEl.style.display = 'block';
+    })
+    .finally(function() {
+      btn.disabled = false; btn.textContent = '🚀 Envoyer ma commande';
+    });
+  }
+
+  // Init boutique on DOM ready
+  document.addEventListener('DOMContentLoaded', boutInit);
+  // ─── FIN BOUTIQUE ──────────────────────────────────────────────────────────
 </script>
 
 <!-- ═══ MODAL ÉDITION DEMANDE ═══ -->
