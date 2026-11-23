@@ -3509,11 +3509,20 @@ function doLogout() {
 </section>
 
 <!-- ░░ BOUTIQUE ░░ -->
-<section id="boutique" style="display:none;background:linear-gradient(180deg,#f4f6fb 0%,#fff 100%);padding:60px 0 80px;">
-  <div style="max-width:1200px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px));">
+<section id="boutique" style="display:none;position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#f4f6fb 0%,#fff 100%);overflow-y:auto;padding:0 0 80px;">
+  <!-- Barre de navigation boutique -->
+  <div style="position:sticky;top:0;z-index:10;background:var(--navy);padding:14px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.18);">
+    <button onclick="closeBoutique()" style="background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:8px 16px;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:'Barlow',sans-serif;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.22)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+      ← Retour
+    </button>
+    <div style="display:flex;align-items:center;gap:10px;flex:1;">
+      <span style="background:var(--orange);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:2px;padding:4px 12px;border-radius:16px;text-transform:uppercase;">🛒 Boutique</span>
+      <span style="color:var(--ice);font-size:.88rem;font-weight:600;display:none;" id="bout-nav-title">GCC Cargo</span>
+    </div>
+  </div>
+  <div style="max-width:1200px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-left,0px)) 0;">
     <div style="text-align:center;margin-bottom:48px;">
-      <span style="background:var(--orange);color:#fff;font-size:.75rem;font-weight:800;letter-spacing:2px;padding:6px 18px;border-radius:20px;text-transform:uppercase;">🛒 Boutique</span>
-      <h2 style="font-family:'Barlow',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:var(--navy);margin:16px 0 12px;">Commandez &amp; Faites Livrer</h2>
+      <h2 style="font-family:'Barlow',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:var(--navy);margin:0 0 12px;">Commandez &amp; Faites Livrer</h2>
       <p style="color:var(--slate);font-size:1rem;max-width:600px;margin:0 auto;">Sélectionnez vos produits beauty &amp; skin care, passez votre commande — on s'occupe du reste jusqu'à votre porte.</p>
     </div>
     <div id="boutique-layout" style="display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start;">
@@ -4555,13 +4564,17 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     if(!t) return;
     e.preventDefault();
     if(href === '#boutique') {
-      // Show boutique, scroll to it
+      // Show boutique as fullscreen overlay
       document.getElementById('boutique').style.display = 'block';
-      setTimeout(function(){ t.scrollIntoView({behavior:'smooth',block:'start'}); }, 30);
+      document.body.style.overflow = 'hidden';
+      document.getElementById('boutique').scrollTop = 0;
       setTimeout(boutEnsureInit, 80);
     } else {
-      // Hide boutique when navigating elsewhere
-      document.getElementById('boutique').style.display = 'none';
+      // If boutique was open, close it first then navigate
+      if(document.getElementById('boutique').style.display !== 'none') {
+        document.getElementById('boutique').style.display = 'none';
+        document.body.style.overflow = '';
+      }
       t.scrollIntoView({behavior:'smooth',block:'start'});
     }
   });
@@ -4573,6 +4586,11 @@ function toggleMobileMenu(){
   m.style.display=m.style.display==='none'?'block':'none';
 }
 function closeMobileMenu(){document.getElementById('mobile-menu').style.display='none';}
+function closeBoutique(){
+  document.getElementById('boutique').style.display='none';
+  document.body.style.overflow='';
+  window.scrollTo({top:0,behavior:'instant'});
+}
 
 // Upload file names
 function showFileName(inp,id){
