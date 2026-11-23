@@ -4944,6 +4944,10 @@ function doUpdate(){
           '<div><strong>Adresse :</strong> ' + (d.adresse||'—') + '</div>' +
           '<div><strong>Paiement :</strong> ' + (d.paiement||'—') + '</div>' +
           '<div><strong>Notes :</strong> ' + (d.notes||'—') + '</div>' +
+          (d.preuve_paiement ? '<div style="margin-top:8px;padding:10px;background:#fff8f0;border-radius:8px;border:1.5px solid var(--orange);">' +
+            '<strong>📸 Preuve de paiement :</strong><br>' +
+            '<img src="' + d.preuve_paiement + '" style="max-width:100%;max-height:260px;border-radius:8px;margin-top:8px;display:block;cursor:zoom-in;" onclick="window.open(this.src)" title="Cliquez pour agrandir">' +
+          '</div>' : '') +
           '<div style="margin-top:10px;"><strong>Articles :</strong></div>' +
           artHtml +
           '<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:1rem;font-weight:900;color:var(--orange);">' +
@@ -5484,10 +5488,14 @@ function doUpdate(){
   function boutCloseForm() {
     document.getElementById('b-order-modal').style.display = 'none';
     document.body.style.overflow = '';
+    _bProofData = null;
   }
+
+  var _bProofData = null; // base64 de la preuve de paiement
 
   function boutSelectPay(mode) {
     _bPayMode = mode;
+    _bProofData = null;
     document.getElementById('b-paiement').value = mode;
     var ids = ['b-pay-gcash','b-pay-bank','b-pay-om','b-pay-momo'];
     var modes = ['gcash','transfer','om','momo'];
@@ -5498,18 +5506,45 @@ function doUpdate(){
       el.style.border = active ? '2px solid var(--orange)' : '2px solid #e8eaf0';
       el.style.background = active ? '#fff8f0' : '#fff';
     });
-    // Show payment info from admin config
+    // Show payment info from admin config + upload preuve
     var infoDiv = document.getElementById('b-pay-info');
     if (infoDiv) {
       var cfg = getPayCfg(mode);
       var html = '<strong>' + (cfg.ico||'') + ' ' + (cfg.label||mode) + '</strong>';
-      if (cfg.num) html += '<br>📞 ' + cfg.num;
+      if (cfg.num) html += '<br>📞 <span style="font-weight:700;letter-spacing:.03em;">' + cfg.num + '</span>';
       if (cfg.nom) html += '<br>👤 ' + cfg.nom;
-      if (cfg.note) html += '<br><em style="color:#555;">' + cfg.note + '</em>';
-      if (cfg.qr) html += '<br><img src="' + cfg.qr + '" style="max-width:100px;border-radius:6px;margin-top:6px;">';
+      if (cfg.qr) html += '<br><img src="' + cfg.qr + '" style="max-width:110px;border-radius:6px;margin-top:8px;display:block;">';
+      if (cfg.note) html += '<br><em style="color:#666;font-size:.82rem;">' + cfg.note + '</em>';
+      // Upload preuve
+      html += '<div style="margin-top:12px;padding-top:10px;border-top:1px dashed #f0a070;">';
+      html += '<label style="font-weight:700;font-size:.82rem;color:var(--navy);display:block;margin-bottom:6px;">📸 Preuve de paiement <span style="color:#888;font-weight:400;">(optionnel)</span></label>';
+      html += '<label id="b-proof-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;background:#fff;border:2px dashed #f0a070;border-radius:8px;padding:10px 12px;font-size:.82rem;color:#666;transition:border-color .2s;" onmouseover="this.style.borderColor=\'var(--orange)\'" onmouseout="this.style.borderColor=\'#f0a070\'">';
+      html += '<span style="font-size:1.3rem;">📎</span><span id="b-proof-name">Cliquez pour joindre une capture d\'écran (JPG, PNG — max 5 Mo)</span>';
+      html += '<input type="file" accept="image/*" style="display:none;" onchange="boutProofUpload(this)">';
+      html += '</label>';
+      html += '<div id="b-proof-preview" style="display:none;margin-top:8px;"></div>';
+      html += '</div>';
       infoDiv.innerHTML = html;
       infoDiv.style.display = 'block';
     }
+  }
+
+  function boutProofUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) { showToast('⚠️','Image trop grande (max 5 Mo).'); return; }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      _bProofData = ev.target.result; // base64 data URL
+      var nameEl = document.getElementById('b-proof-name');
+      if (nameEl) nameEl.textContent = '✅ ' + file.name;
+      var prev = document.getElementById('b-proof-preview');
+      if (prev) {
+        prev.innerHTML = '<img src="' + _bProofData + '" style="max-width:140px;max-height:140px;border-radius:8px;border:1.5px solid var(--orange);">';
+        prev.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   function boutSubmitOrder(e) {
@@ -5557,6 +5592,7 @@ function doUpdate(){
         articles: articles,
         total: total,
         notes: notes,
+        preuve_paiement: _bProofData || null,
         created: new Date().toISOString()
       }
     };
