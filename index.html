@@ -657,6 +657,8 @@ function doAdminLogin() {
     if (typeof refreshAnnonces === 'function') refreshAnnonces();
     if (typeof loadTarifs === 'function') loadTarifs();
     if (typeof showToast === 'function') showToast(tr('connected'), tr('welcomeAdmin'));
+    // Charger silencieusement le badge commandes boutique
+    setTimeout(function(){ if (typeof admBoutLoad === 'function') admBoutLoad(); }, 1500);
   } else {
     _loginAttempts++;
     try { sessionStorage.setItem('gcc_attempts', String(_loginAttempts)); } catch(e) {}
@@ -777,7 +779,7 @@ function doAdminLogin() {
   }
 
   function supaGetAll(cb) {
-    supaFetch('gcc_demandes?order=created_at.desc&limit=200')
+    supaFetch('gcc_demandes?ref=not.like.BOUTIQUE-%25&order=created_at.desc&limit=200')
       .then(function(r){ return r.json(); })
       .then(function(rows){
         if (!Array.isArray(rows)) { cb([]); return; }
@@ -3722,7 +3724,7 @@ function doLogout() {
     <div class="adm-tab" onclick="showAdmTab('parrainage',this)">&#129309; Parrainage</div>
     <div class="adm-tab" onclick="showAdmTab('notifs',this)">&#128276; Notifications</div>
     <div class="adm-tab" onclick="showAdmTab('flyers',this)">&#128444; Flyers</div>
-    <div class="adm-tab" onclick="showAdmTab('boutique-orders',this)">&#128722; Commandes</div>
+    <div class="adm-tab" onclick="showAdmTab('boutique-orders',this)">&#128722; Commandes <span id="bout-new-badge" style="display:none;background:#ef4444;color:#fff;border-radius:9px;font-size:.65rem;font-weight:900;padding:1px 6px;margin-left:4px;vertical-align:middle;"></span></div>
     <div class="adm-tab" onclick="showAdmTab('boutique-catalogue',this);admCatLoad()">&#128247; Catalogue</div>
     <div class="adm-tab" onclick="showAdmTab('parametres',this)">&#9881; Paramètres</div>
   </div>
@@ -4837,8 +4839,8 @@ function doUpdate(){
     var tbody = document.getElementById('adm-bout-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--slate);">Chargement…</td></tr>';
-    var url = SUPA_URL + '/rest/v1/gcc_demandes?statut=like.boutique_*&order=created_at.desc&limit=100';
-    if (filter) url = SUPA_URL + '/rest/v1/gcc_demandes?statut=eq.' + filter + '&order=created_at.desc&limit=100';
+    var url = SUPA_URL + '/rest/v1/gcc_demandes?ref=like.BOUTIQUE-%25&order=created_at.desc&limit=100';
+    if (filter) url = SUPA_URL + '/rest/v1/gcc_demandes?ref=like.BOUTIQUE-%25&statut=eq.' + filter + '&order=created_at.desc&limit=100';
     fetch(url, {
       headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
     })
@@ -4880,6 +4882,13 @@ function doUpdate(){
         '</tr>';
       });
       tbody.innerHTML = html;
+      // Update badge: count rows with statut boutique_nouvelle
+      var newCount = rows.filter(function(r){ return r.statut === 'boutique_nouvelle'; }).length;
+      var badge = document.getElementById('bout-new-badge');
+      if (badge) {
+        if (newCount > 0) { badge.textContent = newCount; badge.style.display = 'inline'; }
+        else { badge.style.display = 'none'; }
+      }
     })
     .catch(function(err) {
       tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#c00;">Erreur de chargement</td></tr>';
