@@ -4567,6 +4567,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       // Show boutique as fullscreen overlay
       document.getElementById('boutique').style.display = 'block';
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       document.getElementById('boutique').scrollTop = 0;
       setTimeout(boutEnsureInit, 80);
     } else {
@@ -4574,6 +4575,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       if(document.getElementById('boutique').style.display !== 'none') {
         document.getElementById('boutique').style.display = 'none';
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
       }
       t.scrollIntoView({behavior:'smooth',block:'start'});
     }
@@ -4589,6 +4591,7 @@ function closeMobileMenu(){document.getElementById('mobile-menu').style.display=
 function closeBoutique(){
   document.getElementById('boutique').style.display='none';
   document.body.style.overflow='';
+  document.documentElement.style.overflow='';
   window.scrollTo({top:0,behavior:'instant'});
 }
 
