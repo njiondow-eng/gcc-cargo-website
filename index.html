@@ -3558,9 +3558,22 @@ function doLogout() {
             <input id="b-phone" type="tel" required placeholder="+33 6 12 34 56 78" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
           </div>
           <div>
-            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">🌍 Pays de livraison</label>
-            <div style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;background:#f5f6fa;color:var(--navy);font-weight:600;">🇵🇭 Philippines</div>
-            <input type="hidden" id="b-country" value="🇵🇭 Philippines">
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">🌍 Pays de livraison *</label>
+            <select id="b-country" required style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;cursor:pointer;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
+              <option value="">Sélectionnez un pays…</option>
+              <option value="Cameroun">🇨🇲 Cameroun</option>
+              <option value="Congo Brazzaville">🇨🇬 Congo Brazzaville</option>
+              <option value="Congo Kinshasa (RDC)">🇨🇩 Congo Kinshasa (RDC)</option>
+              <option value="Gabon">🇬🇦 Gabon</option>
+              <option value="Guinée Équatoriale">🇬🇶 Guinée Équatoriale</option>
+              <option value="Bénin">🇧🇯 Bénin</option>
+              <option value="Côte d'Ivoire">🇨🇮 Côte d'Ivoire</option>
+              <option value="République Centrafricaine">🇨🇫 République Centrafricaine</option>
+              <option value="Togo">🇹🇬 Togo</option>
+              <option value="Burkina Faso">🇧🇫 Burkina Faso</option>
+              <option value="Ghana">🇬🇭 Ghana</option>
+              <option value="Tchad">🇹🇩 Tchad</option>
+            </select>
           </div>
           <div>
             <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">📍 Adresse complète *</label>
