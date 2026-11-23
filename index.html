@@ -19,8 +19,8 @@
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{box-sizing:inherit;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--navy);}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--navy);overflow-x:hidden;max-width:100vw;}
 img{max-width:100%;display:block;}
 a{text-decoration:none;}
 
@@ -493,9 +493,17 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
   .destinations-grid{grid-template-columns:1fr !important;}
   .dest-card{padding:20px 16px !important;}
 
+  /* Referral & Contact 2-col → 1-col */
+  .referral{grid-template-columns:1fr !important;padding:40px 5vw !important;gap:32px !important;}
+  .contact{grid-template-columns:1fr !important;padding:40px 5vw !important;gap:32px !important;}
+
   /* Form */
   .form-grid,.form-grid-2,.fg{grid-template-columns:1fr !important;}
   .form-section{padding:24px 16px !important;}
+
+  /* Recipient rows inside form */
+  .recipient-row{grid-template-columns:1fr 1fr !important;}
+  .recipient-row input:last-of-type{grid-column:1/-1 !important;}
 
   /* Track section */
   .track-inner{padding:32px 5vw !important;}
@@ -508,6 +516,31 @@ table.adm-tbl tr:last-child td{border-bottom:none;}
   /* Footer */
   .footer-grid{grid-template-columns:1fr !important;gap:28px !important;}
   .footer-inner{padding:40px 5vw 24px !important;}
+
+  /* Modals full-width on mobile */
+  .modal{width:95% !important;padding:24px 16px !important;}
+
+  /* Nav */
+  .nav-links{display:none !important;}
+
+  /* Hero pseudo-element overflow fix */
+  .hero::after{display:none !important;}
+
+  /* Boutique grid */
+  .prod-grid{grid-template-columns:1fr 1fr !important;}
+  .bout-form-inner{padding:20px 16px !important;}
+
+  /* Services grid */
+  .services-grid{grid-template-columns:1fr !important;}
+
+  /* KPI / stats */
+  .kpi-grid{grid-template-columns:1fr 1fr !important;}
+
+  /* Send section form */
+  .send-section{padding:48px 5vw !important;}
+  .form-wrap{max-width:100% !important;}
+  .adm-form-row{flex-wrap:wrap !important;}
+  .adm-form-row .fg{min-width:0 !important;flex:1 1 100% !important;}
 }
 @media(max-width:480px){
   .lang-switcher{scale:.85;}
