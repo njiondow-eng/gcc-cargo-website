@@ -2534,36 +2534,27 @@ function doAdminLogin() {
 
   function loadPayConfig() {
     var keys = ['transfer','gcash','momo','om','crypto'];
-    // Charger depuis localStorage immédiatement
-    keys.forEach(function(k) {
-      var c = getPayCfg(k);
-      var elNum = document.getElementById('pay-num-'+k);
-      var elNom = document.getElementById('pay-nom-'+k);
-      var elNote= document.getElementById('pay-note-'+k);
-      var prev  = document.getElementById('pay-qr-prev-'+k);
+    function applyPayFields(k, c) {
+      var elNum  = document.getElementById('pay-num-'+k);
+      var elNom  = document.getElementById('pay-nom-'+k);
+      var elNote = document.getElementById('pay-note-'+k);
+      var elBank = document.getElementById('pay-bank-'+k);
+      var prev   = document.getElementById('pay-qr-prev-'+k);
       if (elNum)  elNum.value  = c.num  || '';
       if (elNom)  elNom.value  = c.nom  || '';
       if (elNote) elNote.value = c.note || '';
+      if (elBank) elBank.value = c.bank || '';
       if (prev && c.qr) { prev.src = c.qr; prev.style.display = 'block'; }
       else if (prev)    { prev.style.display = 'none'; }
-    });
+    }
+    // Charger depuis localStorage immédiatement
+    keys.forEach(function(k) { applyPayFields(k, getPayCfg(k)); });
     // Puis synchroniser depuis Supabase
     supaParamGet('pay_config', function(cfg) {
       if (!cfg) return;
       _payConfig = cfg;
       try { localStorage.setItem('gcc_pay_config', JSON.stringify(_payConfig)); } catch(e) {}
-      keys.forEach(function(k) {
-        var c = getPayCfg(k);
-        var elNum = document.getElementById('pay-num-'+k);
-        var elNom = document.getElementById('pay-nom-'+k);
-        var elNote= document.getElementById('pay-note-'+k);
-        var prev  = document.getElementById('pay-qr-prev-'+k);
-        if (elNum)  elNum.value  = c.num  || '';
-        if (elNom)  elNom.value  = c.nom  || '';
-        if (elNote) elNote.value = c.note || '';
-        if (prev && c.qr) { prev.src = c.qr; prev.style.display = 'block'; }
-        else if (prev)    { prev.style.display = 'none'; }
-      });
+      keys.forEach(function(k) { applyPayFields(k, getPayCfg(k)); });
     });
   }
 
@@ -2586,9 +2577,11 @@ function doAdminLogin() {
       var elNum  = document.getElementById('pay-num-'+k);
       var elNom  = document.getElementById('pay-nom-'+k);
       var elNote = document.getElementById('pay-note-'+k);
+      var elBank = document.getElementById('pay-bank-'+k);
       if (elNum)  _payConfig[k].num  = elNum.value.trim();
       if (elNom)  _payConfig[k].nom  = elNom.value.trim();
       if (elNote) _payConfig[k].note = elNote.value.trim();
+      if (elBank) _payConfig[k].bank = elBank.value.trim();
     });
     try { localStorage.setItem('gcc_pay_config', JSON.stringify(_payConfig)); } catch(e) {}
     supaParamSet('pay_config', _payConfig).then(function(){
@@ -4342,19 +4335,22 @@ function doLogout() {
 
           <!-- Panneaux par méthode -->
           <div id="ppanel-transfer" class="ppanel">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;">
-              <div style="flex:1;min-width:180px;">
+            <div style="display:grid;gap:10px;">
+              <div>
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom de la banque</label>
+                <input class="adm-input" id="pay-bank-transfer" placeholder="BPI · BDO · Metrobank">
+              </div>
+              <div>
                 <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Nom du titulaire</label>
                 <input class="adm-input" id="pay-nom-transfer" placeholder="GCC CARGO HANDLING INC">
               </div>
-              <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Banques acceptées</label>
-                <input class="adm-input" id="pay-num-transfer" placeholder="BPI · BDO · Metrobank">
+              <div>
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro de compte</label>
+                <input class="adm-input" id="pay-num-transfer" placeholder="1234-5678-90">
               </div>
             </div>
-            <div style="margin-top:10px;">
-              <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Message au client</label>
-              <input class="adm-input" id="pay-note-transfer" placeholder="Envoyez la capture d'écran de votre virement.">
+            <div style="margin-top:10px;display:none;">
+              <input class="adm-input" id="pay-note-transfer" placeholder="Envoyez la capture d'écran de votre virement." style="display:none;">
             </div>
             <div style="margin-top:10px;">
               <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">QR Code (optionnel)</label>
@@ -5511,8 +5507,14 @@ function doUpdate(){
     if (infoDiv) {
       var cfg = getPayCfg(mode);
       var html = '<strong>' + (cfg.ico||'') + ' ' + (cfg.label||mode) + '</strong>';
-      if (cfg.num) html += '<br>📞 <span style="font-weight:700;letter-spacing:.03em;">' + cfg.num + '</span>';
-      if (cfg.nom) html += '<br>👤 ' + cfg.nom;
+      if (mode === 'transfer') {
+        if (cfg.bank) html += '<br>🏦 <span style="font-weight:700;">' + cfg.bank + '</span>';
+        if (cfg.nom)  html += '<br>👤 ' + cfg.nom;
+        if (cfg.num)  html += '<br>🔢 Compte : <span style="font-weight:700;letter-spacing:.05em;">' + cfg.num + '</span>';
+      } else {
+        if (cfg.num) html += '<br>📞 <span style="font-weight:700;letter-spacing:.03em;">' + cfg.num + '</span>';
+        if (cfg.nom) html += '<br>👤 ' + cfg.nom;
+      }
       if (cfg.qr) html += '<br><img src="' + cfg.qr + '" style="max-width:110px;border-radius:6px;margin-top:8px;display:block;">';
       if (cfg.note) html += '<br><em style="color:#666;font-size:.82rem;">' + cfg.note + '</em>';
       // Upload preuve
