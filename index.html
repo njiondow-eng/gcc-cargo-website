@@ -3558,11 +3558,9 @@ function doLogout() {
             <input id="b-phone" type="tel" required placeholder="+33 6 12 34 56 78" style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
           </div>
           <div>
-            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">🌍 Pays de livraison *</label>
-            <select id="b-country" required style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;outline:none;cursor:pointer;" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='#e8eaf0'">
-              <option value="">Sélectionnez un pays…</option>
-              <option>🇫🇷 France</option><option>🇧🇪 Belgique</option><option>🇨🇭 Suisse</option><option>🇱🇺 Luxembourg</option><option>🇨🇦 Canada</option><option>🇺🇸 États-Unis</option><option>🇬🇧 Royaume-Uni</option><option>🇩🇪 Allemagne</option><option>🇪🇸 Espagne</option><option>🇮🇹 Italie</option><option>🇳🇱 Pays-Bas</option><option>🇦🇺 Australie</option><option>🇯🇵 Japon</option><option>🇰🇷 Corée du Sud</option><option>🇦🇪 Émirats Arabes Unis</option><option>🇸🇦 Arabie Saoudite</option><option>🇶🇦 Qatar</option>
-            </select>
+            <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">🌍 Pays de livraison</label>
+            <div style="width:100%;padding:11px 15px;border:2px solid #e8eaf0;border-radius:10px;font-size:.93rem;font-family:'Barlow',sans-serif;box-sizing:border-box;background:#f5f6fa;color:var(--navy);font-weight:600;">🇵🇭 Philippines</div>
+            <input type="hidden" id="b-country" value="🇵🇭 Philippines">
           </div>
           <div>
             <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:5px;">📍 Adresse complète *</label>
@@ -3571,15 +3569,24 @@ function doLogout() {
           <div>
             <label style="display:block;font-weight:700;font-size:.88rem;color:var(--navy);margin-bottom:8px;">💳 Mode de paiement *</label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div id="b-pay-gcash" onclick="boutSelectPay('GCash')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+              <div id="b-pay-gcash" onclick="boutSelectPay('gcash')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
                 <div style="font-size:1.4rem;margin-bottom:4px;">💙</div>
                 <div style="font-weight:700;font-size:.88rem;color:var(--navy);">GCash</div>
               </div>
-              <div id="b-pay-bank" onclick="boutSelectPay('Virement bancaire')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+              <div id="b-pay-bank" onclick="boutSelectPay('transfer')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
                 <div style="font-size:1.4rem;margin-bottom:4px;">🏦</div>
                 <div style="font-weight:700;font-size:.88rem;color:var(--navy);">Virement bancaire</div>
               </div>
+              <div id="b-pay-om" onclick="boutSelectPay('om')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+                <div style="font-size:1.4rem;margin-bottom:4px;">🧡</div>
+                <div style="font-weight:700;font-size:.88rem;color:var(--navy);">Orange Money</div>
+              </div>
+              <div id="b-pay-momo" onclick="boutSelectPay('momo')" style="border:2px solid #e8eaf0;border-radius:12px;padding:12px;cursor:pointer;text-align:center;transition:all .2s;">
+                <div style="font-size:1.4rem;margin-bottom:4px;">💚</div>
+                <div style="font-weight:700;font-size:.88rem;color:var(--navy);">MoMo (MTN)</div>
+              </div>
             </div>
+            <div id="b-pay-info" style="display:none;margin-top:12px;padding:12px 14px;background:#fff8f0;border-radius:10px;border:1.5px solid var(--orange);font-size:.85rem;color:var(--navy);"></div>
             <input type="hidden" id="b-paiement">
           </div>
           <div>
@@ -5452,8 +5459,10 @@ function doUpdate(){
     // Reset payment
     _bPayMode = '';
     document.getElementById('b-paiement').value = '';
-    document.getElementById('b-pay-gcash').style.border = '2px solid #e8eaf0';
-    document.getElementById('b-pay-bank').style.border = '2px solid #e8eaf0';
+    ['b-pay-gcash','b-pay-bank','b-pay-om','b-pay-momo'].forEach(function(id){
+      var el = document.getElementById(id); if(el){el.style.border='2px solid #e8eaf0';el.style.background='#fff';}
+    });
+    var pi = document.getElementById('b-pay-info'); if(pi) pi.style.display='none';
     document.getElementById('b-order-error').style.display = 'none';
     document.getElementById('b-order-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -5467,10 +5476,27 @@ function doUpdate(){
   function boutSelectPay(mode) {
     _bPayMode = mode;
     document.getElementById('b-paiement').value = mode;
-    document.getElementById('b-pay-gcash').style.border = mode === 'GCash' ? '2px solid var(--orange)' : '2px solid #e8eaf0';
-    document.getElementById('b-pay-bank').style.border = mode === 'Virement bancaire' ? '2px solid var(--orange)' : '2px solid #e8eaf0';
-    document.getElementById('b-pay-gcash').style.background = mode === 'GCash' ? '#fff8f0' : '#fff';
-    document.getElementById('b-pay-bank').style.background = mode === 'Virement bancaire' ? '#fff8f0' : '#fff';
+    var ids = ['b-pay-gcash','b-pay-bank','b-pay-om','b-pay-momo'];
+    var modes = ['gcash','transfer','om','momo'];
+    ids.forEach(function(id, i) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var active = modes[i] === mode;
+      el.style.border = active ? '2px solid var(--orange)' : '2px solid #e8eaf0';
+      el.style.background = active ? '#fff8f0' : '#fff';
+    });
+    // Show payment info from admin config
+    var infoDiv = document.getElementById('b-pay-info');
+    if (infoDiv) {
+      var cfg = getPayCfg(mode);
+      var html = '<strong>' + (cfg.ico||'') + ' ' + (cfg.label||mode) + '</strong>';
+      if (cfg.num) html += '<br>📞 ' + cfg.num;
+      if (cfg.nom) html += '<br>👤 ' + cfg.nom;
+      if (cfg.note) html += '<br><em style="color:#555;">' + cfg.note + '</em>';
+      if (cfg.qr) html += '<br><img src="' + cfg.qr + '" style="max-width:100px;border-radius:6px;margin-top:6px;">';
+      infoDiv.innerHTML = html;
+      infoDiv.style.display = 'block';
+    }
   }
 
   function boutSubmitOrder(e) {
