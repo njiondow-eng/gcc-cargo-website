@@ -3636,11 +3636,11 @@ function doLogout() {
   </div>
   <div class="contact-form">
     <h3 data-fr="Envoyer un message" data-en="Send a message" data-tl="Magpadala ng Mensahe">Envoyer un message</h3>
-    <div class="cf-field"><label data-fr="Votre nom" data-en="Your name">Votre nom</label><input type="text" data-fr="William Tabi" data-en="William Tabi" data-tl="William Tabi" placeholder="William Tabi"></div>
-    <div class="cf-field"><label data-fr="Email ou WhatsApp" data-en="Email or WhatsApp">Email ou WhatsApp</label><input type="text" data-fr="votre@email.com ou +63 968..." data-en="your@email.com or +63 968..." data-tl="inyong@email.com o +63 968..." placeholder="votre@email.com ou +63 968..."></div>
-    <div class="cf-field"><label data-fr="Sujet" data-en="Subject">Sujet</label><input type="text" data-fr="Renseignement tarif, partenariat..." data-en="Rate inquiry, partnership..." data-tl="Impormasyon sa presyo, pakikipagtulungan..." placeholder="Renseignement tarif, partenariat..."></div>
-    <div class="cf-field"><label data-fr="Message" data-en="Message">Message</label><textarea rows="4" data-fr="Votre message..." data-en="Your message..." data-tl="Ang inyong mensahe..." placeholder="Votre message..."></textarea></div>
-    <button class="btn-send" data-fr="Envoyer le message →" data-en="Send message →" data-tl="Ipadala ang Mensahe →" onclick="showToast('✉️ Message envoyé','Notre équipe vous répondra sous 24h. Merci !')">Envoyer le message →</button>
+    <div class="cf-field"><label data-fr="Votre nom" data-en="Your name">Votre nom</label><input id="cf-nom" type="text" data-fr="William Tabi" data-en="William Tabi" data-tl="William Tabi" placeholder="William Tabi"></div>
+    <div class="cf-field"><label data-fr="Email ou WhatsApp" data-en="Email or WhatsApp">Email ou WhatsApp</label><input id="cf-contact" type="text" data-fr="votre@email.com ou +63 968..." data-en="your@email.com or +63 968..." data-tl="inyong@email.com o +63 968..." placeholder="votre@email.com ou +63 968..."></div>
+    <div class="cf-field"><label data-fr="Sujet" data-en="Subject">Sujet</label><input id="cf-sujet" type="text" data-fr="Renseignement tarif, partenariat..." data-en="Rate inquiry, partnership..." data-tl="Impormasyon sa presyo, pakikipagtulungan..." placeholder="Renseignement tarif, partenariat..."></div>
+    <div class="cf-field"><label data-fr="Message" data-en="Message">Message</label><textarea id="cf-message" rows="4" data-fr="Votre message..." data-en="Your message..." data-tl="Ang inyong mensahe..." placeholder="Votre message..."></textarea></div>
+    <button id="cf-btn" class="btn-send" data-fr="Envoyer le message →" data-en="Send message →" data-tl="Ipadala ang Mensahe →" onclick="sendContactForm()">Envoyer le message →</button>
   </div>
 </section>
 
@@ -4617,6 +4617,41 @@ function showTab(name,btn){
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
+function sendContactForm() {
+  var nom     = (document.getElementById('cf-nom')||{value:''}).value.trim();
+  var contact = (document.getElementById('cf-contact')||{value:''}).value.trim();
+  var sujet   = (document.getElementById('cf-sujet')||{value:''}).value.trim();
+  var msg     = (document.getElementById('cf-message')||{value:''}).value.trim();
+  if (!nom)     { showToast('⚠️','Veuillez saisir votre nom.'); return; }
+  if (!contact) { showToast('⚠️','Veuillez saisir votre email ou WhatsApp.'); return; }
+  if (!msg)     { showToast('⚠️','Veuillez écrire votre message.'); return; }
+  if (typeof emailjs === 'undefined') {
+    showToast('⚠️ Erreur','Service email non disponible. Contactez-nous directement.');
+    return;
+  }
+  var btn = document.getElementById('cf-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
+  emailjs.send('service_zeagk6m', 'template_contact_gcc', {
+    from_name:    nom,
+    from_contact: contact,
+    subject:      sujet || 'Message via site web',
+    message:      msg
+  })
+  .then(function() {
+    showToast('✅ Message envoyé !', 'Notre équipe vous répondra sous 24h. Merci ' + nom + ' !');
+    ['cf-nom','cf-contact','cf-sujet','cf-message'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+  })
+  .catch(function(err) {
+    console.error('Contact form error:', err);
+    showToast('⚠️ Erreur envoi', 'Code ' + (err.status||'?') + '. Réessayez ou écrivez-nous directement.');
+  })
+  .finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer le message →'; }
+  });
+}
+
 function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
   if (!emailExp || !emailExp.trim()) {
     console.warn('sendEmailNotif: pas d\'email pour', ref);
