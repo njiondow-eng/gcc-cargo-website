@@ -4632,10 +4632,11 @@ function sendContactForm() {
   var btn = document.getElementById('cf-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
   emailjs.send('service_zeagk6m', 'template_contact_gcc', {
-    from_name:    nom,
-    from_contact: contact,
-    subject:      sujet || 'Message via site web',
-    message:      msg
+    name:    nom,
+    email:   contact,
+    subject: sujet || 'Message via site web',
+    message: msg,
+    time:    new Date().toLocaleString('fr-FR', {timeZone:'Asia/Manila'})
   })
   .then(function() {
     showToast('✅ Message envoyé !', 'Notre équipe vous répondra sous 24h. Merci ' + nom + ' !');
