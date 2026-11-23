@@ -712,7 +712,7 @@ function doAdminLogin() {
   /* ── Config paiement dynamique (éditable en admin) ── */
   var _PAY_DEFAULTS = {
     transfer: {label:'Bank Transfer',    ico:'🏦', note:'Banque : BPI · BDO · Metrobank — Titulaire : GCC CARGO HANDLING INC', num:'', nom:'GCC CARGO HANDLING INC', qr:''},
-    gcash:    {label:'GCash / Maya',     ico:'📱', note:'Envoyez la capture d\'écran de la transaction.',                         num:'+63 968 313 5356',   nom:'', qr:''},
+    gcash:    {label:'GCash',     ico:'📱', note:'Envoyez la capture d\'écran de la transaction.',                         num:'+63 968 313 5356',   nom:'', qr:''},
     momo:     {label:'MoMo Money',       ico:'💚', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
     om:       {label:'Orange Money (OM)',ico:'🧡', note:'Envoyez la capture d\'écran du dépôt.',                                  num:'+237 6 XX XX XX XX', nom:'', qr:''},
     crypto:   {label:'Crypto (USDT/BTC)', ico:'₿',  note:'Envoyez la capture d\'écran de la transaction blockchain.',              num:'',                   nom:'', qr:''},
@@ -3276,7 +3276,7 @@ function doLogout() {
                 <label data-fr="Méthode de paiement" data-en="Payment method" data-tl="Paraan ng pagbabayad">Méthode de paiement</label>
                 <select id="modePaiement" onchange="handleModePaiement(this.value)" style="font-size:.9rem;">
                   <option value="transfer">🏦 Bank Transfer (BPI, BDO, Metrobank…)</option>
-                  <option value="gcash">📱 GCash / Maya</option>
+                  <option value="gcash">📱 GCash</option>
                   <option value="momo">💚 MoMo Money</option>
                   <option value="om">🧡 Orange Money (OM)</option>
                   <option value="crypto">₿ Crypto (USDT / BTC / ETH)</option>
@@ -3311,8 +3311,8 @@ function doLogout() {
             🕗 <span data-fr="Horaires : Lun–Sam, 9h00 – 18h00" data-en="Hours: Mon–Sat, 9:00 AM – 6:00 PM" data-tl="Oras: Lun–Sab, 9:00 – 18:00">Horaires : Lun–Sam, 9h00 – 18h00</span><br>
             📞 +63 968 313 5356 / +63 915 385 7604
           </div>
-          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash/Maya · Bank Transfer" data-tl="💳 Tinatanggap na pagbabayad: Cash (₱) · GCash/Maya · Bank Transfer">
-            💳 Paiement accepté : Cash (₱) · GCash/Maya · Bank Transfer
+          <p style="font-size:.78rem;color:var(--slate);margin-top:10px;" data-fr="💳 Paiement accepté : Cash (₱) · GCash · Bank Transfer" data-en="💳 Payment accepted: Cash (₱) · GCash · Bank Transfer" data-tl="💳 Tinatanggap na pagbabayad: Cash (₱) · GCash · Bank Transfer">
+            💳 Paiement accepté : Cash (₱) · GCash · Bank Transfer
           </p>
         </div>
       </div>
@@ -4327,7 +4327,7 @@ function doLogout() {
           <!-- Tabs internes paiement -->
           <div style="display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap;">
             <button onclick="switchPayTab('transfer',this)" id="ptab-transfer" style="background:var(--navy);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🏦 Bank Transfer</button>
-            <button onclick="switchPayTab('gcash',this)" id="ptab-gcash" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">📱 GCash/Maya</button>
+            <button onclick="switchPayTab('gcash',this)" id="ptab-gcash" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">📱 GCash</button>
             <button onclick="switchPayTab('momo',this)" id="ptab-momo" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">💚 MoMo</button>
             <button onclick="switchPayTab('om',this)" id="ptab-om" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">🧡 Orange Money</button>
             <button onclick="switchPayTab('crypto',this)" id="ptab-crypto" style="background:#e8edf3;color:var(--navy);border:none;padding:7px 14px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;">₿ Crypto</button>
@@ -4364,7 +4364,7 @@ function doLogout() {
           <div id="ppanel-gcash" class="ppanel" style="display:none;">
             <div style="display:flex;gap:14px;flex-wrap:wrap;">
               <div style="flex:1;min-width:180px;">
-                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro GCash / Maya</label>
+                <label style="font-size:.78rem;font-weight:700;color:var(--navy);display:block;margin-bottom:4px;">Numéro GCash</label>
                 <input class="adm-input" id="pay-num-gcash" placeholder="+63 9XX XXX XXXX">
               </div>
               <div style="flex:1;min-width:180px;">
