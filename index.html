@@ -6,7 +6,7 @@
 <title>GCC CARGO HANDLING INC — Safe Cargo, Global Delivery</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" onload="emailjs.init('xTeaUIuh4FJ4jttE5');"></script>
+<!-- EmailJS remplacé par Resend via Supabase Edge Functions -->
 <style>
 /* ═══ TOKENS ═══ */
 :root{
@@ -4689,6 +4689,8 @@ function showTab(name,btn){
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
+var SUPA_FN = 'https://voxgdylvevwfpomamhjo.supabase.co/functions/v1';
+
 function sendContactForm() {
   var nom     = (document.getElementById('cf-nom')||{value:''}).value.trim();
   var contact = (document.getElementById('cf-contact')||{value:''}).value.trim();
@@ -4697,20 +4699,22 @@ function sendContactForm() {
   if (!nom)     { showToast('⚠️','Veuillez saisir votre nom.'); return; }
   if (!contact) { showToast('⚠️','Veuillez saisir votre email ou WhatsApp.'); return; }
   if (!msg)     { showToast('⚠️','Veuillez écrire votre message.'); return; }
-  if (typeof emailjs === 'undefined') {
-    showToast('⚠️ Erreur','Service email non disponible. Contactez-nous directement.');
-    return;
-  }
   var btn = document.getElementById('cf-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours...'; }
-  emailjs.send('service_zeagk6m', 'template_e8cpjih', {
-    name:    nom,
-    email:   contact,
-    subject: sujet || 'Message via site web',
-    message: msg,
-    time:    new Date().toLocaleString('fr-FR', {timeZone:'Asia/Manila'})
+  fetch(SUPA_FN + '/send-contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nom:     nom,
+      contact: contact,
+      sujet:   sujet || 'Message via site web',
+      message: msg,
+      time:    new Date().toLocaleString('fr-FR', {timeZone:'Asia/Manila'})
+    })
   })
-  .then(function() {
+  .then(function(r) { return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+  .then(function(res) {
+    if (!res.ok) throw new Error(res.data.error || 'Erreur serveur');
     showToast('✅ Message envoyé !', 'Notre équipe vous répondra sous 24h. Merci ' + nom + ' !');
     ['cf-nom','cf-contact','cf-sujet','cf-message'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
@@ -4718,7 +4722,7 @@ function sendContactForm() {
   })
   .catch(function(err) {
     console.error('Contact form error:', err);
-    showToast('⚠️ Erreur envoi', 'Code ' + (err.status||'?') + '. Réessayez ou écrivez-nous directement.');
+    showToast('⚠️ Erreur envoi', 'Réessayez ou écrivez-nous directement à notifications.gcccargo@gmail.com');
   })
   .finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = 'Envoyer le message →'; }
@@ -4730,28 +4734,27 @@ function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
     console.warn('sendEmailNotif: pas d\'email pour', ref);
     return;
   }
-  if (typeof emailjs === 'undefined') {
-    console.error('sendEmailNotif: EmailJS SDK non chargé');
-    showToast('⚠️ Erreur email', 'SDK EmailJS non disponible.');
-    return;
-  }
-  var params = {
-    to_email:   emailExp.trim(),
-    expediteur: expediteurNom || 'Client',
-    ref:        ref || '',
-    statut:     statut || '',
-    note:       note || ''
-  };
-  console.log('EmailJS send:', params);
-  emailjs.send('service_zeagk6m', 'template_2a8sadf', params)
-    .then(function(resp) {
-      console.log('EmailJS success:', resp);
-      showToast('📧 Email envoyé', 'Notification envoyée à ' + (expediteurNom || ref) + '.');
+  fetch(SUPA_FN + '/send-notif', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      to_email:   emailExp.trim(),
+      expediteur: expediteurNom || 'Client',
+      ref:        ref || '',
+      statut:     statut || '',
+      note:       note || ''
     })
-    .catch(function(err) {
-      console.error('EmailJS error:', JSON.stringify(err));
-      showToast('⚠️ Erreur email', 'Code ' + (err.status || '?') + ' — ' + (err.text || 'Erreur inconnue'));
-    });
+  })
+  .then(function(r) { return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+  .then(function(res) {
+    if (!res.ok) throw new Error(res.data.error || 'Erreur serveur');
+    console.log('Notification envoyée:', res.data.id);
+    showToast('📧 Email envoyé', 'Notification envoyée à ' + (expediteurNom || ref) + '.');
+  })
+  .catch(function(err) {
+    console.error('sendEmailNotif error:', err);
+    showToast('⚠️ Erreur email', 'La notification n\'a pas pu être envoyée.');
+  });
 }
 
 function doUpdate(){
