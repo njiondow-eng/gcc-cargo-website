@@ -4520,6 +4520,41 @@ function doLogout() {
 <!-- TOAST -->
 <div class="toast" id="toast"><strong id="toast-title"></strong><span id="toast-msg"></span></div>
 
+<!-- ═══ MODAL CONFIRMATION CONTACT ═══ -->
+<div id="contact-confirm-overlay" style="display:none;position:fixed;inset:0;z-index:1200;background:rgba(11,31,58,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:16px;max-width:460px;width:100%;box-shadow:0 24px 64px rgba(11,31,58,.28);overflow:hidden;animation:cfadeIn .3s ease;">
+    <!-- Header vert -->
+    <div style="background:linear-gradient(135deg,#1e7e34,#2E7D32);padding:28px 32px 24px;text-align:center;">
+      <div style="width:64px;height:64px;background:rgba(255,255,255,.18);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px;">✅</div>
+      <h2 style="color:#fff;font-size:1.3rem;font-weight:900;margin:0 0 6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.03em;">Message envoyé !</h2>
+      <p style="color:rgba(255,255,255,.85);font-size:.88rem;margin:0;">Votre demande a bien été transmise à notre équipe.</p>
+    </div>
+    <!-- Corps -->
+    <div style="padding:28px 32px;">
+      <div style="background:#f0faf2;border-left:4px solid #2E7D32;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px;">
+        <p style="color:#1e5128;font-size:.92rem;margin:0;line-height:1.6;">
+          <strong>Bonjour <span id="cf-confirm-nom"></span> 👋</strong><br>
+          Nous avons bien reçu votre message et nous vous répondrons dans les <strong>24 à 48 heures</strong> via l'adresse ou le numéro que vous avez fourni.
+        </p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:12px 16px;background:#f4f6fb;border-radius:10px;margin-bottom:22px;">
+        <span style="font-size:1.4rem;">📞</span>
+        <div>
+          <div style="font-size:.78rem;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Besoin urgent ?</div>
+          <div style="font-size:.88rem;color:#0B1F3A;font-weight:700;">WhatsApp : <a href="https://wa.me/639XXXXXXXXX" style="color:#E87722;">+63 9XX XXX XXXX</a></div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('contact-confirm-overlay').style.display='none'" style="width:100%;background:#0B1F3A;color:#fff;border:none;border-radius:10px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes cfadeIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+#contact-confirm-overlay.open{display:flex!important;}
+</style>
+
 <!-- MODALE CONFIRMATION SOUMISSION -->
 <div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(11,31,58,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;padding:40px 32px 32px;text-align:center;box-shadow:0 32px 100px rgba(0,0,0,.45);position:relative;animation:confirmPop .35s cubic-bezier(.34,1.56,.64,1) both;">
@@ -4715,7 +4750,11 @@ function sendContactForm() {
   .then(function(r) { return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
   .then(function(res) {
     if (!res.ok) throw new Error(res.data.error || 'Erreur serveur');
-    showToast('✅ Message envoyé !', 'Notre équipe vous répondra sous 24h. Merci ' + nom + ' !');
+    // Afficher le modal de confirmation
+    var confirmEl = document.getElementById('cf-confirm-nom');
+    if (confirmEl) confirmEl.textContent = nom;
+    var overlay = document.getElementById('contact-confirm-overlay');
+    if (overlay) { overlay.style.display = 'flex'; }
     ['cf-nom','cf-contact','cf-sujet','cf-message'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
     });
