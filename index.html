@@ -147,6 +147,7 @@ nav{
 /* ─── Modal notification ─────────────────────────────────────── */
 #notif-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;padding:20px;}
 #notif-modal.open{display:flex;}
+#retard-modal.open{display:flex;}
 .notif-box{background:#1a2a3a;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:28px 24px;width:100%;max-width:360px;position:relative;}
 .notif-box h3{margin:0 0 6px;font-size:1.05rem;color:#fff;}
 .notif-box .notif-sub{font-size:.8rem;color:#90caf9;margin-bottom:18px;}
@@ -1657,6 +1658,8 @@ function doAdminLogin() {
         + '<td style="white-space:nowrap;">'
         + '<button class="notif-btn adm-statut-btn" data-i="' + i + '" title="Changer statut" style="background:var(--navy);margin-bottom:4px;">🔄 Statut</button><br>'
         + '<button class="notif-btn adm-email-btn" data-i="' + i + '" title="Notifier client" style="background:var(--sky);margin-bottom:4px;">📧 Email</button><br>'
+        + '<button class="notif-btn adm-recu-btn" data-i="' + i + '" title="Confirmer réception au client" style="background:#22c55e;margin-bottom:4px;">✅ Reçu</button><br>'
+        + '<button class="notif-btn adm-retard-btn" data-i="' + i + '" title="Notifier retard d\'embarquement" style="background:#f59e0b;margin-bottom:4px;">⏳ Retard</button><br>'
         + '<button class="notif-btn adm-edit-btn" data-i="' + i + '" title="Éditer" style="background:#2e7d32;margin-bottom:4px;">✏️ Éditer</button><br>'
         + '<button class="notif-btn adm-del-btn" data-i="' + i + '" title="Supprimer" style="background:#e74c3c;">🗑 Suppr.</button>'
         + '</td></tr>';
@@ -1669,6 +1672,30 @@ function doAdminLogin() {
         var idx = parseInt(this.getAttribute('data-i'));
         var s = _submissions[idx];
         if (s) sendEmailNotif(s.ref, s.expediteur||'', s.email_exp||'', s.statut, '');
+      });
+    });
+    tbody.querySelectorAll('.adm-recu-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var s = _submissions[idx];
+        if (!s) return;
+        if (!s.email_exp || !s.email_exp.trim()) {
+          showToast('⚠️ Pas d\'email', 'Ce client n\'a pas fourni d\'adresse email.');
+          return;
+        }
+        sendEmailType(s, 'confirmation_reception');
+      });
+    });
+    tbody.querySelectorAll('.adm-retard-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-i'));
+        var s = _submissions[idx];
+        if (!s) return;
+        if (!s.email_exp || !s.email_exp.trim()) {
+          showToast('⚠️ Pas d\'email', 'Ce client n\'a pas fourni d\'adresse email.');
+          return;
+        }
+        openRetardModal(idx);
       });
     });
     tbody.querySelectorAll('.adm-del-btn').forEach(function(btn) {
@@ -4768,6 +4795,90 @@ function sendContactForm() {
   });
 }
 
+/* ── Envoi email typé (confirmation_reception / retard_embarquement) ── */
+function sendEmailType(s, type) {
+  var payload = {
+    to_email:   s.email_exp.trim(),
+    expediteur: s.expediteur || 'Client',
+    ref:        s.ref || '',
+    destination: s.destination || '',
+    type:       type
+  };
+  fetch(SUPA_FN + '/send-notif', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+  .then(function(res) {
+    if (!res.ok) throw new Error(res.data.error || 'Erreur serveur');
+    var label = type === 'confirmation_reception' ? '✅ Confirmation envoyée' : '⏳ Notification retard envoyée';
+    showToast(label, 'Email envoyé à ' + (s.expediteur || s.ref) + '.');
+  })
+  .catch(function(err) {
+    console.error('sendEmailType error:', err);
+    showToast('⚠️ Erreur email', 'La notification n\'a pas pu être envoyée.');
+  });
+}
+
+/* ── Modal retard d'embarquement ── */
+var _retardIdx = null;
+function openRetardModal(idx) {
+  _retardIdx = idx;
+  var s = _submissions[idx];
+  var modal = document.getElementById('retard-modal');
+  if (!modal) return;
+  var info = modal.querySelector('#retard-modal-info');
+  if (info) info.textContent = 'Colis ' + (s.ref || '') + ' — ' + (s.expediteur || '') + (s.destination ? ' → ' + s.destination : '');
+  var msg = modal.querySelector('#retard-msg');
+  if (msg) msg.value = '';
+  var date = modal.querySelector('#retard-date');
+  if (date) date.value = '';
+  modal.classList.add('open');
+  setTimeout(function(){ if (msg) msg.focus(); }, 100);
+}
+function closeRetardModal() {
+  var modal = document.getElementById('retard-modal');
+  if (modal) modal.classList.remove('open');
+  _retardIdx = null;
+}
+function sendRetardEmail() {
+  if (_retardIdx === null) return;
+  var s = _submissions[_retardIdx];
+  if (!s) return;
+  var msg  = (document.getElementById('retard-msg') || {}).value || '';
+  var date = (document.getElementById('retard-date') || {}).value || '';
+  var payload = {
+    to_email:        s.email_exp.trim(),
+    expediteur:      s.expediteur || 'Client',
+    ref:             s.ref || '',
+    destination:     s.destination || '',
+    type:            'retard_embarquement',
+    message_retard:  msg.trim(),
+    nouvelle_date:   date.trim()
+  };
+  var btn = document.getElementById('retard-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+  fetch(SUPA_FN + '/send-notif', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+  .then(function(res) {
+    if (!res.ok) throw new Error(res.data.error || 'Erreur serveur');
+    showToast('⏳ Notification envoyée', 'Email retard envoyé à ' + (s.expediteur || s.ref) + '.');
+    closeRetardModal();
+  })
+  .catch(function(err) {
+    console.error('sendRetardEmail error:', err);
+    showToast('⚠️ Erreur email', 'La notification n\'a pas pu être envoyée.');
+  })
+  .finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer la notification'; }
+  });
+}
+
 function sendEmailNotif(ref, expediteurNom, emailExp, statut, note) {
   if (!emailExp || !emailExp.trim()) {
     console.warn('sendEmailNotif: pas d\'email pour', ref);
@@ -4941,6 +5052,12 @@ function doUpdate(){
     if (modal) {
       modal.addEventListener('click', function(e) {
         if (e.target === modal) closeNotifyModal();
+      });
+    }
+    var retardModal = document.getElementById('retard-modal');
+    if (retardModal) {
+      retardModal.addEventListener('click', function(e) {
+        if (e.target === retardModal) closeRetardModal();
       });
     }
   });
@@ -5769,6 +5886,26 @@ function doUpdate(){
     <button class="parrain-submit" id="parrain-submit-btn" onclick="submitParrain()">🤝 Obtenir mon code parrain</button>
     <div style="text-align:center;margin-top:10px;">
       <button onclick="closeParrainModal()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;font-family:'Barlow',sans-serif;">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL RETARD D'EMBARQUEMENT (ADMIN) ═══ -->
+<div id="retard-modal" role="dialog" aria-modal="true" aria-label="Notifier un retard d'embarquement" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:4000;align-items:center;justify-content:center;padding:20px;display:none;">
+  <div style="background:#1a2a3a;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:28px 24px;width:100%;max-width:420px;position:relative;">
+    <button onclick="closeRetardModal()" title="Fermer" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+    <h3 style="margin:0 0 4px;font-size:1.05rem;color:#fff;">⏳ Retard d'embarquement</h3>
+    <div id="retard-modal-info" style="font-size:.82rem;color:rgba(214,237,251,.6);margin-bottom:18px;"></div>
+
+    <label style="display:block;font-size:.8rem;color:rgba(255,255,255,.65);margin-bottom:5px;">Raison du retard <span style="color:rgba(255,255,255,.35)">(optionnel — un message par défaut sera envoyé si vide)</span></label>
+    <textarea id="retard-msg" rows="4" placeholder="Ex : Problème de capacité sur le vol du 28/11. Votre colis partira au prochain départ disponible..." style="width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;padding:10px 12px;font-size:.9rem;resize:vertical;font-family:inherit;"></textarea>
+
+    <label style="display:block;font-size:.8rem;color:rgba(255,255,255,.65);margin:12px 0 5px;">Nouvelle date d'embarquement prévue <span style="color:rgba(255,255,255,.35)">(optionnel)</span></label>
+    <input id="retard-date" type="text" placeholder="Ex : 05 décembre 2026" style="width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;padding:10px 12px;font-size:.9rem;font-family:inherit;">
+
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button onclick="closeRetardModal()" style="flex:1;padding:11px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);cursor:pointer;font-size:.9rem;">Annuler</button>
+      <button id="retard-send-btn" onclick="sendRetardEmail()" style="flex:2;padding:11px;border-radius:8px;border:none;background:#f59e0b;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;">Envoyer la notification</button>
     </div>
   </div>
 </div>
